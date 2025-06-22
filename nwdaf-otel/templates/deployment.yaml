@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Job
+kind: Deployment
 metadata:
   name: {{ include "nwdaf-otel.fullname" . }}
   labels:
