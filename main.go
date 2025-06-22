@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"crypto/tls"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
 
 // TODO: add logger & metrics
 func main() {
@@ -22,4 +28,19 @@ func main() {
 	//}
 	//// TODO: Setup NRF
 	fmt.Println("Hello World")
+
+	nrfClientTransport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	nrfClient := http.Client{
+		Timeout:   time.Second * 5,
+		Transport: nrfClientTransport,
+	}
+	res, err := nrfClient.Get("https://nrf:29510/nnrf-nfm/v1/nf-instances?limit=10")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	fmt.Println(res.StatusCode)
+	fmt.Println("Successfully connected NRF client and ready to register.")
 }
