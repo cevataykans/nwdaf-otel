@@ -30,7 +30,8 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_BOT_ACCESS }}
       - name: Build & Publish
+        env:
+          PLATFORM_TAG: ${{ matrix.os == 'ubuntu-latest' && 'amd-latest' || 'arm-latest' }}
         run: |
-          echo "PLATFORM_TAG=${{ matrix.os == 'ubuntu-latest' && 'amd-latest' || 'arm-latest' }}" >> $GITHUB_ENV
           docker build -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.PLATFORM_TAG }} --target release .
           docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.PLATFORM_TAG }}
