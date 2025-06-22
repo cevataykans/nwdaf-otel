@@ -25,6 +25,8 @@ jobs:
       - name: Set up Docker
         if: matrix.os == 'macos-latest'
         uses: docker/setup-docker-action@v4
+        env:
+          LIMA_START_ARGS: --cpus 4 --memory 8
       - name: Test
         run: echo "Hello ${{ matrix.os }}"
       - uses: actions/checkout@v4
