@@ -1,0 +1,27 @@
+name: publish.yml
+on:
+  workflow_call:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish_image:
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest ]
+    permissions:
+      contents: read
+    name: Publish Docker Image ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Test
+        run: echo "Hello ${{ matrix.os }}"
+      - uses: actions/checkout@v4
+      - name: Test Docker
+        run: docker image ls
+
