@@ -14,11 +14,12 @@ import (
 func main() {
 	// TODO: parse flags -> path for config
 
-	fmt.Println("Hello World")
+	log.Println("Hello World")
 
 	srv := server.NewAnalyticsInfoServer()
 	srv.Setup()
 	errChan := srv.Start()
+	log.Println("Server started")
 
 	nrfClientTransport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -45,4 +46,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Application Finished!")
 }
