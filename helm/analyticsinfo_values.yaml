@@ -11,13 +11,13 @@ image:
   # This sets the pull policy for images.
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "amd-latest"
+  tag: "analyticsinfo-amd-latest"
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
-nameOverride: "nwdaf"
-fullnameOverride: "nwdaf"
+nameOverride: "nwdaf-analytics-info"
+fullnameOverride: "nwdaf-analytics-info"
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
