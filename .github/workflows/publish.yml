@@ -19,6 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-24.04-arm, ubuntu-latest ]
+        server: [ analyticsinfo ]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -35,5 +36,5 @@ jobs:
         env:
           PLATFORM_TAG: ${{ matrix.os == 'ubuntu-latest' && 'amd-latest' || 'arm-latest' }}
         run: |
-          docker build -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.PLATFORM_TAG }} --target release .
-          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.PLATFORM_TAG }}
+          docker build -f cmd/${{ matrix.server }}/Dockerfile -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }} --target release .
+          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}

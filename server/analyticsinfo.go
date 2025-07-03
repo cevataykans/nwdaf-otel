@@ -1,36 +1,39 @@
-package nwdaf
+package server
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
+	analyticsinfoAPI "nwdaf-otel/generated/analyticsinfo"
+	"nwdaf-otel/server/analyticsinfo"
 )
 
-type analyticsInfoService struct {
+// TODO: accept a config, that will point to port, certificate e.g. options
+type analyticsInfoServer struct {
+	mux *mux.Router
 }
 
-// TODO: decide if analytics subscription transfer not supported ?
-func (s *analyticsInfoService) Setup(mux *http.ServeMux) {
-	mux.HandleFunc("/nnwdaf-analyticsinfo/v1/analytics", s.handleGetAnalytics)
-	mux.HandleFunc("/nnwdaf-analyticsinfo/v1/context", s.handleGetContext)
+func NewAnalyticsInfoServer() Server {
+	return &analyticsInfoServer{mux: nil}
 }
 
-func (s *analyticsInfoService) handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	// TODO: parse query params, execute logic
-	w.WriteHeader(http.StatusNoContent) // if requested analytics is not found
-	w.WriteHeader(http.StatusOK)        // if content is found
+func (s *analyticsInfoServer) Setup() {
+	analyticsDocumentService := analyticsinfo.NewNWDAFAnalyticsDocumentAPIService()
+	analyticsDocumentController := analyticsinfo.NewNWDAFAnalyticsDocumentAPIController(analyticsDocumentService)
+	contextDocumentService := analyticsinfo.NewNWDAFContextDocumentAPIService()
+	contextDocumentController := analyticsinfo.NewNWDAFContextDocumentAPIController(contextDocumentService)
+	s.mux = analyticsinfoAPI.NewRouter(analyticsDocumentController, contextDocumentController)
 }
 
-func (s *analyticsInfoService) handleGetContext(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	// TODO: parse query params, execute logic
-	w.WriteHeader(http.StatusNoContent) // if requested context is not found
-	w.WriteHeader(http.StatusOK)        // if context is found
+func (s *analyticsInfoServer) Start() chan error {
+	errChan := make(chan error)
+	go func() {
+		// TODO: get PORT from config
+		// TODO: configure TLS, use mkcert certificates
+		srv := http.Server{
+			Addr:    ":8080",
+			Handler: s.mux,
+		}
+		errChan <- srv.ListenAndServe()
+	}()
+	return errChan
 }

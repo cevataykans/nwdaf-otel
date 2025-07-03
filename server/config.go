@@ -1,4 +1,4 @@
-package nwdaf
+package server
 
 type Config struct {
 }
