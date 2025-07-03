@@ -23,6 +23,13 @@ func (s *analyticsInfoServer) Setup() {
 	contextDocumentService := analyticsinfo.NewNWDAFContextDocumentAPIService()
 	contextDocumentController := analyticsinfo.NewNWDAFContextDocumentAPIController(contextDocumentService)
 	s.mux = analyticsinfoAPI.NewRouter(analyticsDocumentController, contextDocumentController)
+
+	// Handle health check probes
+	s.mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		r.Body.Close()
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 	log.Println("Server setup complete")
 }
 
