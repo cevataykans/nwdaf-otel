@@ -1,0 +1,115 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: simplest
+spec:
+  managementState: managed
+  image: "otel/opentelemetry-collector:latest"
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: 'otel-collector'
+              scrape_interval: 10s
+              static_configs:
+                - targets: ['otel-collector:8888']
+    processors:
+      batch:
+        timeout: 1s            # Adjust the timeout to allow more time for processing
+        send_batch_size: 4096    # Set a higher send batch size to handle more traces at once
+      attributes/trace:
+        actions:
+          - key: response_flags
+            action: delete
+          - key: upstream_cluster
+            action: delete
+          - key: downstream_cluster
+            action: delete
+          - key: http.protocol
+            action: delete
+          - key: istio.canonical_revision
+            action: delete
+          - key: istio.mesh_id
+            action: delete
+          - key: node_id
+            action: delete
+          - key: upstream_cluster.name
+            action: delete
+          - key: user_agent
+            action: delete
+          - key: zone
+            action: delete
+          - key: span.kind
+            action: delete
+          - key: istio.namespace
+            action: delete
+          - key: guid:x-request-id
+            action: delete
+          - key: component
+            action: delete
+
+      filter/traces:
+        spans:
+          exclude:
+            match_type: strict
+            attributes:
+              #- key: grpc.authority
+              # value: "webui:9876"
+              #- key: k8s.pod.service_name
+              #  value: "webui.aether-5gc"
+              - key: istio.canonical_service
+                value: "simapp"
+
+              #error_mode: ignore
+              #traces:
+              #span:
+              #- IsMatch(resource.attributes["k8s.pod.name"], "my-pod-name.*")
+      memory_limiter:
+        limit_mib: 12000  # Increase memory limit
+        check_interval: 1s
+        spike_limit_mib: 2048
+        #  batch:
+        #send_batch_size: 1000
+        #timeout: 5s
+        #queued_retry:
+        #num_workers: 4
+        #queue_size: 10000  # Increase queue size
+    exporters:
+      prometheus:
+        endpoint: "0.0.0.0:9090" #"http://prometheus.monitoring.svc.cluster.local:9090"
+          #tls:
+        #insecure: true
+      otlp:
+        endpoint: "http://jaeger-collector.default.svc.cluster.local:4317"
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s  # Delay before first retry
+          max_interval: 30s     # Maximum delay between retries
+          max_elapsed_time: 300s # Maximum total retry duration
+        sending_queue:
+          enabled: true
+          num_consumers: 4       # Number of workers retrying spans
+          queue_size: 10000      # Large buffer to store spans before dropping
+    service:
+      telemetry:
+        metrics:
+          level: detailed
+#          address: "0.0.0.0:9090"
+        logs:
+          level: info #debug
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch, filter/traces, attributes/trace , memory_limiter ]    # filter/traces] #, queued_retry] #, resource]
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp, prometheus]
+          processors: [batch]
+          exporters: [prometheus]

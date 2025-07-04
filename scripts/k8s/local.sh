@@ -37,9 +37,9 @@ kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releas
 sleep 3m
 
 echo "****** FILTERED ELASTIC INSTALLATION ******"
-kubectl apply -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+kubectl apply -f scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
 echo "****** JAEGER CONFIG INSTALLATION ******"
-kubectl apply -f ~/jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
+kubectl apply -f scripts/jaeger_config.yaml
 
 cd "$ISTIO_DIR"
 echo "****** ISTIO INSTALLATION ******"
