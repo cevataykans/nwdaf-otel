@@ -7,8 +7,20 @@ current_dir=$(pwd)
 ISTIO_DIR=/home/sevinc/jungmann/istio
 AETHER_DIR=/home/sevinc/aether-onramp/
 
+echo "****** AETHER UNINSTALLATION ******"
+cd "$AETHER_DIR"
+#make aether-ueransim-uninstall
+make aether-amp-uninstall
+make aether-5gc-uninstall
+cd "$current_dir"
+
+cd "$ISTIO_DIR"
+echo "****** REMOVE ISTIO ******"
+kubectl delete -f istio-1.17.8/istio-telemetry.yaml -n istio-system
+cd "$current_dir"
+
 echo "****** REMOVE JAEGER CONFIG ******"
-kubectl delete -f ~/jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
+kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
 
 echo "****** REMOVE FILTERED ELASTIC ******"
 kubectl delete -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
@@ -22,9 +34,10 @@ echo "****** REMOVE CERT MANAGER ******"
 kubectl delete -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 sleep 1m
 
+echo "Checking all remaining pods before k8s uninstallation ..."
+kubectl get pods --all-namespaces
+
 cd "$AETHER_DIR"
 echo "****** REMOVE K8S ******"
 make aether-k8s-uninstall
 cd "$current_dir"
-
-sleep 30s

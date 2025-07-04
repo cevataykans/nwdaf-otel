@@ -1,0 +1,1 @@
+kubectl port-forward svc/jaeger-query 16686 --address 0.0.0.0 -n default
