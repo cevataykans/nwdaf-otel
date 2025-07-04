@@ -1,0 +1,139 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger-collector
+spec:
+  replicas: 12
+  selector:
+    matchLabels:
+      app: jaeger-collector
+  template:
+    metadata:
+      labels:
+        app: jaeger-collector
+    spec:
+      containers:
+        - name: jaeger-collector
+          image: jaegertracing/jaeger-collector:1.70.0
+          env:
+            - name: SPAN_STORAGE_TYPE
+              value: "elasticsearch"
+            - name: ES_SERVER_URLS
+              value: "http://elasticsearch-master:9200"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+            - name: COLLECTOR_QUEUE_SIZE
+              value: "100000"
+          ports:
+            - containerPort: 14269
+            - containerPort: 4317
+            - containerPort: 4318
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger-query
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger-query
+  template:
+    metadata:
+      labels:
+        app: jaeger-query
+    spec:
+      containers:
+        - name: jaeger-query
+          image: jaegertracing/jaeger-query:1.70.0
+          env:
+            - name: SPAN_STORAGE_TYPE
+              value: "elasticsearch"
+            - name: ES_SERVER_URLS
+              value: "http://elasticsearch-master:9200"
+          ports:
+            - containerPort: 16686
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-collector
+spec:
+  selector:
+    app: jaeger-collector
+  ports:
+    - name: http-metrics
+      port: 14269
+      targetPort: 14269
+    - name: grpc
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-query
+spec:
+  selector:
+    app: jaeger-query
+  ports:
+    - name: ui
+      port: 16686
+      targetPort: 16686
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-master
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9200
+      targetPort: 9200
+    - name: transport
+      protocol: TCP
+      port: 9300
+      targetPort: 9300
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: ES_JAVA_OPTS
+              value: "-Xms2g -Xmx2g"
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+          resources:
+            requests:
+              memory: 4Gi
+              #cpu: 0.3
+            limits:
+              memory: 12Gi

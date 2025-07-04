@@ -34,7 +34,7 @@ sleep 1m
 echo "****** OTEL INSTALLATION ******"
 #kubectl apply -f otel_operator_go_dec.yaml
 kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
-sleep 2m
+sleep 3m
 
 echo "****** FILTERED ELASTIC INSTALLATION ******"
 kubectl apply -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
