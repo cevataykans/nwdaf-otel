@@ -8,12 +8,12 @@ ISTIO_DIR=/home/sevinc/jungmann/istio
 AETHER_DIR=/home/sevinc/aether-onramp/
 
 echo "****** REMOVE JAEGER CONFIG ******"
-kubectl delete -f jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
+kubectl delete -f ~/jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
 
-echo "****** FILTERED ELASTIC INSTALLATION ******"
-kubectl delete -f jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+echo "****** REMOVE FILTERED ELASTIC ******"
+kubectl delete -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
 
-echo "****** REMOVE OTEL INSTALLATION ******"
+echo "****** REMOVE OTEL ******"
 #kubectl delete -f otel_operator_go_dec.yaml
 kubectl delete -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
 sleep 2m

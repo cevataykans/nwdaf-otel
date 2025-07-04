@@ -18,7 +18,7 @@ cd "$current_dir"
 
 sleep 30s
 
-# TODO add if amchine should be integrated in the cluster
+# TODO add if machine should be integrated in the cluster
 # copy kubeconfig to cmvm7
 #scp -i ~/.ssh/cmvm7_key ~/.kube/config jungmann@cmvm7.cit.tum.de:~/.kube/config
 #ssh -i ~/.ssh/cmvm7_key  jungmann@cmvm7.cit.tum.de "sudo rm -rf /opt/local-path-provisioner/; sudo mkdir /opt/local-path-provisioner/"
@@ -37,9 +37,9 @@ kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releas
 sleep 2m
 
 echo "****** FILTERED ELASTIC INSTALLATION ******"
-kubectl apply -f jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+kubectl apply -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
 echo "****** JAEGER CONFIG INSTALLATION ******"
-kubectl apply -f jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
+kubectl apply -f ~/jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
 
 cd "$ISTIO_DIR"
 echo "****** ISTIO INSTALLATION ******"
@@ -57,7 +57,7 @@ make aether-amp-install
 cd "$current_dir"
 
 echo "****** REMOVING ISTIO FROM MET ******"
-bash jungmann/setup_scripts/remove_istio_from_met_nf.sh
+bash ~/jungmann/setup_scripts/remove_istio_from_met_nf.sh
 echo "****** PORT FORWARDING JAEGER ******"
-bash jungmann/setup_scripts/port-forward.sh &
+bash ~/jungmann/setup_scripts/port-forward.sh &
 #bash ./injection.sh
