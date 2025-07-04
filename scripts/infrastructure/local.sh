@@ -12,6 +12,7 @@ sudo rm -rf /opt/local-path-provisioner/
 sudo mkdir /opt/local-path-provisioner/
 
 cd "$AETHER_DIR"
+echo "****** K8S INSTALLATION ******"
 make aether-k8s-install
 cd "$current_dir"
 
@@ -26,28 +27,37 @@ sleep 30s
 #ssh -i ~/.ssh/cmvm7_key  jungmann@cmvm7.cit.tum.de "sudo ip route add 192.168.252.0/24 via 131.159.25.123 dev ens192; sudo ip route add 192.168.250.0/24 via 131.159.25.123 dev ens192"
 #ssh -i ~/.ssh/cmvm7_key  jungmann@cmvm8.cit.tum.de "sudo ip route add 192.168.252.0/24 via 131.159.25.123 dev ens192; sudo ip route add 192.168.250.0/24 via 131.159.25.123 dev ens192"
 
+echo "****** CERT MANAGER INSTALLATION ******"
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 sleep 1m
 
+echo "****** OTEL INSTALLATION ******"
 #kubectl apply -f otel_operator_go_dec.yaml
 kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
 sleep 2m
 
+echo "****** FILTERED ELASTIC INSTALLATION ******"
 kubectl apply -f jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+echo "****** JAEGER CONFIG INSTALLATION ******"
 kubectl apply -f jungmann/setup_scripts/jaeger_config_3.yaml       #jaeger_config.yaml
 
 cd "$ISTIO_DIR"
+echo "****** ISTIO INSTALLATION ******"
 sh install_istio.sh
 cd "$current_dir"
 
 sleep 1m
 
 cd "$AETHER_DIR"
+echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
+echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
 #make aether-ueransim-install
 cd "$current_dir"
 
+echo "****** REMOVING ISTIO FROM MET ******"
 bash jungmann/setup_scripts/remove_istio_from_met_nf.sh
+echo "****** PORT FORWARDING JAEGER ******"
 bash jungmann/setup_scripts/port-forward.sh &
 #bash ./injection.sh
