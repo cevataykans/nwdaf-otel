@@ -41,23 +41,23 @@ kubectl apply -f scripts/collector_filtered_elastic.yaml   # collector_filtered.
 echo "****** JAEGER CONFIG INSTALLATION ******"
 kubectl apply -f scripts/jaeger_config.yaml
 
-cd "$ISTIO_DIR"
-echo "****** ISTIO INSTALLATION ******"
-sh install_istio.sh
-cd "$current_dir"
-
-sleep 1m
-
-cd "$AETHER_DIR"
-echo "****** AETHER 5GC INSTALLATION ******"
-make aether-5gc-install
-echo "****** AETHER AMP INSTALLATION ******"
-make aether-amp-install
-#make aether-ueransim-install
-cd "$current_dir"
-
-echo "****** REMOVING ISTIO FROM MET ******"
-bash ~/jungmann/setup_scripts/remove_istio_from_met_nf.sh
-echo "****** PORT FORWARDING JAEGER ******"
-bash ~/jungmann/setup_scripts/port-forward.sh &
-#bash ./injection.sh
+#cd "$ISTIO_DIR"
+#echo "****** ISTIO INSTALLATION ******"
+#sh install_istio.sh
+#cd "$current_dir"
+#
+#sleep 1m
+#
+#cd "$AETHER_DIR"
+#echo "****** AETHER 5GC INSTALLATION ******"
+#make aether-5gc-install
+#echo "****** AETHER AMP INSTALLATION ******"
+#make aether-amp-install
+##make aether-ueransim-install
+#cd "$current_dir"
+#
+#echo "****** REMOVING ISTIO FROM MET ******"
+#bash ~/jungmann/setup_scripts/remove_istio_from_met_nf.sh
+#echo "****** PORT FORWARDING JAEGER ******"
+#bash ~/jungmann/setup_scripts/port-forward.sh &
+##bash ./injection.sh
