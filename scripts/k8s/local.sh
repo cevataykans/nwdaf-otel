@@ -56,8 +56,8 @@ make aether-amp-install
 #make aether-ueransim-install
 cd "$current_dir"
 
-echo "****** REMOVING ISTIO FROM MET ******"
-bash ~/jungmann/setup_scripts/remove_istio_from_met_nf.sh
-echo "****** PORT FORWARDING JAEGER ******"
-bash ~/jungmann/setup_scripts/port-forward.sh &
+#echo "****** REMOVING ISTIO FROM MET ******"
+#bash scripts/k8s/remove_istio_from_met_nf.sh
+#echo "****** PORT FORWARDING JAEGER ******"
+#bash scripts/k8s/port-forward.sh &
 #bash ./injection.sh
