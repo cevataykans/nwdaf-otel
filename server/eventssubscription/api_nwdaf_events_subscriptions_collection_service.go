@@ -12,8 +12,9 @@ package eventssubscription
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
+	eventssubscriptionAPI "nwdaf-otel/generated/eventssubscription"
 )
 
 // NWDAFEventsSubscriptionsCollectionAPIService is a service that implements the logic for the NWDAFEventsSubscriptionsCollectionAPIServicer
@@ -28,7 +29,7 @@ func NewNWDAFEventsSubscriptionsCollectionAPIService() *NWDAFEventsSubscriptions
 }
 
 // CreateNWDAFEventsSubscription - Create a new Individual NWDAF Events Subscription
-func (s *NWDAFEventsSubscriptionsCollectionAPIService) CreateNWDAFEventsSubscription(ctx context.Context, nnwdafEventsSubscription NnwdafEventsSubscription) (ImplResponse, error) {
+func (s *NWDAFEventsSubscriptionsCollectionAPIService) CreateNWDAFEventsSubscription(ctx context.Context, nnwdafEventsSubscription eventssubscriptionAPI.NnwdafEventsSubscription) (eventssubscriptionAPI.ImplResponse, error) {
 	// TODO - update CreateNWDAFEventsSubscription with the required logic for this service method.
 	// Add api_nwdaf_events_subscriptions_collection_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -68,5 +69,5 @@ func (s *NWDAFEventsSubscriptionsCollectionAPIService) CreateNWDAFEventsSubscrip
 	// TODO: Uncomment the next line to return response Response(0, {}) or use other options such as http.Ok ...
 	// return Response(0, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("CreateNWDAFEventsSubscription method not implemented")
+	return eventssubscriptionAPI.Response(http.StatusNotImplemented, nil), errors.New("CreateNWDAFEventsSubscription method not implemented")
 }

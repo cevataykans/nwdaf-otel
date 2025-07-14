@@ -13,30 +13,31 @@ package eventssubscription
 import (
 	"encoding/json"
 	"net/http"
+	eventssubscriptionAPI "nwdaf-otel/generated/eventssubscription"
 	"strings"
 )
 
 // NWDAFEventSubscriptionTransfersCollectionAPIController binds http requests to an api service and writes the service results to the http response
 type NWDAFEventSubscriptionTransfersCollectionAPIController struct {
-	service NWDAFEventSubscriptionTransfersCollectionAPIServicer
-	errorHandler ErrorHandler
+	service      eventssubscriptionAPI.NWDAFEventSubscriptionTransfersCollectionAPIServicer
+	errorHandler eventssubscriptionAPI.ErrorHandler
 }
 
 // NWDAFEventSubscriptionTransfersCollectionAPIOption for how the controller is set up.
 type NWDAFEventSubscriptionTransfersCollectionAPIOption func(*NWDAFEventSubscriptionTransfersCollectionAPIController)
 
 // WithNWDAFEventSubscriptionTransfersCollectionAPIErrorHandler inject ErrorHandler into controller
-func WithNWDAFEventSubscriptionTransfersCollectionAPIErrorHandler(h ErrorHandler) NWDAFEventSubscriptionTransfersCollectionAPIOption {
+func WithNWDAFEventSubscriptionTransfersCollectionAPIErrorHandler(h eventssubscriptionAPI.ErrorHandler) NWDAFEventSubscriptionTransfersCollectionAPIOption {
 	return func(c *NWDAFEventSubscriptionTransfersCollectionAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewNWDAFEventSubscriptionTransfersCollectionAPIController creates a default api controller
-func NewNWDAFEventSubscriptionTransfersCollectionAPIController(s NWDAFEventSubscriptionTransfersCollectionAPIServicer, opts ...NWDAFEventSubscriptionTransfersCollectionAPIOption) *NWDAFEventSubscriptionTransfersCollectionAPIController {
+func NewNWDAFEventSubscriptionTransfersCollectionAPIController(s eventssubscriptionAPI.NWDAFEventSubscriptionTransfersCollectionAPIServicer, opts ...NWDAFEventSubscriptionTransfersCollectionAPIOption) *NWDAFEventSubscriptionTransfersCollectionAPIController {
 	controller := &NWDAFEventSubscriptionTransfersCollectionAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: eventssubscriptionAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -47,9 +48,9 @@ func NewNWDAFEventSubscriptionTransfersCollectionAPIController(s NWDAFEventSubsc
 }
 
 // Routes returns all the api routes for the NWDAFEventSubscriptionTransfersCollectionAPIController
-func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) Routes() Routes {
-	return Routes{
-		"CreateNWDAFEventSubscriptionTransfer": Route{
+func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) Routes() eventssubscriptionAPI.Routes {
+	return eventssubscriptionAPI.Routes{
+		"CreateNWDAFEventSubscriptionTransfer": eventssubscriptionAPI.Route{
 			"CreateNWDAFEventSubscriptionTransfer",
 			strings.ToUpper("Post"),
 			"/nnwdaf-eventssubscription/v1/transfers",
@@ -59,9 +60,9 @@ func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) Routes() Routes
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the NWDAFEventSubscriptionTransfersCollectionAPIController
-func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) OrderedRoutes() []eventssubscriptionAPI.Route {
+	return []eventssubscriptionAPI.Route{
+		eventssubscriptionAPI.Route{
 			"CreateNWDAFEventSubscriptionTransfer",
 			strings.ToUpper("Post"),
 			"/nnwdaf-eventssubscription/v1/transfers",
@@ -74,18 +75,18 @@ func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) OrderedRoutes()
 
 // CreateNWDAFEventSubscriptionTransfer - Provide information about requested analytics subscriptions transfer and potentially create a new Individual NWDAF Event Subscription Transfer resource.
 func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) CreateNWDAFEventSubscriptionTransfer(w http.ResponseWriter, r *http.Request) {
-	var analyticsSubscriptionsTransferParam AnalyticsSubscriptionsTransfer
+	var analyticsSubscriptionsTransferParam eventssubscriptionAPI.AnalyticsSubscriptionsTransfer
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&analyticsSubscriptionsTransferParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &eventssubscriptionAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertAnalyticsSubscriptionsTransferRequired(analyticsSubscriptionsTransferParam); err != nil {
+	if err := eventssubscriptionAPI.AssertAnalyticsSubscriptionsTransferRequired(analyticsSubscriptionsTransferParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertAnalyticsSubscriptionsTransferConstraints(analyticsSubscriptionsTransferParam); err != nil {
+	if err := eventssubscriptionAPI.AssertAnalyticsSubscriptionsTransferConstraints(analyticsSubscriptionsTransferParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -96,5 +97,5 @@ func (c *NWDAFEventSubscriptionTransfersCollectionAPIController) CreateNWDAFEven
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = eventssubscriptionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }

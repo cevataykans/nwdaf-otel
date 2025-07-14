@@ -13,6 +13,7 @@ package mlmodelprovision
 import (
 	"encoding/json"
 	"net/http"
+	mlmodelprovisionAPI "nwdaf-otel/generated/mlmodelprovision"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -20,25 +21,25 @@ import (
 
 // IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController binds http requests to an api service and writes the service results to the http response
 type IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController struct {
-	service IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIServicer
-	errorHandler ErrorHandler
+	service      mlmodelprovisionAPI.IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIServicer
+	errorHandler mlmodelprovisionAPI.ErrorHandler
 }
 
 // IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption for how the controller is set up.
 type IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption func(*IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController)
 
 // WithIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIErrorHandler inject ErrorHandler into controller
-func WithIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIErrorHandler(h ErrorHandler) IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption {
+func WithIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIErrorHandler(h mlmodelprovisionAPI.ErrorHandler) IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption {
 	return func(c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController creates a default api controller
-func NewIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController(s IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption) *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController {
+func NewIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController(s mlmodelprovisionAPI.IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIOption) *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController {
 	controller := &IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: mlmodelprovisionAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -49,15 +50,15 @@ func NewIndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController(s Indiv
 }
 
 // Routes returns all the api routes for the IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController
-func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Routes() Routes {
-	return Routes{
-		"UpdateNWDAFMLModelProvisionSubcription": Route{
+func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Routes() mlmodelprovisionAPI.Routes {
+	return mlmodelprovisionAPI.Routes{
+		"UpdateNWDAFMLModelProvisionSubcription": mlmodelprovisionAPI.Route{
 			"UpdateNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFMLModelProvisionSubcription,
 		},
-		"DeleteNWDAFMLModelProvisionSubcription": Route{
+		"DeleteNWDAFMLModelProvisionSubcription": mlmodelprovisionAPI.Route{
 			"DeleteNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions/{subscriptionId}",
@@ -67,15 +68,15 @@ func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Route
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController
-func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) OrderedRoutes() []mlmodelprovisionAPI.Route {
+	return []mlmodelprovisionAPI.Route{
+		mlmodelprovisionAPI.Route{
 			"UpdateNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFMLModelProvisionSubcription,
 		},
-		Route{
+		mlmodelprovisionAPI.Route{
 			"DeleteNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions/{subscriptionId}",
@@ -91,21 +92,21 @@ func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Updat
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &mlmodelprovisionAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
-	var nwdafMlModelProvSubscParam NwdafMlModelProvSubsc
+	var nwdafMlModelProvSubscParam mlmodelprovisionAPI.NwdafMlModelProvSubsc
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&nwdafMlModelProvSubscParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &mlmodelprovisionAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertNwdafMlModelProvSubscRequired(nwdafMlModelProvSubscParam); err != nil {
+	if err := mlmodelprovisionAPI.AssertNwdafMlModelProvSubscRequired(nwdafMlModelProvSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertNwdafMlModelProvSubscConstraints(nwdafMlModelProvSubscParam); err != nil {
+	if err := mlmodelprovisionAPI.AssertNwdafMlModelProvSubscConstraints(nwdafMlModelProvSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -116,7 +117,7 @@ func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Updat
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = mlmodelprovisionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
 // DeleteNWDAFMLModelProvisionSubcription - Delete an existing Individual NWDAF ML Model Provision Subscription.
@@ -124,7 +125,7 @@ func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Delet
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &mlmodelprovisionAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
 	result, err := c.service.DeleteNWDAFMLModelProvisionSubcription(r.Context(), subscriptionIdParam)
@@ -134,5 +135,5 @@ func (c *IndividualNWDAFMLModelProvisionSubscriptionDocumentAPIController) Delet
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = mlmodelprovisionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }

@@ -13,6 +13,7 @@ package eventssubscription
 import (
 	"encoding/json"
 	"net/http"
+	eventssubscriptionAPI "nwdaf-otel/generated/eventssubscription"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -20,25 +21,25 @@ import (
 
 // IndividualNWDAFEventsSubscriptionDocumentAPIController binds http requests to an api service and writes the service results to the http response
 type IndividualNWDAFEventsSubscriptionDocumentAPIController struct {
-	service IndividualNWDAFEventsSubscriptionDocumentAPIServicer
-	errorHandler ErrorHandler
+	service      eventssubscriptionAPI.IndividualNWDAFEventsSubscriptionDocumentAPIServicer
+	errorHandler eventssubscriptionAPI.ErrorHandler
 }
 
 // IndividualNWDAFEventsSubscriptionDocumentAPIOption for how the controller is set up.
 type IndividualNWDAFEventsSubscriptionDocumentAPIOption func(*IndividualNWDAFEventsSubscriptionDocumentAPIController)
 
 // WithIndividualNWDAFEventsSubscriptionDocumentAPIErrorHandler inject ErrorHandler into controller
-func WithIndividualNWDAFEventsSubscriptionDocumentAPIErrorHandler(h ErrorHandler) IndividualNWDAFEventsSubscriptionDocumentAPIOption {
+func WithIndividualNWDAFEventsSubscriptionDocumentAPIErrorHandler(h eventssubscriptionAPI.ErrorHandler) IndividualNWDAFEventsSubscriptionDocumentAPIOption {
 	return func(c *IndividualNWDAFEventsSubscriptionDocumentAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewIndividualNWDAFEventsSubscriptionDocumentAPIController creates a default api controller
-func NewIndividualNWDAFEventsSubscriptionDocumentAPIController(s IndividualNWDAFEventsSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFEventsSubscriptionDocumentAPIOption) *IndividualNWDAFEventsSubscriptionDocumentAPIController {
+func NewIndividualNWDAFEventsSubscriptionDocumentAPIController(s eventssubscriptionAPI.IndividualNWDAFEventsSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFEventsSubscriptionDocumentAPIOption) *IndividualNWDAFEventsSubscriptionDocumentAPIController {
 	controller := &IndividualNWDAFEventsSubscriptionDocumentAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: eventssubscriptionAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -49,15 +50,15 @@ func NewIndividualNWDAFEventsSubscriptionDocumentAPIController(s IndividualNWDAF
 }
 
 // Routes returns all the api routes for the IndividualNWDAFEventsSubscriptionDocumentAPIController
-func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) Routes() Routes {
-	return Routes{
-		"UpdateNWDAFEventsSubscription": Route{
+func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) Routes() eventssubscriptionAPI.Routes {
+	return eventssubscriptionAPI.Routes{
+		"UpdateNWDAFEventsSubscription": eventssubscriptionAPI.Route{
 			"UpdateNWDAFEventsSubscription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-eventssubscription/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFEventsSubscription,
 		},
-		"DeleteNWDAFEventsSubscription": Route{
+		"DeleteNWDAFEventsSubscription": eventssubscriptionAPI.Route{
 			"DeleteNWDAFEventsSubscription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-eventssubscription/v1/subscriptions/{subscriptionId}",
@@ -67,15 +68,15 @@ func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) Routes() Routes
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the IndividualNWDAFEventsSubscriptionDocumentAPIController
-func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) OrderedRoutes() []eventssubscriptionAPI.Route {
+	return []eventssubscriptionAPI.Route{
+		eventssubscriptionAPI.Route{
 			"UpdateNWDAFEventsSubscription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-eventssubscription/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFEventsSubscription,
 		},
-		Route{
+		eventssubscriptionAPI.Route{
 			"DeleteNWDAFEventsSubscription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-eventssubscription/v1/subscriptions/{subscriptionId}",
@@ -91,21 +92,21 @@ func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) UpdateNWDAFEven
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &eventssubscriptionAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
-	var nnwdafEventsSubscriptionParam NnwdafEventsSubscription
+	var nnwdafEventsSubscriptionParam eventssubscriptionAPI.NnwdafEventsSubscription
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&nnwdafEventsSubscriptionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &eventssubscriptionAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertNnwdafEventsSubscriptionRequired(nnwdafEventsSubscriptionParam); err != nil {
+	if err := eventssubscriptionAPI.AssertNnwdafEventsSubscriptionRequired(nnwdafEventsSubscriptionParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertNnwdafEventsSubscriptionConstraints(nnwdafEventsSubscriptionParam); err != nil {
+	if err := eventssubscriptionAPI.AssertNnwdafEventsSubscriptionConstraints(nnwdafEventsSubscriptionParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -116,7 +117,7 @@ func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) UpdateNWDAFEven
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = eventssubscriptionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
 // DeleteNWDAFEventsSubscription - Delete an existing Individual NWDAF Events Subscription
@@ -124,7 +125,7 @@ func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) DeleteNWDAFEven
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &eventssubscriptionAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
 	result, err := c.service.DeleteNWDAFEventsSubscription(r.Context(), subscriptionIdParam)
@@ -134,5 +135,5 @@ func (c *IndividualNWDAFEventsSubscriptionDocumentAPIController) DeleteNWDAFEven
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = eventssubscriptionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }

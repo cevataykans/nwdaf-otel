@@ -12,8 +12,9 @@ package eventssubscription
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
+	eventssubscriptionAPI "nwdaf-otel/generated/eventssubscription"
 )
 
 // NWDAFEventSubscriptionTransfersCollectionAPIService is a service that implements the logic for the NWDAFEventSubscriptionTransfersCollectionAPIServicer
@@ -28,7 +29,7 @@ func NewNWDAFEventSubscriptionTransfersCollectionAPIService() *NWDAFEventSubscri
 }
 
 // CreateNWDAFEventSubscriptionTransfer - Provide information about requested analytics subscriptions transfer and potentially create a new Individual NWDAF Event Subscription Transfer resource.
-func (s *NWDAFEventSubscriptionTransfersCollectionAPIService) CreateNWDAFEventSubscriptionTransfer(ctx context.Context, analyticsSubscriptionsTransfer AnalyticsSubscriptionsTransfer) (ImplResponse, error) {
+func (s *NWDAFEventSubscriptionTransfersCollectionAPIService) CreateNWDAFEventSubscriptionTransfer(ctx context.Context, analyticsSubscriptionsTransfer eventssubscriptionAPI.AnalyticsSubscriptionsTransfer) (eventssubscriptionAPI.ImplResponse, error) {
 	// TODO - update CreateNWDAFEventSubscriptionTransfer with the required logic for this service method.
 	// Add api_nwdaf_event_subscription_transfers_collection_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -71,5 +72,5 @@ func (s *NWDAFEventSubscriptionTransfersCollectionAPIService) CreateNWDAFEventSu
 	// TODO: Uncomment the next line to return response Response(0, {}) or use other options such as http.Ok ...
 	// return Response(0, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("CreateNWDAFEventSubscriptionTransfer method not implemented")
+	return eventssubscriptionAPI.Response(http.StatusNotImplemented, nil), errors.New("CreateNWDAFEventSubscriptionTransfer method not implemented")
 }

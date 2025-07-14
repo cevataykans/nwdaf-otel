@@ -13,30 +13,31 @@ package mlmodelprovision
 import (
 	"encoding/json"
 	"net/http"
+	mlmodelprovisionAPI "nwdaf-otel/generated/mlmodelprovision"
 	"strings"
 )
 
 // SubscriptionsCollectionAPIController binds http requests to an api service and writes the service results to the http response
 type SubscriptionsCollectionAPIController struct {
-	service SubscriptionsCollectionAPIServicer
-	errorHandler ErrorHandler
+	service      mlmodelprovisionAPI.SubscriptionsCollectionAPIServicer
+	errorHandler mlmodelprovisionAPI.ErrorHandler
 }
 
 // SubscriptionsCollectionAPIOption for how the controller is set up.
 type SubscriptionsCollectionAPIOption func(*SubscriptionsCollectionAPIController)
 
 // WithSubscriptionsCollectionAPIErrorHandler inject ErrorHandler into controller
-func WithSubscriptionsCollectionAPIErrorHandler(h ErrorHandler) SubscriptionsCollectionAPIOption {
+func WithSubscriptionsCollectionAPIErrorHandler(h mlmodelprovisionAPI.ErrorHandler) SubscriptionsCollectionAPIOption {
 	return func(c *SubscriptionsCollectionAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewSubscriptionsCollectionAPIController creates a default api controller
-func NewSubscriptionsCollectionAPIController(s SubscriptionsCollectionAPIServicer, opts ...SubscriptionsCollectionAPIOption) *SubscriptionsCollectionAPIController {
+func NewSubscriptionsCollectionAPIController(s mlmodelprovisionAPI.SubscriptionsCollectionAPIServicer, opts ...SubscriptionsCollectionAPIOption) *SubscriptionsCollectionAPIController {
 	controller := &SubscriptionsCollectionAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: mlmodelprovisionAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -47,9 +48,9 @@ func NewSubscriptionsCollectionAPIController(s SubscriptionsCollectionAPIService
 }
 
 // Routes returns all the api routes for the SubscriptionsCollectionAPIController
-func (c *SubscriptionsCollectionAPIController) Routes() Routes {
-	return Routes{
-		"CreateNWDAFMLModelProvisionSubcription": Route{
+func (c *SubscriptionsCollectionAPIController) Routes() mlmodelprovisionAPI.Routes {
+	return mlmodelprovisionAPI.Routes{
+		"CreateNWDAFMLModelProvisionSubcription": mlmodelprovisionAPI.Route{
 			"CreateNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Post"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions",
@@ -59,9 +60,9 @@ func (c *SubscriptionsCollectionAPIController) Routes() Routes {
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the SubscriptionsCollectionAPIController
-func (c *SubscriptionsCollectionAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *SubscriptionsCollectionAPIController) OrderedRoutes() []mlmodelprovisionAPI.Route {
+	return []mlmodelprovisionAPI.Route{
+		mlmodelprovisionAPI.Route{
 			"CreateNWDAFMLModelProvisionSubcription",
 			strings.ToUpper("Post"),
 			"/nnwdaf-mlmodelprovision/v1/subscriptions",
@@ -74,18 +75,18 @@ func (c *SubscriptionsCollectionAPIController) OrderedRoutes() []Route {
 
 // CreateNWDAFMLModelProvisionSubcription - Create a new Individual NWDAF ML Model Provision Subscription resource.
 func (c *SubscriptionsCollectionAPIController) CreateNWDAFMLModelProvisionSubcription(w http.ResponseWriter, r *http.Request) {
-	var nwdafMlModelProvSubscParam NwdafMlModelProvSubsc
+	var nwdafMlModelProvSubscParam mlmodelprovisionAPI.NwdafMlModelProvSubsc
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&nwdafMlModelProvSubscParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &mlmodelprovisionAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertNwdafMlModelProvSubscRequired(nwdafMlModelProvSubscParam); err != nil {
+	if err := mlmodelprovisionAPI.AssertNwdafMlModelProvSubscRequired(nwdafMlModelProvSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertNwdafMlModelProvSubscConstraints(nwdafMlModelProvSubscParam); err != nil {
+	if err := mlmodelprovisionAPI.AssertNwdafMlModelProvSubscConstraints(nwdafMlModelProvSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -96,5 +97,5 @@ func (c *SubscriptionsCollectionAPIController) CreateNWDAFMLModelProvisionSubcri
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = mlmodelprovisionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }

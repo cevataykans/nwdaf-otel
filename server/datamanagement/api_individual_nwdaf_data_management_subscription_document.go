@@ -13,6 +13,7 @@ package datamanagement
 import (
 	"encoding/json"
 	"net/http"
+	datamanagementAPI "nwdaf-otel/generated/datamanagement"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -20,25 +21,25 @@ import (
 
 // IndividualNWDAFDataManagementSubscriptionDocumentAPIController binds http requests to an api service and writes the service results to the http response
 type IndividualNWDAFDataManagementSubscriptionDocumentAPIController struct {
-	service IndividualNWDAFDataManagementSubscriptionDocumentAPIServicer
-	errorHandler ErrorHandler
+	service      datamanagementAPI.IndividualNWDAFDataManagementSubscriptionDocumentAPIServicer
+	errorHandler datamanagementAPI.ErrorHandler
 }
 
 // IndividualNWDAFDataManagementSubscriptionDocumentAPIOption for how the controller is set up.
 type IndividualNWDAFDataManagementSubscriptionDocumentAPIOption func(*IndividualNWDAFDataManagementSubscriptionDocumentAPIController)
 
 // WithIndividualNWDAFDataManagementSubscriptionDocumentAPIErrorHandler inject ErrorHandler into controller
-func WithIndividualNWDAFDataManagementSubscriptionDocumentAPIErrorHandler(h ErrorHandler) IndividualNWDAFDataManagementSubscriptionDocumentAPIOption {
+func WithIndividualNWDAFDataManagementSubscriptionDocumentAPIErrorHandler(h datamanagementAPI.ErrorHandler) IndividualNWDAFDataManagementSubscriptionDocumentAPIOption {
 	return func(c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewIndividualNWDAFDataManagementSubscriptionDocumentAPIController creates a default api controller
-func NewIndividualNWDAFDataManagementSubscriptionDocumentAPIController(s IndividualNWDAFDataManagementSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFDataManagementSubscriptionDocumentAPIOption) *IndividualNWDAFDataManagementSubscriptionDocumentAPIController {
+func NewIndividualNWDAFDataManagementSubscriptionDocumentAPIController(s datamanagementAPI.IndividualNWDAFDataManagementSubscriptionDocumentAPIServicer, opts ...IndividualNWDAFDataManagementSubscriptionDocumentAPIOption) *IndividualNWDAFDataManagementSubscriptionDocumentAPIController {
 	controller := &IndividualNWDAFDataManagementSubscriptionDocumentAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: datamanagementAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -49,15 +50,15 @@ func NewIndividualNWDAFDataManagementSubscriptionDocumentAPIController(s Individ
 }
 
 // Routes returns all the api routes for the IndividualNWDAFDataManagementSubscriptionDocumentAPIController
-func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) Routes() Routes {
-	return Routes{
-		"UpdateNWDAFDataSubscription": Route{
+func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) Routes() datamanagementAPI.Routes {
+	return datamanagementAPI.Routes{
+		"UpdateNWDAFDataSubscription": datamanagementAPI.Route{
 			"UpdateNWDAFDataSubscription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-datamanagement/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFDataSubscription,
 		},
-		"DeleteNWDAFDataSubscription": Route{
+		"DeleteNWDAFDataSubscription": datamanagementAPI.Route{
 			"DeleteNWDAFDataSubscription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-datamanagement/v1/subscriptions/{subscriptionId}",
@@ -67,15 +68,15 @@ func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) Routes(
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the IndividualNWDAFDataManagementSubscriptionDocumentAPIController
-func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) OrderedRoutes() []datamanagementAPI.Route {
+	return []datamanagementAPI.Route{
+		datamanagementAPI.Route{
 			"UpdateNWDAFDataSubscription",
 			strings.ToUpper("Put"),
 			"/nnwdaf-datamanagement/v1/subscriptions/{subscriptionId}",
 			c.UpdateNWDAFDataSubscription,
 		},
-		Route{
+		datamanagementAPI.Route{
 			"DeleteNWDAFDataSubscription",
 			strings.ToUpper("Delete"),
 			"/nnwdaf-datamanagement/v1/subscriptions/{subscriptionId}",
@@ -91,21 +92,21 @@ func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) UpdateN
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &datamanagementAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
-	var nnwdafDataManagementSubscParam NnwdafDataManagementSubsc
+	var nnwdafDataManagementSubscParam datamanagementAPI.NnwdafDataManagementSubsc
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&nnwdafDataManagementSubscParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &datamanagementAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertNnwdafDataManagementSubscRequired(nnwdafDataManagementSubscParam); err != nil {
+	if err := datamanagementAPI.AssertNnwdafDataManagementSubscRequired(nnwdafDataManagementSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertNnwdafDataManagementSubscConstraints(nnwdafDataManagementSubscParam); err != nil {
+	if err := datamanagementAPI.AssertNnwdafDataManagementSubscConstraints(nnwdafDataManagementSubscParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -116,7 +117,7 @@ func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) UpdateN
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = datamanagementAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
 // DeleteNWDAFDataSubscription - unsubscribe from notifications
@@ -124,7 +125,7 @@ func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) DeleteN
 	params := mux.Vars(r)
 	subscriptionIdParam := params["subscriptionId"]
 	if subscriptionIdParam == "" {
-		c.errorHandler(w, r, &RequiredError{"subscriptionId"}, nil)
+		c.errorHandler(w, r, &datamanagementAPI.RequiredError{"subscriptionId"}, nil)
 		return
 	}
 	result, err := c.service.DeleteNWDAFDataSubscription(r.Context(), subscriptionIdParam)
@@ -134,5 +135,5 @@ func (c *IndividualNWDAFDataManagementSubscriptionDocumentAPIController) DeleteN
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = datamanagementAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }
