@@ -53,7 +53,8 @@ echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
-#make aether-ueransim-install
+make aether-gnbsim-install
+#make aether-ueransim-install#
 cd "$current_dir"
 
 #echo "****** REMOVING ISTIO FROM MET ******"

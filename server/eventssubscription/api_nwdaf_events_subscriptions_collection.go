@@ -13,30 +13,31 @@ package eventssubscription
 import (
 	"encoding/json"
 	"net/http"
+	eventssubscriptionAPI "nwdaf-otel/generated/eventssubscription"
 	"strings"
 )
 
 // NWDAFEventsSubscriptionsCollectionAPIController binds http requests to an api service and writes the service results to the http response
 type NWDAFEventsSubscriptionsCollectionAPIController struct {
-	service NWDAFEventsSubscriptionsCollectionAPIServicer
-	errorHandler ErrorHandler
+	service      eventssubscriptionAPI.NWDAFEventsSubscriptionsCollectionAPIServicer
+	errorHandler eventssubscriptionAPI.ErrorHandler
 }
 
 // NWDAFEventsSubscriptionsCollectionAPIOption for how the controller is set up.
 type NWDAFEventsSubscriptionsCollectionAPIOption func(*NWDAFEventsSubscriptionsCollectionAPIController)
 
 // WithNWDAFEventsSubscriptionsCollectionAPIErrorHandler inject ErrorHandler into controller
-func WithNWDAFEventsSubscriptionsCollectionAPIErrorHandler(h ErrorHandler) NWDAFEventsSubscriptionsCollectionAPIOption {
+func WithNWDAFEventsSubscriptionsCollectionAPIErrorHandler(h eventssubscriptionAPI.ErrorHandler) NWDAFEventsSubscriptionsCollectionAPIOption {
 	return func(c *NWDAFEventsSubscriptionsCollectionAPIController) {
 		c.errorHandler = h
 	}
 }
 
 // NewNWDAFEventsSubscriptionsCollectionAPIController creates a default api controller
-func NewNWDAFEventsSubscriptionsCollectionAPIController(s NWDAFEventsSubscriptionsCollectionAPIServicer, opts ...NWDAFEventsSubscriptionsCollectionAPIOption) *NWDAFEventsSubscriptionsCollectionAPIController {
+func NewNWDAFEventsSubscriptionsCollectionAPIController(s eventssubscriptionAPI.NWDAFEventsSubscriptionsCollectionAPIServicer, opts ...NWDAFEventsSubscriptionsCollectionAPIOption) *NWDAFEventsSubscriptionsCollectionAPIController {
 	controller := &NWDAFEventsSubscriptionsCollectionAPIController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: eventssubscriptionAPI.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -47,9 +48,9 @@ func NewNWDAFEventsSubscriptionsCollectionAPIController(s NWDAFEventsSubscriptio
 }
 
 // Routes returns all the api routes for the NWDAFEventsSubscriptionsCollectionAPIController
-func (c *NWDAFEventsSubscriptionsCollectionAPIController) Routes() Routes {
-	return Routes{
-		"CreateNWDAFEventsSubscription": Route{
+func (c *NWDAFEventsSubscriptionsCollectionAPIController) Routes() eventssubscriptionAPI.Routes {
+	return eventssubscriptionAPI.Routes{
+		"CreateNWDAFEventsSubscription": eventssubscriptionAPI.Route{
 			"CreateNWDAFEventsSubscription",
 			strings.ToUpper("Post"),
 			"/nnwdaf-eventssubscription/v1/subscriptions",
@@ -59,9 +60,9 @@ func (c *NWDAFEventsSubscriptionsCollectionAPIController) Routes() Routes {
 }
 
 // OrderedRoutes returns all the api routes in a deterministic order for the NWDAFEventsSubscriptionsCollectionAPIController
-func (c *NWDAFEventsSubscriptionsCollectionAPIController) OrderedRoutes() []Route {
-	return []Route{
-		Route{
+func (c *NWDAFEventsSubscriptionsCollectionAPIController) OrderedRoutes() []eventssubscriptionAPI.Route {
+	return []eventssubscriptionAPI.Route{
+		eventssubscriptionAPI.Route{
 			"CreateNWDAFEventsSubscription",
 			strings.ToUpper("Post"),
 			"/nnwdaf-eventssubscription/v1/subscriptions",
@@ -74,18 +75,18 @@ func (c *NWDAFEventsSubscriptionsCollectionAPIController) OrderedRoutes() []Rout
 
 // CreateNWDAFEventsSubscription - Create a new Individual NWDAF Events Subscription
 func (c *NWDAFEventsSubscriptionsCollectionAPIController) CreateNWDAFEventsSubscription(w http.ResponseWriter, r *http.Request) {
-	var nnwdafEventsSubscriptionParam NnwdafEventsSubscription
+	var nnwdafEventsSubscriptionParam eventssubscriptionAPI.NnwdafEventsSubscription
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&nnwdafEventsSubscriptionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &eventssubscriptionAPI.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertNnwdafEventsSubscriptionRequired(nnwdafEventsSubscriptionParam); err != nil {
+	if err := eventssubscriptionAPI.AssertNnwdafEventsSubscriptionRequired(nnwdafEventsSubscriptionParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := AssertNnwdafEventsSubscriptionConstraints(nnwdafEventsSubscriptionParam); err != nil {
+	if err := eventssubscriptionAPI.AssertNnwdafEventsSubscriptionConstraints(nnwdafEventsSubscriptionParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -96,5 +97,5 @@ func (c *NWDAFEventsSubscriptionsCollectionAPIController) CreateNWDAFEventsSubsc
 		return
 	}
 	// If no error, encode the body and the result code
-	_ = EncodeJSONResponse(result.Body, &result.Code, w)
+	_ = eventssubscriptionAPI.EncodeJSONResponse(result.Body, &result.Code, w)
 }
