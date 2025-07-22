@@ -1,0 +1,17 @@
+---
+
+- name: Uninstall Kubernetes manifests from remote node
+  hosts: all
+  become: true
+  tasks:
+    - name: Delete cert-manager resources
+      command: >
+        kubectl delete -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+      environment:
+        KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+      register: delete_output
+      ignore_errors: yes  # In case resources were already deleted
+
+    - name: Show delete result
+      debug:
+        var: delete_output.stdout_lines

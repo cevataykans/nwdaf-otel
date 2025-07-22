@@ -9,7 +9,7 @@ AETHER_DIR=/home/sevinc/aether-onramp/
 
 echo "****** AETHER UNINSTALLATION ******"
 cd "$AETHER_DIR"
-#make aether-ueransim-uninstall
+make aether-ueransim-uninstall
 make aether-amp-uninstall
 make aether-5gc-uninstall
 cd "$current_dir"
@@ -23,7 +23,7 @@ echo "****** REMOVE JAEGER CONFIG ******"
 kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
 
 echo "****** REMOVE FILTERED ELASTIC ******"
-kubectl delete -f ~/jungmann/setup_scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+kubectl delete -f scripts/collector_filtered_elastic.yaml
 
 echo "****** REMOVE OTEL ******"
 #kubectl delete -f otel_operator_go_dec.yaml
