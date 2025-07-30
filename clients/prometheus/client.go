@@ -26,11 +26,9 @@ func NewClient() (*Client, error) {
 			InsecureSkipVerify: true,
 		},
 	}
-	c := &http.Client{}
 	promClient, err := api.NewClient(
 		api.Config{
 			Address:      Address,
-			Client:       c,
 			RoundTripper: tp,
 		})
 	if err != nil {
