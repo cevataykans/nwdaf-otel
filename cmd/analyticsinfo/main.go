@@ -76,8 +76,20 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
 			break
 		}
+
+		log.Println("Testing a random interval now - see if minutes match")
+		err = promClient.QueryCPUTotalSeconds(
+			time.Unix(nextMin-30, 0),
+			time.Unix(nextMin+30, 0),
+			time.Minute)
+		if err != nil {
+			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
+			break
+		}
+
 		nextMin += 60
 		time.Sleep(time.Minute)
+
 	}
 	log.Println("Loop Complete!")
 }
