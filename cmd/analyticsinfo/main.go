@@ -67,29 +67,21 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 
 	// print for one hour metrics
 	for i := 0; i < 60; i++ {
-		log.Printf("Current Time: %v\n", time.Now().UTC())
+		old := time.Now()
+		log.Printf("Current Time: %v\n", old)
 		err := promClient.QueryCPUTotalSeconds(
-			time.Unix(nextMin-60, 0),
+			time.Unix(nextMin-60, 1),
 			time.Unix(nextMin, 0),
 			time.Minute)
 		if err != nil {
 			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
 			break
 		}
-
-		log.Println("Testing a random interval now - see if minutes match")
-		err = promClient.QueryCPUTotalSeconds(
-			time.Unix(nextMin-30, 0),
-			time.Unix(nextMin+30, 0),
-			time.Minute)
-		if err != nil {
-			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
-			break
-		}
-
 		nextMin += 60
-		time.Sleep(time.Minute)
 
+		cur := time.Now()
+		log.Printf("Sleeping amount: %v\n", cur.Sub(old))
+		time.Sleep(60 - cur.Sub(old))
 	}
 	log.Println("Loop Complete!")
 }
