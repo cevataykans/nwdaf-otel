@@ -1,0 +1,23 @@
+---
+
+- name: Apply Kubernetes manifests on remote RKE2 node
+  hosts: all
+  become: true
+  tasks:
+    - name: Apply cert-manager manifest from URL
+      command: >
+        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+      environment:
+        KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+
+    - name: Wait for cert-manager pods to be ready
+      command: >
+        kubectl wait --namespace cert-manager --for=condition=Available deployment/cert-manager --timeout=120s
+      environment:
+        KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+      register: wait_output
+      ignore_errors: yes
+
+    - name: Show wait result
+      debug:
+        var: wait_output.stdout_lines
