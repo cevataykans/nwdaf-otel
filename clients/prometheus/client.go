@@ -45,15 +45,14 @@ func minutesToTime(m int64) time.Time {
 	return time.Unix(time.Now().Unix()/86400*86400+m*60, 0)
 }
 
-func (c *Client) QueryCPUTotalSeconds() error {
+func (c *Client) QueryCPUTotalSeconds(start, end time.Time, step time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	currentSecond := time.Now().UTC().Second()
 	results, warnings, err := c.promClient.QueryRange(ctx, "rate(container_cpu_usage_seconds_total{container=\"bessd\"}[1m])", v1.Range{
-		Start: time.Unix(int64(currentSecond)-60, 0).UTC(),
-		End:   time.Unix(int64(currentSecond), 0).UTC(),
-		Step:  time.Minute,
+		Start: start,
+		End:   end,
+		Step:  step,
 	})
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
@@ -69,9 +68,9 @@ func (c *Client) QueryCPUTotalSeconds() error {
 
 	// Iterate over the vector
 	for _, row := range matrix {
-		fmt.Printf("Metric: %v\n", row.Metric)
+		log.Printf("Metric: %v\n", row.Metric)
 		for _, value := range row.Values {
-			fmt.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
 	}
 	return nil

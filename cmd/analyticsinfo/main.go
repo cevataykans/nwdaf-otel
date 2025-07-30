@@ -48,15 +48,36 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = promClient.QueryCPUTotalSeconds()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Successfully received metrics and printed them!")
+	go queryCPUMetrics(promClient)
 
 	err = <-errChan
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("server shutdown err: %v\n", err)
 	}
 	log.Println("Application Finished!")
+}
+
+func queryCPUMetrics(promClient *prometheus.Client) {
+
+	curSeconds := time.Now().UTC().Unix()
+	remainingSeconds := 60 - (curSeconds % 60)
+	nextMin := curSeconds + remainingSeconds
+	log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
+	time.Sleep(time.Duration(remainingSeconds) * time.Second)
+
+	// print for one hour metrics
+	for i := 0; i < 60; i++ {
+		log.Printf("Current Time: %v\n", time.Now().UTC())
+		err := promClient.QueryCPUTotalSeconds(
+			time.Unix(nextMin-60, 0),
+			time.Unix(nextMin, 0),
+			time.Minute)
+		if err != nil {
+			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
+			break
+		}
+		nextMin += 60
+		time.Sleep(time.Minute)
+	}
+	log.Println("Loop Complete!")
 }

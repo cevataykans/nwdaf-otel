@@ -49,14 +49,14 @@ func (s *analyticsInfoServer) Setup() {
 func (s *analyticsInfoServer) Start() chan error {
 	errChan := make(chan error)
 	go func() {
-		// TODO: get PORT from config
-		// TODO: configure TLS, use mkcert certificates
 		srv := http.Server{
 			Addr:    ":8080",
 			Handler: s.mux,
 		}
-		errChan <- srv.ListenAndServe()
+		log.Println("Listening and serving HTTP on " + srv.Addr)
+		err := srv.ListenAndServe()
 		log.Println("Server stopped")
+		errChan <- err
 	}()
 	return errChan
 }
