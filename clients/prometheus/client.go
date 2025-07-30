@@ -53,6 +53,7 @@ func (c *Client) QueryCPUTotalSeconds() error {
 	results, warnings, err := c.promClient.QueryRange(ctx, "rate(container_cpu_usage_seconds_total{container=\"bessd\"}[1m])", v1.Range{
 		Start: time.Unix(int64(currentSecond)-60, 0).UTC(),
 		End:   time.Unix(int64(currentSecond), 0).UTC(),
+		Step:  time.Minute,
 	})
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
