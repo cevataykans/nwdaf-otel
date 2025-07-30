@@ -80,8 +80,8 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 		nextMin += 60
 
 		cur := time.Now()
-		log.Printf("Sleeping amount: %v\n", cur.Sub(old))
-		time.Sleep(60 - cur.Sub(old))
+		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
+		time.Sleep(time.Minute - cur.Sub(old))
 	}
 	log.Println("Loop Complete!")
 }
