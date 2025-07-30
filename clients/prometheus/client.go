@@ -26,9 +26,7 @@ func NewClient() (*Client, error) {
 			InsecureSkipVerify: true,
 		},
 	}
-	c := &http.Client{
-		Transport: tp,
-	}
+	c := &http.Client{}
 	promClient, err := api.NewClient(
 		api.Config{
 			Address:      Address,
