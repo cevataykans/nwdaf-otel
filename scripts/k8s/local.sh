@@ -51,13 +51,16 @@ sleep 1m
 cd "$AETHER_DIR"
 echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
+echo "****** REMOVING ISTIO FROM MET ******"
+bash scripts/k8s/remove_istio_from_met_nf.sh
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
-make aether-ueransim-install
+echo "****** AETHER UERANSIM INSTALLATION ******"
+#make aether-ueransim-install
 cd "$current_dir"
 
-#echo "****** REMOVING ISTIO FROM MET ******"
-#bash scripts/k8s/remove_istio_from_met_nf.sh
+echo "****** REMOVING ISTIO FROM MET ******"
+bash scripts/k8s/remove_istio_from_met_nf.sh
 #echo "****** PORT FORWARDING JAEGER ******"
 #bash scripts/k8s/port-forward.sh &
 #bash ./injection.sh

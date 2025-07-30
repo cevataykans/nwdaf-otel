@@ -1,8 +1,7 @@
 package main
 
 import (
-	"nwdaf-otel/nrf"
-	"nwdaf-otel/server"
+	"nwdaf-otel/clients/nrf"
 )
 
 var Config struct {

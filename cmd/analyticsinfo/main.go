@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"nwdaf-otel/clients/prometheus"
 	"nwdaf-otel/server"
 	"time"
 )
@@ -41,6 +42,17 @@ func main() {
 	}(res.Body)
 	fmt.Println(res.StatusCode)
 	fmt.Println("Successfully connected NRF client and ready to register.")
+
+	promClient, err := prometheus.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = promClient.QueryCPUTotalSeconds()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Successfully received metrics and printed them!")
 
 	err = <-errChan
 	if err != nil {
