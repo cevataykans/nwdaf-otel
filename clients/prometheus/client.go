@@ -62,16 +62,17 @@ func (c *Client) QueryCPUTotalSeconds() error {
 		log.Printf("Warnings: %v", warnings)
 	}
 
-	values, ok := results.(model.Vector)
+	matrix, ok := results.(model.Matrix)
 	if !ok {
 		return fmt.Errorf("result vector is not a vector, but actual: ", results.Type())
 	}
 
 	// Iterate over the vector
-	for _, sample := range values {
-		fmt.Printf("Metric: %v\n", sample.Metric)
-		fmt.Printf("Value: %v\n", sample.Value)
-		fmt.Printf("Timestamp: %v\n", sample.Timestamp.Time())
+	for _, row := range matrix {
+		fmt.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			fmt.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
 	}
 	return nil
 }
