@@ -45,11 +45,12 @@ func minutesToTime(m int64) time.Time {
 	return time.Unix(time.Now().Unix()/86400*86400+m*60, 0)
 }
 
-func (c *Client) QueryCPUTotalSeconds(start, end time.Time, step time.Duration) error {
+func (c *Client) QueryCPUTotalSeconds(service string, start, end time.Time, step time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	results, warnings, err := c.promClient.QueryRange(ctx, "rate(container_cpu_usage_seconds_total{container=\"bessd\"}[1m])", v1.Range{
+	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, v1.Range{
 		Start: start,
 		End:   end,
 		Step:  step,
@@ -72,6 +73,7 @@ func (c *Client) QueryCPUTotalSeconds(start, end time.Time, step time.Duration) 
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
+		log.Println("METRIC DONE")
 	}
 	return nil
 }

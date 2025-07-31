@@ -65,20 +65,35 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 	log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
 	time.Sleep(time.Duration(remainingSeconds) * time.Second)
 
+	// services is a list of container names used for filtering queried metrics.
+	services := []string{
+		"bessd",
+		"amf",
+		"ausf",
+		"nrf",
+		"nssf",
+		"pcf",
+		"smf",
+		"udm",
+		"udr",
+	}
+
 	// print for one hour metrics
 	for i := 0; i < 60; i++ {
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
-		err := promClient.QueryCPUTotalSeconds(
-			time.Unix(nextMin-60, 1),
-			time.Unix(nextMin, 0),
-			time.Minute)
-		if err != nil {
-			log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
-			break
+		for _, service := range services {
+			err := promClient.QueryCPUTotalSeconds(
+				service,
+				time.Unix(nextMin-60, 1),
+				time.Unix(nextMin, 0),
+				time.Minute)
+			if err != nil {
+				log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
+				break
+			}
+			nextMin += 60
 		}
-		nextMin += 60
-
 		cur := time.Now()
 		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		time.Sleep(time.Minute - cur.Sub(old))
