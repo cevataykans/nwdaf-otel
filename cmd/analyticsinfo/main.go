@@ -92,8 +92,8 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 				log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
 				break
 			}
-			nextMin += 60
 		}
+		nextMin += 60
 		cur := time.Now()
 		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		time.Sleep(time.Minute - cur.Sub(old))
