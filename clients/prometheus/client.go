@@ -1,9 +1,12 @@
 package prometheus
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
@@ -13,11 +16,13 @@ import (
 )
 
 const (
-	Address = "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
+	Address        = "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
+	ElasticAddress = "http://elasticsearch-master.default.svc.cluster.local:9200"
 )
 
 type Client struct {
 	promClient v1.API
+	esClient   *elasticsearch.Client
 }
 
 func NewClient() (*Client, error) {
@@ -34,11 +39,75 @@ func NewClient() (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating prometheus client: %v", err)
 	}
-
 	apiClient := v1.NewAPI(promClient)
+
+	// Create Elasticsearch client
+	esClient, err := elasticsearch.NewClient(elasticsearch.Config{Addresses: []string{ElasticAddress}})
+	if err != nil {
+		return nil, fmt.Errorf("error creating elastic search client: %v", err)
+	}
 	return &Client{
 		apiClient,
+		esClient,
 	}, nil
+}
+
+func (c *Client) QueryTraces(service string, start, end time.Time) error {
+	// Build the Elasticsearch query
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"bool": map[string]interface{}{
+				"must": []map[string]interface{}{
+					{
+						"wildcard": map[string]interface{}{
+							"process.serviceName.keyword": map[string]interface{}{
+								"value": fmt.Sprintf("%s*", service),
+							},
+						},
+					},
+				},
+			},
+		},
+		"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
+		"size":    1000,
+	}
+
+	// Encode query to JSON
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		log.Fatalf("Error encoding query: %s", err)
+	}
+
+	// Perform the search request
+	es := c.esClient
+	res, err := es.Search(
+		es.Search.WithContext(context.Background()),
+		es.Search.WithIndex("jaeger-span-*"),
+		es.Search.WithBody(&buf),
+		es.Search.WithTrackTotalHits(true),
+	)
+	if err != nil {
+		return fmt.Errorf("Error getting response: %v", err)
+	}
+	defer res.Body.Close()
+
+	// Decode response
+	var r map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		return fmt.Errorf("Error parsing response body: %v", err)
+	}
+
+	// Print results
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		doc := hit.(map[string]interface{})["_source"]
+		traceID := doc.(map[string]interface{})["traceID"]
+		service := doc.(map[string]interface{})["process.serviceName"]
+		op := doc.(map[string]interface{})["operationName"]
+		start := doc.(map[string]interface{})["startTime"]
+
+		fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v\n", traceID, service, op, start)
+	}
+	return nil
 }
 
 func minutesToTime(m int64) time.Time {

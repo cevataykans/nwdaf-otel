@@ -48,13 +48,58 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go queryMetrics(promClient)
+	go queryTraces(promClient)
+	//go queryMetrics(promClient)
 
 	err = <-errChan
 	if err != nil {
 		log.Printf("server shutdown err: %v\n", err)
 	}
 	log.Println("Application Finished!")
+}
+
+func queryTraces(elasticClient *prometheus.Client) {
+	curSeconds := time.Now().UTC().Unix()
+	remainingSeconds := 60 - (curSeconds % 60)
+	nextMin := curSeconds + remainingSeconds
+	log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
+	time.Sleep(time.Duration(remainingSeconds) * time.Second)
+
+	// services is a list of container names used for filtering queried metrics.
+	services := []string{
+		"bessd",
+		"amf",
+		"ausf",
+		"nrf",
+		"nssf",
+		"pcf",
+		"smf",
+		"udm",
+		"udr",
+		"webui",
+		"simapp",
+	}
+
+	// print for one hour metrics
+	for i := 0; i < 60; i++ {
+		old := time.Now()
+		log.Printf("Current Time: %v\n", old)
+		for _, service := range services {
+			err := elasticClient.QueryTraces(
+				service,
+				time.Unix(nextMin-60, 1),
+				time.Unix(nextMin, 0),
+			)
+			if err != nil {
+				log.Printf("Error querying traces %v: %v\n", service, err)
+			}
+		}
+		nextMin += 60
+		cur := time.Now()
+		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
+		time.Sleep(time.Minute - cur.Sub(old))
+	}
+	log.Println("Loop Complete!")
 }
 
 func queryMetrics(promClient *prometheus.Client) {
