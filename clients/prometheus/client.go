@@ -95,13 +95,14 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
 		doc := hit.(map[string]interface{})["_source"]
 		traceID := doc.(map[string]interface{})["traceID"]
-		service := doc.(map[string]interface{})["process.serviceName"]
+		service := doc.(map[string]interface{})["process"]
+		serviceName := service.(map[string]interface{})["serviceName"]
 		op := doc.(map[string]interface{})["operationName"]
 		start := doc.(map[string]interface{})["startTime"]
 		duration := doc.(map[string]interface{})["duration"]
 
 		fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
-			traceID, service, op, start, duration)
+			traceID, serviceName, op, start, duration)
 	}
 	return nil
 }

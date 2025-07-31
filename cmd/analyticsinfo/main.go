@@ -85,6 +85,7 @@ func queryTraces(elasticClient *prometheus.Client) {
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
 		for _, service := range services {
+			log.Printf("Tracing service: %v\n", service)
 			err := elasticClient.QueryTraces(
 				service,
 				time.Unix(nextMin-60, 1),
