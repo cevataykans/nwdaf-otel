@@ -56,20 +56,14 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	// Build the Elasticsearch query
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"must": []map[string]interface{}{
-					{
-						"wildcard": map[string]interface{}{
-							"process.serviceName.keyword": map[string]interface{}{
-								"value": fmt.Sprintf("%s*", service),
-							},
-						},
-					},
+			"wildcard": map[string]interface{}{
+				"process.serviceName": map[string]interface{}{
+					"value": fmt.Sprintf("%s*", service),
 				},
 			},
 		},
-		"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
-		"size":    1000,
+		//"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
+		//"size":    1000,
 	}
 
 	// Encode query to JSON
@@ -87,14 +81,14 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 		es.Search.WithTrackTotalHits(true),
 	)
 	if err != nil {
-		return fmt.Errorf("Error getting response: %v", err)
+		return fmt.Errorf("error getting response: %v", err)
 	}
 	defer res.Body.Close()
 
 	// Decode response
 	var r map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return fmt.Errorf("Error parsing response body: %v", err)
+		return fmt.Errorf("error parsing response body: %v", err)
 	}
 
 	// Print results
@@ -104,8 +98,10 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 		service := doc.(map[string]interface{})["process.serviceName"]
 		op := doc.(map[string]interface{})["operationName"]
 		start := doc.(map[string]interface{})["startTime"]
+		duration := doc.(map[string]interface{})["duration"]
 
-		fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v\n", traceID, service, op, start)
+		fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
+			traceID, service, op, start, duration)
 	}
 	return nil
 }
