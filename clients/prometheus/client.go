@@ -83,7 +83,7 @@ func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Du
 }
 
 func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1.Range) error {
-	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{container=\"%s\"}[1m])", service)
+	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
@@ -103,13 +103,13 @@ func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("BYTES SENT TOTAL METRIC DONE")
 	}
+	log.Println("BYTES SENT TOTAL METRIC DONE")
 	return nil
 }
 
 func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) error {
-	query := fmt.Sprintf("rate(container_network_receive_bytes_total{container=\"%s\"}[1m])", service)
+	query := fmt.Sprintf("rate(container_network_receive_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
@@ -129,13 +129,13 @@ func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, 
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("BYTES RECEIVED TOTAL METRIC DONE")
 	}
+	log.Println("BYTES RECEIVED TOTAL METRIC DONE")
 	return nil
 }
 
 func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) error {
-	query := fmt.Sprintf("rate(container_network_receive_packets_total{container=\"%s\"}[1m])", service)
+	query := fmt.Sprintf("rate(container_network_receive_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
@@ -155,13 +155,13 @@ func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("RECEIVE PACKETS TOTAL METRIC DONE")
 	}
+	log.Println("RECEIVE PACKETS TOTAL METRIC DONE")
 	return nil
 }
 
 func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) error {
-	query := fmt.Sprintf("rate(container_network_transmit_packets_total{container=\"%s\"}[1m])", service)
+	query := fmt.Sprintf("rate(container_network_transmit_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
@@ -181,8 +181,8 @@ func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, 
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("TRANSMIT PACKETS TOTAL METRIC DONE")
 	}
+	log.Println("TRANSMIT PACKETS TOTAL METRIC DONE")
 	return nil
 }
 
@@ -207,8 +207,8 @@ func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) er
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("MEMORY METRIC DONE")
 	}
+	log.Println("MEMORY METRIC DONE")
 	return nil
 }
 
@@ -233,7 +233,7 @@ func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("CPU METRIC DONE")
 	}
+	log.Println("CPU METRIC DONE")
 	return nil
 }
