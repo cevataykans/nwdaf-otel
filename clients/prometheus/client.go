@@ -45,16 +45,46 @@ func minutesToTime(m int64) time.Time {
 	return time.Unix(time.Now().Unix()/86400*86400+m*60, 0)
 }
 
-func (c *Client) QueryCPUTotalSeconds(service string, start, end time.Time, step time.Duration) error {
+func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, v1.Range{
-		Start: start,
-		End:   end,
-		Step:  step,
-	})
+	r := v1.Range{Start: start, End: end, Step: step}
+	err := c.queryCPUTotalSeconds(ctx, service, r)
+	if err != nil {
+		return err
+	}
+
+	err = c.queryMemory(ctx, service, r)
+	if err != nil {
+		return err
+	}
+
+	err = c.queryNetworkBytesReceived(ctx, service, r)
+	if err != nil {
+		return err
+	}
+
+	err = c.queryNetworkBytesSent(ctx, service, r)
+	if err != nil {
+		return err
+	}
+
+	err = c.queryReceivePacketsTotal(ctx, service, r)
+	if err != nil {
+		return err
+	}
+
+	err = c.queryTransmitPacketsTotal(ctx, service, r)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return fmt.Errorf("error querying Prometheus: %v", err)
 	}
@@ -64,7 +94,7 @@ func (c *Client) QueryCPUTotalSeconds(service string, start, end time.Time, step
 
 	matrix, ok := results.(model.Matrix)
 	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: ", results.Type())
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
 	}
 
 	// Iterate over the vector
@@ -73,7 +103,137 @@ func (c *Client) QueryCPUTotalSeconds(service string, start, end time.Time, step
 		for _, value := range row.Values {
 			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
 		}
-		log.Println("METRIC DONE")
+		log.Println("BYTES SENT TOTAL METRIC DONE")
+	}
+	return nil
+}
+
+func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("rate(container_network_receive_bytes_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
+	if err != nil {
+		return fmt.Errorf("error querying Prometheus: %v", err)
+	}
+	if len(warnings) > 0 {
+		log.Printf("Warnings: %v", warnings)
+	}
+
+	matrix, ok := results.(model.Matrix)
+	if !ok {
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+	}
+
+	// Iterate over the vector
+	for _, row := range matrix {
+		log.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
+		log.Println("BYTES RECEIVED TOTAL METRIC DONE")
+	}
+	return nil
+}
+
+func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("rate(container_network_receive_packets_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
+	if err != nil {
+		return fmt.Errorf("error querying Prometheus: %v", err)
+	}
+	if len(warnings) > 0 {
+		log.Printf("Warnings: %v", warnings)
+	}
+
+	matrix, ok := results.(model.Matrix)
+	if !ok {
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+	}
+
+	// Iterate over the vector
+	for _, row := range matrix {
+		log.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
+		log.Println("RECEIVE PACKETS TOTAL METRIC DONE")
+	}
+	return nil
+}
+
+func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("rate(container_network_transmit_packets_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
+	if err != nil {
+		return fmt.Errorf("error querying Prometheus: %v", err)
+	}
+	if len(warnings) > 0 {
+		log.Printf("Warnings: %v", warnings)
+	}
+
+	matrix, ok := results.(model.Matrix)
+	if !ok {
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+	}
+
+	// Iterate over the vector
+	for _, row := range matrix {
+		log.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
+		log.Println("TRANSMIT PACKETS TOTAL METRIC DONE")
+	}
+	return nil
+}
+
+func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("avg_over_time(container_memory_usage_bytes{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
+	if err != nil {
+		return fmt.Errorf("error querying Prometheus: %v", err)
+	}
+	if len(warnings) > 0 {
+		log.Printf("Warnings: %v", warnings)
+	}
+
+	matrix, ok := results.(model.Matrix)
+	if !ok {
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+	}
+
+	// Iterate over the vector
+	for _, row := range matrix {
+		log.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
+		log.Println("MEMORY METRIC DONE")
+	}
+	return nil
+}
+
+func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.Range) error {
+	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m])", service)
+	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
+	if err != nil {
+		return fmt.Errorf("error querying Prometheus: %v", err)
+	}
+	if len(warnings) > 0 {
+		log.Printf("Warnings: %v", warnings)
+	}
+
+	matrix, ok := results.(model.Matrix)
+	if !ok {
+		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+	}
+
+	// Iterate over the vector
+	for _, row := range matrix {
+		log.Printf("Metric: %v\n", row.Metric)
+		for _, value := range row.Values {
+			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+		}
+		log.Println("CPU METRIC DONE")
 	}
 	return nil
 }

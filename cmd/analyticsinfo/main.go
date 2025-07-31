@@ -48,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go queryCPUMetrics(promClient)
+	go queryMetrics(promClient)
 
 	err = <-errChan
 	if err != nil {
@@ -57,7 +57,7 @@ func main() {
 	log.Println("Application Finished!")
 }
 
-func queryCPUMetrics(promClient *prometheus.Client) {
+func queryMetrics(promClient *prometheus.Client) {
 
 	curSeconds := time.Now().UTC().Unix()
 	remainingSeconds := 60 - (curSeconds % 60)
@@ -83,14 +83,13 @@ func queryCPUMetrics(promClient *prometheus.Client) {
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
 		for _, service := range services {
-			err := promClient.QueryCPUTotalSeconds(
+			err := promClient.QueryMetrics(
 				service,
 				time.Unix(nextMin-60, 1),
 				time.Unix(nextMin, 0),
 				time.Minute)
 			if err != nil {
-				log.Printf("Error querying prom for CPU Total Seconds: %v\nExiting loop.\n", err)
-				break
+				log.Printf("Error querying metrics %v: %v\n", service, err)
 			}
 		}
 		nextMin += 60
