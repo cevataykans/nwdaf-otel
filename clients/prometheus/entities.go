@@ -91,3 +91,23 @@ type AvgField struct {
 type AvgFieldInner struct {
 	Field string `json:"field"`
 }
+
+// Response received from AVG duration for service traces
+type ElasticsearchResponse struct {
+	Took     int  `json:"took"`
+	TimedOut bool `json:"timed_out"`
+	Hits     struct {
+		Total struct {
+			Value    int    `json:"value"`
+			Relation string `json:"relation"`
+		} `json:"total"`
+	} `json:"hits"`
+	Aggregations struct {
+		DurationAgg struct {
+			DocCount    int `json:"doc_count"`
+			AvgDuration struct {
+				Value *float64 `json:"value"`
+			} `json:"avg_duration"`
+		} `json:"duration"`
+	} `json:"aggregations"`
+}

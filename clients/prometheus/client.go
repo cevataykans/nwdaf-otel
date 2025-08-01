@@ -121,15 +121,28 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	//		traceID, serviceName, op, start, duration)
 	//}
 	log.Printf("Query Response: %v", r)
-	aggregation := r["aggregations"].(map[string]interface{})
-	durationDoc := aggregation["duration"].(map[string]interface{})
-	count := durationDoc["doc_count"].(float64)
-	if int(count) == 0 {
+	var avgRes ElasticsearchResponse
+	if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
+		return fmt.Errorf("failed to decode response: %v", err)
+	}
+
+	if avgRes.TimedOut {
+		return fmt.Errorf("avg query timed out for service: %s", service)
+	}
+	log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
+
+	if avgRes.Aggregations.DurationAgg.DocCount == 0 {
 		return nil
 	}
-	avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
-	value := avgDurationDoc["value"].(float64)
-	log.Printf("Avg duration of service '%s' traces: %v\n", service, value)
+	//aggregation := r["aggregations"].(map[string]interface{})
+	//durationDoc := aggregation["duration"].(map[string]interface{})
+	//count := durationDoc["doc_count"].(float64)
+	//if int(count) == 0 {
+	//	return nil
+	//}
+	//avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
+	//value := avgDurationDoc["value"].(float64)
+	log.Printf("Avg duration of service '%s' traces: %v\n", service, avgRes.Aggregations.DurationAgg.AvgDuration)
 	return nil
 }
 
