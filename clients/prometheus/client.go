@@ -117,18 +117,19 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	//	start := doc.(map[string]interface{})["startTime"]
 	//	duration := doc.(map[string]interface{})["duration"]
 	//
-	//	fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
+	//	log.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
 	//		traceID, serviceName, op, start, duration)
 	//}
+	log.Printf("Query Response: %v", r)
 	aggregation := r["aggregations"].(map[string]interface{})
 	durationDoc := aggregation["duration"].(map[string]interface{})
-	count := durationDoc["doc_count"].(int)
-	if count == 0 {
+	count := durationDoc["doc_count"].(float64)
+	if int(count) == 0 {
 		return nil
 	}
 	avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
 	value := avgDurationDoc["value"].(float64)
-	fmt.Printf("Avg duration of service '%s' traces: %v\n", service, value)
+	log.Printf("Avg duration of service '%s' traces: %v\n", service, value)
 	return nil
 }
 
