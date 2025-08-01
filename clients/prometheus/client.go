@@ -54,36 +54,37 @@ func NewClient() (*Client, error) {
 
 func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	// Build the Elasticsearch query
-	query := map[string]interface{}{
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"must": []map[string]interface{}{
-					{
-						"wildcard": map[string]interface{}{
-							"process.serviceName": map[string]interface{}{
-								"value": fmt.Sprintf("%s*", service),
-							},
-						},
-					},
-					{
-						"range": map[string]interface{}{
-							"startTimeMillis": map[string]interface{}{
-								// Jaegar timestamps are in Unix milliseconds
-								"gte": start.Unix() * 1000,
-								"lte": end.Unix() * 1000,
-							},
-						},
-					},
-				},
-			},
-		},
-		//"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
-		//"size":    1000,
-	}
+	//query := map[string]interface{}{
+	//	"query": map[string]interface{}{
+	//		"bool": map[string]interface{}{
+	//			"must": []map[string]interface{}{
+	//				{
+	//					"wildcard": map[string]interface{}{
+	//						"process.serviceName": map[string]interface{}{
+	//							"value": fmt.Sprintf("%s*", service),
+	//						},
+	//					},
+	//				},
+	//				{
+	//					"range": map[string]interface{}{
+	//						"startTimeMillis": map[string]interface{}{
+	//							// Jaegar timestamps are in Unix milliseconds
+	//							"gte": start.Unix() * 1000,
+	//							"lte": end.Unix() * 1000,
+	//						},
+	//					},
+	//				},
+	//			},
+	//		},
+	//	},
+	//	//"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
+	//	//"size":    1000,
+	//}
+	queryEntity := CreateESAvgQuery(service, start, end)
 
 	// Encode query to JSON
 	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+	if err := json.NewEncoder(&buf).Encode(queryEntity); err != nil {
 		log.Fatalf("Error encoding query: %s", err)
 	}
 
@@ -107,18 +108,23 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	}
 
 	// Print results
-	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
-		doc := hit.(map[string]interface{})["_source"]
-		traceID := doc.(map[string]interface{})["traceID"]
-		service := doc.(map[string]interface{})["process"]
-		serviceName := service.(map[string]interface{})["serviceName"]
-		op := doc.(map[string]interface{})["operationName"]
-		start := doc.(map[string]interface{})["startTime"]
-		duration := doc.(map[string]interface{})["duration"]
-
-		fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
-			traceID, serviceName, op, start, duration)
-	}
+	//for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+	//	doc := hit.(map[string]interface{})["_source"]
+	//	traceID := doc.(map[string]interface{})["traceID"]
+	//	service := doc.(map[string]interface{})["process"]
+	//	serviceName := service.(map[string]interface{})["serviceName"]
+	//	op := doc.(map[string]interface{})["operationName"]
+	//	start := doc.(map[string]interface{})["startTime"]
+	//	duration := doc.(map[string]interface{})["duration"]
+	//
+	//	fmt.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
+	//		traceID, serviceName, op, start, duration)
+	//}
+	aggregation := r["aggregations"].(map[string]interface{})
+	durationDoc := aggregation["duration"].(map[string]interface{})
+	avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
+	value := avgDurationDoc["value"].(float64)
+	fmt.Printf("Avg duration of service '%s' traces: %v\n", service, value)
 	return nil
 }
 
