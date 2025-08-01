@@ -102,10 +102,10 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	defer res.Body.Close()
 
 	// Decode response
-	var r map[string]interface{}
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return fmt.Errorf("error parsing response body: %v", err)
-	}
+	//var r map[string]interface{}
+	//if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+	//	return fmt.Errorf("error parsing response body: %v", err)
+	//}
 
 	// Print results
 	//for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
@@ -120,7 +120,6 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	//	log.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
 	//		traceID, serviceName, op, start, duration)
 	//}
-	log.Printf("Query Response: %v", r)
 	var avgRes ElasticsearchResponse
 	if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
 		return fmt.Errorf("failed to decode response: %v", err)
