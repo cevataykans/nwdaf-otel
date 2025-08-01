@@ -56,9 +56,24 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	// Build the Elasticsearch query
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
-			"wildcard": map[string]interface{}{
-				"process.serviceName": map[string]interface{}{
-					"value": fmt.Sprintf("%s*", service),
+			"bool": map[string]interface{}{
+				"must": []map[string]interface{}{
+					{
+						"wildcard": map[string]interface{}{
+							"process.serviceName": map[string]interface{}{
+								"value": fmt.Sprintf("%s*", service),
+							},
+						},
+					},
+					{
+						"range": map[string]interface{}{
+							"startTimeMillis": map[string]interface{}{
+								// Jaegar timestamps are in Unix milliseconds
+								"gte": start.Unix() * 1000,
+								"lte": end.Unix() * 1000,
+							},
+						},
+					},
 				},
 			},
 		},

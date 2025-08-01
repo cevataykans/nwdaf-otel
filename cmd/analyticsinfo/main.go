@@ -82,6 +82,24 @@ func queryTraces(elasticClient *prometheus.Client) {
 
 	// print for one hour metrics
 	for i := 0; i < 60; i++ {
+
+		if i == 0 {
+			log.Println("Verifying Query Behavior - One Entry for WEBUI Must be Printed")
+			for _, service := range services {
+				log.Printf("Tracing service: %v\n", service)
+				err := elasticClient.QueryTraces(
+					service,
+					time.Unix(1754041395, 0),
+					time.Unix(1754041396, 0),
+				)
+				if err != nil {
+					log.Printf("Error querying traces %v: %v\n", service, err)
+				}
+			}
+			log.Println("!!!!!! Check behavior !!!!!!")
+			continue
+		}
+
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
 		for _, service := range services {
