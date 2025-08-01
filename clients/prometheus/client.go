@@ -122,6 +122,10 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 	//}
 	aggregation := r["aggregations"].(map[string]interface{})
 	durationDoc := aggregation["duration"].(map[string]interface{})
+	count := durationDoc["doc_count"].(int)
+	if count == 0 {
+		return nil
+	}
 	avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
 	value := avgDurationDoc["value"].(float64)
 	fmt.Printf("Avg duration of service '%s' traces: %v\n", service, value)
