@@ -20,7 +20,7 @@ type sqlLiteRepo struct {
 }
 
 func NewSQLiteRepo() (Repository, error) {
-	db, err := sql.Open("sqlite3", "/data/series.db")
+	db, err := sql.Open("sqlite", "/data/series.db")
 	if err != nil {
 		return nil, err
 	}

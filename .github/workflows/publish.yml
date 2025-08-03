@@ -6,8 +6,7 @@ on:
       - main
     paths:
       - '**.go'
-      - 'Dockerfile'
-      - '**.Dockerfile'
+      - '**/Dockerfile*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
