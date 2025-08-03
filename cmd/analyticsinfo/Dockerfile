@@ -11,7 +11,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o cmd/server cmd/analyticsinfo/main.go
 FROM alpine:latest AS release
 
 # Last command helps clearing cache, reducing image size
-RUN apt-get update && apt-get install -y libsqlite3-0 && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache sqlite
 
 # Bind volume where DB stores data
 VOLUME ["/data"]
