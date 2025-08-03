@@ -21,6 +21,7 @@ const (
 )
 
 type MetricResults struct {
+	Id                          int64
 	Timestamp                   int64
 	Service                     string
 	CpuTotalSeconds             float64

@@ -31,7 +31,8 @@ func NewSQLiteRepo() (Repository, error) {
 
 func (r sqlLiteRepo) Setup() error {
 	_, err := r.Exec(`CREATE TABLE IF NOT EXISTS series (
-        ts INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY,
+        ts INTEGER,
         service TEXT,
         cpu_usage REAL,
         memory_usage REAL,
@@ -94,7 +95,7 @@ func (r sqlLiteRepo) Debug() error {
 
 	for rows.Next() {
 		m := prometheus.MetricResults{}
-		err := rows.Scan(&m.Timestamp, &m.Service, &m.CpuTotalSeconds, &m.MemoryTotalBytes,
+		err := rows.Scan(&m.Id, &m.Timestamp, &m.Service, &m.CpuTotalSeconds, &m.MemoryTotalBytes,
 			&m.NetworkTransmitBytesTotal, &m.NetworkTransmitPacketsTotal,
 			&m.NetworkReceiveBytesTotal, &m.NetworkReceivePacketsTotal,
 			&m.AvgTraceDuration)
