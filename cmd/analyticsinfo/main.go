@@ -48,8 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go queryTraces(promClient)
-	//go queryMetrics(promClient)
+	go queryResources(promClient)
 
 	err = <-errChan
 	if err != nil {
@@ -58,7 +57,7 @@ func main() {
 	log.Println("Application Finished!")
 }
 
-func queryTraces(elasticClient *prometheus.Client) {
+func queryResources(client *prometheus.Client) {
 	curSeconds := time.Now().UTC().Unix()
 	remainingSeconds := 60 - (curSeconds % 60)
 	nextMin := curSeconds + remainingSeconds
@@ -82,79 +81,21 @@ func queryTraces(elasticClient *prometheus.Client) {
 
 	// print for one hour metrics
 	for i := 0; i < 60; i++ {
-
-		if i == 0 {
-			log.Println("Verifying Query Behavior - One Entry for WEBUI Must be Printed")
-			for _, service := range services {
-				log.Printf("Tracing service: %v\n", service)
-				err := elasticClient.QueryTraces(
-					service,
-					time.Unix(1754041395, 0),
-					time.Unix(1754041396, 0),
-				)
-				if err != nil {
-					log.Printf("Error querying traces %v: %v\n", service, err)
-				}
-			}
-			log.Println("!!!!!! Check behavior !!!!!!")
-			continue
-		}
-
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
 		for _, service := range services {
-			log.Printf("Tracing service: %v\n", service)
-			err := elasticClient.QueryTraces(
-				service,
-				time.Unix(nextMin-60, 1),
-				time.Unix(nextMin, 0),
-			)
+			log.Printf("Querying service: %v\n", service)
+			start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
+			avgDuration, err := client.QueryTraces(service, start, end)
 			if err != nil {
-				log.Printf("Error querying traces %v: %v\n", service, err)
+				log.Printf("Error querying traces: %v\n", err)
 			}
-		}
-		nextMin += 60
-		cur := time.Now()
-		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
-		time.Sleep(time.Minute - cur.Sub(old))
-	}
-	log.Println("Loop Complete!")
-}
 
-func queryMetrics(promClient *prometheus.Client) {
-
-	curSeconds := time.Now().UTC().Unix()
-	remainingSeconds := 60 - (curSeconds % 60)
-	nextMin := curSeconds + remainingSeconds
-	log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
-	time.Sleep(time.Duration(remainingSeconds) * time.Second)
-
-	// services is a list of container names used for filtering queried metrics.
-	services := []string{
-		"bessd",
-		"amf",
-		"ausf",
-		"nrf",
-		"nssf",
-		"pcf",
-		"smf",
-		"udm",
-		"udr",
-	}
-
-	// print for one hour metrics
-	for i := 0; i < 60; i++ {
-		old := time.Now()
-		log.Printf("Current Time: %v\n", old)
-		for _, service := range services {
-			err := promClient.QueryMetrics(
-				service,
-				time.Unix(nextMin-60, 1),
-				time.Unix(nextMin, 0),
-				time.Minute)
+			metrics, err := client.QueryMetrics(service, start, end, time.Minute)
 			if err != nil {
-				log.Printf("Error querying metrics %v: %v\n", service, err)
+				log.Printf("Error querying metrics %v\n", err)
 			}
+			log.Printf("Metrics %v and average trace duration: %v\n", metrics, avgDuration)
 		}
 		nextMin += 60
 		cur := time.Now()

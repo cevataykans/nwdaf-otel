@@ -16,9 +16,18 @@ import (
 )
 
 const (
-	Address        = "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
-	ElasticAddress = "http://elasticsearch-master.default.svc.cluster.local:9200"
+	PrometheusAddress = "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
+	ElasticAddress    = "http://elasticsearch-master.default.svc.cluster.local:9200"
 )
+
+type MetricResults struct {
+	CpuTotalSeconds             float64
+	MemoryTotalBytes            float64
+	NetworkReceiveBytesTotal    float64
+	NetworkTransmitBytesTotal   float64
+	NetworkReceivePacketsTotal  float64
+	NetworkTransmitPacketsTotal float64
+}
 
 type Client struct {
 	promClient v1.API
@@ -26,6 +35,7 @@ type Client struct {
 }
 
 func NewClient() (*Client, error) {
+	// Create Prometheus client
 	tp := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -33,7 +43,7 @@ func NewClient() (*Client, error) {
 	}
 	promClient, err := api.NewClient(
 		api.Config{
-			Address:      Address,
+			Address:      PrometheusAddress,
 			RoundTripper: tp,
 		})
 	if err != nil {
@@ -52,40 +62,12 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
-func (c *Client) QueryTraces(service string, start, end time.Time) error {
-	// Build the Elasticsearch query
-	//query := map[string]interface{}{
-	//	"query": map[string]interface{}{
-	//		"bool": map[string]interface{}{
-	//			"must": []map[string]interface{}{
-	//				{
-	//					"wildcard": map[string]interface{}{
-	//						"process.serviceName": map[string]interface{}{
-	//							"value": fmt.Sprintf("%s*", service),
-	//						},
-	//					},
-	//				},
-	//				{
-	//					"range": map[string]interface{}{
-	//						"startTimeMillis": map[string]interface{}{
-	//							// Jaegar timestamps are in Unix milliseconds
-	//							"gte": start.Unix() * 1000,
-	//							"lte": end.Unix() * 1000,
-	//						},
-	//					},
-	//				},
-	//			},
-	//		},
-	//	},
-	//	//"_source": []string{"traceID", "operationName", "process.serviceName", "startTime"},
-	//	//"size":    1000,
-	//}
+func (c *Client) QueryTraces(service string, start, end time.Time) (float64, error) {
 	queryEntity := CreateESAvgQuery(service, start, end)
-
 	// Encode query to JSON
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(queryEntity); err != nil {
-		log.Fatalf("Error encoding query: %s", err)
+		return 0, fmt.Errorf("Error encoding query: %s", err)
 	}
 
 	// Perform the search request
@@ -97,230 +79,110 @@ func (c *Client) QueryTraces(service string, start, end time.Time) error {
 		es.Search.WithTrackTotalHits(true),
 	)
 	if err != nil {
-		return fmt.Errorf("error getting response: %v", err)
+		return 0, fmt.Errorf("error getting response: %v", err)
 	}
-	defer res.Body.Close()
-
-	// Decode response
-	//var r map[string]interface{}
-	//if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-	//	return fmt.Errorf("error parsing response body: %v", err)
-	//}
-
-	// Print results
-	//for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
-	//	doc := hit.(map[string]interface{})["_source"]
-	//	traceID := doc.(map[string]interface{})["traceID"]
-	//	service := doc.(map[string]interface{})["process"]
-	//	serviceName := service.(map[string]interface{})["serviceName"]
-	//	op := doc.(map[string]interface{})["operationName"]
-	//	start := doc.(map[string]interface{})["startTime"]
-	//	duration := doc.(map[string]interface{})["duration"]
-	//
-	//	log.Printf("TraceID: %s | Service: %s | Operation: %s | StartTime: %v | Duration: %v\n",
-	//		traceID, serviceName, op, start, duration)
-	//}
+	defer func() {
+		err := res.Body.Close()
+		if err != nil {
+			log.Printf("error closing response body: %v\n", err)
+		}
+	}()
 	var avgRes ElasticsearchResponse
 	if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
-		return fmt.Errorf("failed to decode response: %v", err)
+		return 0, fmt.Errorf("failed to decode response: %v", err)
 	}
 
 	if avgRes.TimedOut {
-		return fmt.Errorf("avg query timed out for service: %s", service)
+		return 0, fmt.Errorf("avg query timed out for service: %s", service)
 	}
 	log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
 
-	if avgRes.Aggregations.DurationAgg.DocCount == 0 {
-		return nil
+	avgDuration := avgRes.Aggregations.DurationAgg.AvgDuration.Value
+	if avgRes.Aggregations.DurationAgg.DocCount == 0 || avgDuration == nil {
+		return 0, nil
 	}
-	//aggregation := r["aggregations"].(map[string]interface{})
-	//durationDoc := aggregation["duration"].(map[string]interface{})
-	//count := durationDoc["doc_count"].(float64)
-	//if int(count) == 0 {
-	//	return nil
-	//}
-	//avgDurationDoc := durationDoc["avg_duration"].(map[string]interface{})
-	//value := avgDurationDoc["value"].(float64)
-	log.Printf("Avg duration of service '%s' traces: %v\n", service, avgRes.Aggregations.DurationAgg.AvgDuration)
-	return nil
+	log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
+	return *avgDuration, nil
 }
 
-func minutesToTime(m int64) time.Time {
-	return time.Unix(time.Now().Unix()/86400*86400+m*60, 0)
-}
-
-func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Duration) error {
+func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Duration) (MetricResults, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	r := v1.Range{Start: start, End: end, Step: step}
-	err := c.queryCPUTotalSeconds(ctx, service, r)
+	results := MetricResults{}
+	res, err := c.queryCPUTotalSeconds(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
+	results.CpuTotalSeconds = res
 
-	err = c.queryMemory(ctx, service, r)
+	res, err = c.queryMemory(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
+	results.MemoryTotalBytes = res
 
-	err = c.queryNetworkBytesReceived(ctx, service, r)
+	res, err = c.queryNetworkBytesReceived(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
+	results.NetworkReceiveBytesTotal = res
 
-	err = c.queryNetworkBytesSent(ctx, service, r)
+	res, err = c.queryNetworkBytesSent(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
+	results.NetworkTransmitBytesTotal = res
 
-	err = c.queryReceivePacketsTotal(ctx, service, r)
+	res, err = c.queryReceivePacketsTotal(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
+	results.NetworkReceivePacketsTotal = res
 
-	err = c.queryTransmitPacketsTotal(ctx, service, r)
+	res, err = c.queryTransmitPacketsTotal(ctx, service, r)
 	if err != nil {
-		return err
+		return results, err
 	}
-	return nil
+	results.NetworkTransmitPacketsTotal = res
+	return results, nil
 }
 
-func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
-	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
-	}
-	if len(warnings) > 0 {
-		log.Printf("Warnings: %v", warnings)
-	}
-
-	matrix, ok := results.(model.Matrix)
-	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
-	}
-
-	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
-	}
-	log.Println("BYTES SENT TOTAL METRIC DONE")
-	return nil
+	return c.queryPrometheus(ctx, query, r)
 }
 
-func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_network_receive_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
-	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
-	}
-	if len(warnings) > 0 {
-		log.Printf("Warnings: %v", warnings)
-	}
-
-	matrix, ok := results.(model.Matrix)
-	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
-	}
-
-	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
-	}
-	log.Println("BYTES RECEIVED TOTAL METRIC DONE")
-	return nil
+	return c.queryPrometheus(ctx, query, r)
 }
 
-func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_network_receive_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
-	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
-	}
-	if len(warnings) > 0 {
-		log.Printf("Warnings: %v", warnings)
-	}
-
-	matrix, ok := results.(model.Matrix)
-	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
-	}
-
-	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
-	}
-	log.Println("RECEIVE PACKETS TOTAL METRIC DONE")
-	return nil
+	return c.queryPrometheus(ctx, query, r)
 }
 
-func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_network_transmit_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
-	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
-	}
-	if len(warnings) > 0 {
-		log.Printf("Warnings: %v", warnings)
-	}
-
-	matrix, ok := results.(model.Matrix)
-	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
-	}
-
-	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
-	}
-	log.Println("TRANSMIT PACKETS TOTAL METRIC DONE")
-	return nil
+	return c.queryPrometheus(ctx, query, r)
 }
 
-func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("avg_over_time(container_memory_usage_bytes{container=\"%s\"}[1m])", service)
-	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
-	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
-	}
-	if len(warnings) > 0 {
-		log.Printf("Warnings: %v", warnings)
-	}
-
-	matrix, ok := results.(model.Matrix)
-	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
-	}
-
-	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
-	}
-	log.Println("MEMORY METRIC DONE")
-	return nil
+	return c.queryPrometheus(ctx, query, r)
 }
 
-func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.Range) error {
+func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m])", service)
+	return c.queryPrometheus(ctx, query, r)
+}
+
+func (c *Client) queryPrometheus(ctx context.Context, query string, r v1.Range) (float64, error) {
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
-		return fmt.Errorf("error querying Prometheus: %v", err)
+		return 0, fmt.Errorf("error querying Prometheus: %v", err)
 	}
 	if len(warnings) > 0 {
 		log.Printf("Warnings: %v", warnings)
@@ -328,16 +190,22 @@ func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.
 
 	matrix, ok := results.(model.Matrix)
 	if !ok {
-		return fmt.Errorf("result vector is not a vector, but actual: %v", results.Type())
+		return 0, fmt.Errorf("result vector is not of type Matrix, but actual: %v", results.Type())
 	}
 
+	value := 0.0
 	// Iterate over the vector
-	for _, row := range matrix {
-		log.Printf("Metric: %v\n", row.Metric)
-		for _, value := range row.Values {
-			log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
-		}
+	//for _, row := range matrix {
+	//	log.Printf("Metric: %v\n", row.Metric)
+	//	for _, value := range row.Values {
+	//		log.Printf("Timestamp: %v - Value: %v\n", value.Timestamp, value.Value)
+	//	}
+	//}
+	if len(matrix) > 0 && len(matrix[0].Values) > 0 {
+		end := len(matrix[0].Values) - 1
+		value = float64(matrix[0].Values[end].Value)
+		ts := int64(matrix[0].Values[end].Timestamp)
+		log.Printf("Timestamp: %v - Value: %v\n", ts, value)
 	}
-	log.Println("CPU METRIC DONE")
-	return nil
+	return value, nil
 }
