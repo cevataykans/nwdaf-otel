@@ -11,7 +11,7 @@ import (
 
 type Repository interface {
 	Setup() error
-	InsertBatch(metrics []prometheus.MetricResults) error
+	InsertBatch(data []prometheus.MetricResults) error
 	Debug() error
 }
 
@@ -53,7 +53,7 @@ func (r sqlLiteRepo) InsertBatch(metrics []prometheus.MetricResults) error {
 		return err
 	}
 	stmt, err := tx.Prepare(
-		"INSERT INTO metrics(ts, service, cpu_usage, memory_usage, total_bytes_sent, total_packets_sent, total_bytes_received, total_packets_received, avg_trace_duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		"INSERT INTO series(ts, service, cpu_usage, memory_usage, total_bytes_sent, total_packets_sent, total_bytes_received, total_packets_received, avg_trace_duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
