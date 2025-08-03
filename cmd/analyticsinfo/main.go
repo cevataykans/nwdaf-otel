@@ -94,6 +94,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 	for i := 0; i < 60; i++ {
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
+		statistics := make([]prometheus.MetricResults, 0)
 		for _, service := range services {
 			log.Printf("Querying service: %v\n", service)
 			start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
@@ -106,7 +107,29 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 				log.Printf("Error querying traces: %v\n", err)
 			}
 			log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
+			statistics = append(statistics, prometheus.MetricResults{
+				Service:                     service,
+				Timestamp:                   nextMin,
+				CpuTotalSeconds:             metrics.CpuTotalSeconds,
+				MemoryTotalBytes:            metrics.MemoryTotalBytes,
+				NetworkReceiveBytesTotal:    metrics.NetworkReceiveBytesTotal,
+				NetworkTransmitBytesTotal:   metrics.NetworkTransmitBytesTotal,
+				NetworkReceivePacketsTotal:  metrics.NetworkReceivePacketsTotal,
+				NetworkTransmitPacketsTotal: metrics.NetworkTransmitPacketsTotal,
+				AvgTraceDuration:            avgDuration,
+			})
 		}
+
+		err := repo.InsertBatch(statistics)
+		if err != nil {
+			log.Printf("Error inserting batch: %v\n", err)
+		}
+
+		err = repo.Debug()
+		if err != nil {
+			log.Printf("Error debug reading statistics: %v\n", err)
+		}
+
 		nextMin += 60
 		cur := time.Now()
 		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
