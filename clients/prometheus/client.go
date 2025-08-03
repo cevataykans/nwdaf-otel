@@ -192,6 +192,9 @@ func (c *Client) queryPrometheus(ctx context.Context, query string, r v1.Range) 
 	if !ok {
 		return 0, fmt.Errorf("result vector is not of type Matrix, but actual: %v", results.Type())
 	}
+	if len(matrix) > 1 {
+		log.Printf("warning, matrix has more results then service with count: %v", len(matrix))
+	}
 
 	value := 0.0
 	// Iterate over the vector

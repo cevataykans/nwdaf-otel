@@ -86,16 +86,15 @@ func queryResources(client *prometheus.Client) {
 		for _, service := range services {
 			log.Printf("Querying service: %v\n", service)
 			start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
-			avgDuration, err := client.QueryTraces(service, start, end)
-			if err != nil {
-				log.Printf("Error querying traces: %v\n", err)
-			}
-
 			metrics, err := client.QueryMetrics(service, start, end, time.Minute)
 			if err != nil {
 				log.Printf("Error querying metrics %v\n", err)
 			}
-			log.Printf("Metrics %v and average trace duration: %v\n", metrics, avgDuration)
+			avgDuration, err := client.QueryTraces(service, start, end)
+			if err != nil {
+				log.Printf("Error querying traces: %v\n", err)
+			}
+			log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
 		}
 		nextMin += 60
 		cur := time.Now()
