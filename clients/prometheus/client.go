@@ -21,12 +21,15 @@ const (
 )
 
 type MetricResults struct {
+	Timestamp                   int64
+	Service                     string
 	CpuTotalSeconds             float64
 	MemoryTotalBytes            float64
 	NetworkReceiveBytesTotal    float64
 	NetworkTransmitBytesTotal   float64
 	NetworkReceivePacketsTotal  float64
 	NetworkTransmitPacketsTotal float64
+	AvgTraceDuration            float64
 }
 
 type Client struct {

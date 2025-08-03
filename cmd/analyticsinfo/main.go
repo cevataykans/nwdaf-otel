@@ -2,11 +2,11 @@ package main
 
 import (
 	"crypto/tls"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"nwdaf-otel/clients/prometheus"
+	"nwdaf-otel/repository"
 	"nwdaf-otel/server"
 	"time"
 )
@@ -40,15 +40,26 @@ func main() {
 			log.Println(err)
 		}
 	}(res.Body)
-	fmt.Println(res.StatusCode)
-	fmt.Println("Successfully connected NRF client and ready to register.")
+	log.Println(res.StatusCode)
+	log.Println("Successfully connected NRF client and ready to register.")
+
+	log.Println("Creating DB")
+	repo, err := repository.NewSQLiteRepo()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = repo.Setup()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	promClient, err := prometheus.NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	go queryResources(promClient)
+	go queryResources(promClient, repo)
 
 	err = <-errChan
 	if err != nil {
@@ -57,7 +68,7 @@ func main() {
 	log.Println("Application Finished!")
 }
 
-func queryResources(client *prometheus.Client) {
+func queryResources(client *prometheus.Client, repo repository.Repository) {
 	curSeconds := time.Now().UTC().Unix()
 	remainingSeconds := 60 - (curSeconds % 60)
 	nextMin := curSeconds + remainingSeconds
