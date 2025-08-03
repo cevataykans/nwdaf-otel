@@ -1,6 +1,6 @@
 name: publish.yml
 on:
-  workflow_call:
+  workflow_dispatch:
   push:
     branches:
       - main
