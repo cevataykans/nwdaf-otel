@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Disable firewall for the core!
-sudo ufw enable
+sudo ufw disable
 
 current_dir=$(pwd)
 
