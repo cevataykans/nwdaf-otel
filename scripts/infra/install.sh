@@ -61,7 +61,7 @@ make aether-ueransim-install
 cd "$current_dir"
 
 echo "****** REMOVING ISTIO FROM MET ******"
-bash scripts/k8s/remove_istio_from_met_nf.sh
+bash scripts/k8s/filter_istio_sidecar.sh
 #echo "****** PORT FORWARDING JAEGER ******"
-#bash scripts/k8s/port-forward.sh &
+#bash scripts/k8s/port-forward_jaeger.sh &
 #bash ./injection.sh
