@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Disable firewall for the core!
+sudo ufw disable
+
 current_dir=$(pwd)
 
 # Paths to the directories for the corresponding application (Path ending in the directory)
@@ -28,12 +31,12 @@ sleep 30s
 #ssh -i ~/.ssh/cmvm7_key  jungmann@cmvm8.cit.tum.de "sudo ip route add 192.168.252.0/24 via 131.159.25.123 dev ens192; sudo ip route add 192.168.250.0/24 via 131.159.25.123 dev ens192"
 
 echo "****** CERT MANAGER INSTALLATION ******"
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
 sleep 1m
 
 echo "****** OTEL INSTALLATION ******"
 #kubectl apply -f otel_operator_go_dec.yaml
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.131.0/opentelemetry-operator.yaml
 sleep 3m
 
 echo "****** FILTERED ELASTIC INSTALLATION ******"
@@ -51,16 +54,14 @@ sleep 1m
 cd "$AETHER_DIR"
 echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
-echo "****** REMOVING ISTIO FROM MET ******"
-bash scripts/k8s/remove_istio_from_met_nf.sh
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
 echo "****** AETHER UERANSIM INSTALLATION ******"
-#make aether-ueransim-install
+make aether-ueransim-install
 cd "$current_dir"
 
 echo "****** REMOVING ISTIO FROM MET ******"
-bash scripts/k8s/remove_istio_from_met_nf.sh
+bash scripts/k8s/filter_istio_sidecar.sh
 #echo "****** PORT FORWARDING JAEGER ******"
-#bash scripts/k8s/port-forward.sh &
+#bash scripts/k8s/port-forward_jaeger.sh &
 #bash ./injection.sh

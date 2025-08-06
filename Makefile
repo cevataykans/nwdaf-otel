@@ -14,3 +14,9 @@ generate_all:
 	mv ./generated/temp/go/* ./generated/eventssubscription
 	openapi-generator generate -i templates/5G_APIs/TS29520_Nnwdaf_MLModelProvision.yaml -g go-server -o ./generated/temp --additional-properties=packageName=mlmodelprovision
 	mv ./generated/temp/go/* ./generated/mlmodelprovision
+
+install:
+	bash scripts/infra/install.sh
+
+uninstall:
+	bash scripts/infra/uninstall.sh

@@ -9,7 +9,7 @@ AETHER_DIR=/home/sevinc/aether-onramp/
 
 echo "****** AETHER UNINSTALLATION ******"
 cd "$AETHER_DIR"
-#make aether-ueransim-uninstall
+make aether-ueransim-uninstall
 make aether-amp-uninstall
 make aether-5gc-uninstall
 cd "$current_dir"
@@ -27,11 +27,11 @@ kubectl delete -f scripts/collector_filtered_elastic.yaml
 
 echo "****** REMOVE OTEL ******"
 #kubectl delete -f otel_operator_go_dec.yaml
-kubectl delete -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+kubectl delete -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.131.0/opentelemetry-operator.yaml
 sleep 2m
 
 echo "****** REMOVE CERT MANAGER ******"
-kubectl delete -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
 sleep 1m
 
 echo "Checking all remaining pods before k8s uninstallation ..."
@@ -41,3 +41,6 @@ cd "$AETHER_DIR"
 echo "****** REMOVE K8S ******"
 make aether-k8s-uninstall
 cd "$current_dir"
+
+# Re-enable firewall for the core!
+sudo ufw enable
