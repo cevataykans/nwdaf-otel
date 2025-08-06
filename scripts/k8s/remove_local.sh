@@ -9,7 +9,7 @@ AETHER_DIR=/home/sevinc/aether-onramp/
 
 echo "****** AETHER UNINSTALLATION ******"
 cd "$AETHER_DIR"
-#make aether-ueransim-uninstall
+make aether-ueransim-uninstall
 make aether-amp-uninstall
 make aether-5gc-uninstall
 cd "$current_dir"
