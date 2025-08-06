@@ -5,7 +5,7 @@ current_dir=$(pwd)
 # Paths to the directories for the corresponding application (Path ending in the directory)
 # Manually adapt to local setup (TODO: Clone istio and Aether if necessary BUT: Values still need to be adapted manually)
 ISTIO_DIR=/home/sevinc/jungmann/istio
-AETHER_DIR=/home/sevinc/aether-onramp/
+AETHER_DIR=/home/sevinc/vc/aether-onramp/
 
 # remove dangling data from disk from older metric installations
 sudo rm -rf /opt/local-path-provisioner/
@@ -56,7 +56,7 @@ bash scripts/k8s/remove_istio_from_met_nf.sh
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
 echo "****** AETHER UERANSIM INSTALLATION ******"
-#make aether-ueransim-install
+make aether-ueransim-install
 cd "$current_dir"
 
 echo "****** REMOVING ISTIO FROM MET ******"
