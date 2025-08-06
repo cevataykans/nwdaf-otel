@@ -41,3 +41,6 @@ cd "$AETHER_DIR"
 echo "****** REMOVE K8S ******"
 make aether-k8s-uninstall
 cd "$current_dir"
+
+# Re-enable firewall for the core!
+sudo ufw enable
