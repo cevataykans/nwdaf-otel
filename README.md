@@ -23,6 +23,7 @@ Some tips that I can give is:
 
 In aether-onramp, navigate to the vars/main.yml and **only** change:
 * core.amf.ip (should be nuc3 IP)
+* Also change hosts.ini
 * Thats it, if I have not missed anything!
 
 Install the core with:
