@@ -51,8 +51,6 @@ sleep 1m
 cd "$AETHER_DIR"
 echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
-echo "****** REMOVING ISTIO FROM MET ******"
-bash scripts/k8s/remove_istio_from_met_nf.sh
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
 echo "****** AETHER UERANSIM INSTALLATION ******"
