@@ -6,6 +6,9 @@ import (
 )
 
 func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
+	if service == UPFContainer {
+		service = UPFPod
+	}
 	return ESQuery{
 		Size: 0,
 		Aggs: Aggregations{

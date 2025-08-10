@@ -18,6 +18,8 @@ import (
 const (
 	PrometheusAddress = "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
 	ElasticAddress    = "http://elasticsearch-master.default.svc.cluster.local:9200"
+	UPFContainer      = "bessd"
+	UPFPod            = "upf"
 )
 
 type MetricResults struct {
@@ -154,21 +156,33 @@ func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Du
 }
 
 func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1.Range) (float64, error) {
+	if service == UPFContainer {
+		service = UPFPod
+	}
 	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	return c.queryPrometheus(ctx, query, r)
 }
 
 func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) (float64, error) {
+	if service == UPFContainer {
+		service = UPFPod
+	}
 	query := fmt.Sprintf("rate(container_network_receive_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	return c.queryPrometheus(ctx, query, r)
 }
 
 func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
+	if service == UPFContainer {
+		service = UPFPod
+	}
 	query := fmt.Sprintf("rate(container_network_receive_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	return c.queryPrometheus(ctx, query, r)
 }
 
 func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
+	if service == UPFContainer {
+		service = UPFPod
+	}
 	query := fmt.Sprintf("rate(container_network_transmit_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
 	return c.queryPrometheus(ctx, query, r)
 }
