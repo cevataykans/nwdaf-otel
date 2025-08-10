@@ -86,8 +86,6 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		"smf",
 		"udm",
 		"udr",
-		"webui",
-		"simapp",
 	}
 
 	// print for one hour metrics
