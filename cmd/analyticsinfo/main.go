@@ -29,7 +29,7 @@ func main() {
 		Timeout:   time.Second * 5,
 		Transport: nrfClientTransport,
 	}
-	res, err := nrfClient.Get("https://nrf:29510/nnrf-nfm/v1/nf-instances?limit=10")
+	res, err := nrfClient.Get("http://nrf:29510/nnrf-nfm/v1/nf-instances?limit=10")
 	if err != nil {
 		log.Fatal(err)
 	}
