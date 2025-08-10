@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Disable firewall for the core!
-sudo ufw disable
-
 current_dir=$(pwd)
 
 # Paths to the directories for the corresponding application (Path ending in the directory)
