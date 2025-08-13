@@ -7,6 +7,7 @@ import os
 # Flag to indicate whether the program should keep running
 running = True
 ueransim_executable_path = 'ueransim_onramp/build'
+ueransim_config_path = 'ueransim_onramp/config'
 gnb_executable = 'nr-gnb'
 ue_executable = 'nr-ue'
 binder_executable = 'nr-binder'
@@ -39,17 +40,18 @@ def run_gnb():
     print('Spawning GNB Process\n')
     gnb = run_process('gnb',
                 os.path.join('..', ueransim_executable_path, 'nr-gnb'),
-                args=['-c', '../config/custom-gnb.yaml'])
+                args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')])
     start = time.monotonic()
     # Process stdout
     for line in gnb.stdout:
-        print(line, end='\n')
         line = line.strip()
+        print(line, end='\n')
         if 'NG Setup procedure is successful' in line:
             return True
 
         # Detect an error message
         if 'error' in line.lower():
+            print(line, end='\n')
             return False
 
         # Apply 10 second deadline
