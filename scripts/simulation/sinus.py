@@ -43,6 +43,7 @@ def run_gnb():
     start = time.monotonic()
     # Process stdout
     for line in gnb.stdout:
+        print(line, end='\n')
         line = line.strip()
         if 'NG Setup procedure is successful' in line:
             return True
