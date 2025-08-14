@@ -106,7 +106,10 @@ def run_ue():
     min_ping_duration = 1
     max_ping_duration = 60
     counter = random.randint(min_ping_duration, max_ping_duration)
-    ping_process = run_process('ping', args=['-I', tun_interface, '8.8.8.8', '-c', f'{counter}'])
+    ping_process = run_process(
+        os.path.join('..', ueransim_executable_path, 'nr-binder'),
+        args=[tun_interface, 'ping', '8.8.8.8', '-c', f'{counter}']
+    )
 
     # Save everything in list
     global ue_processes
