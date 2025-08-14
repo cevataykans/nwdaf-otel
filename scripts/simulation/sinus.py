@@ -16,7 +16,7 @@ max_device_count = 300
 min_device_count = 20
 cur_device_count = 0
 wave_period_seconds = 600
-max_device_spawn_in_second = 0.1
+max_device_spawn_in_second = 10
 gnb_process: subprocess.Popen = None
 ue_processes = []
 starting_imsi = 208930100007487
@@ -108,9 +108,8 @@ def run_ue():
 
     print(f'UE tun interface: {tun_interface}\n')
     # Run ping command with deadline
-    min_ping_duration = 1
-    max_ping_duration = 60
-    counter = random.randint(min_ping_duration, max_ping_duration)
+    global min_device_count, max_device_count
+    counter = random.randint(min_device_count, max_device_count)
     ping_process = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-binder'),
         args=[tun_interface, 'ping', '8.8.8.8', '-c', f'{counter}']
