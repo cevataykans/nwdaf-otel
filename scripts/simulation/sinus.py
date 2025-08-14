@@ -201,17 +201,17 @@ def main_simulation():
         print('GNB could not start, returning main sim ...\n')
         return
 
-    global running
+    global running, cur_device_count
     sleep_time = 1 / max_device_spawn_in_second
     while running:
         spawn_ue()
 
         # Check out devices that have reached their lifespan and should deregister before exiting
         remove_unused_ue_resources()
-
+        print(f'Loop complete: cur_device_count: {cur_device_count}')
         time.sleep(sleep_time)
-    print('Main Simulation Loop Exit')
 
+    print('Main Simulation Loop Exit')
 
 def main():
     # Register signal handlers
