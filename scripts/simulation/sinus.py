@@ -34,7 +34,7 @@ def run_process(executable_path, args=None):
     return process
 
 def run_gnb():
-    print('Spawning GNB Process\n')
+    print('\nSpawning GNB Process')
     gnb = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-gnb'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')]
@@ -45,12 +45,12 @@ def run_gnb():
     # Process stdout
     for line in gnb.stdout:
         line = line.strip()
-        print(line, end='\n')
         if 'NG Setup procedure is successful' in line:
             return True
 
         # Detect an error message
         if 'error' in line.lower():
+            print(line, end='\n')
             return False
 
         # Apply 10 second deadline
@@ -68,7 +68,7 @@ def run_ue():
         starting_imsi += 1
 
     imsi_arg = f'imsi-{cur_imsi}'
-    print(f'Starting UE with imsi: {imsi_arg}\n')
+    print(f'\nStarting UE with imsi: {imsi_arg}')
     ue = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-ue'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg]
@@ -77,17 +77,17 @@ def run_ue():
     tun_interface = ''
     for line in ue.stdout:
         line = line.strip()
-        print(line, end='\n')
 
         # Detect an error message
         if "error" in line.lower():
+            print(line)
             return False
 
         if 'is successful' in line and 'is up' in line:
-            print('Device is alive\n')
             start = line.rfind('[')
             end = line.rfind(',')
             if start == -1 or end == -1:
+                print(f'ERROR Device interface cannot be found in line: {line}\n')
                 return False
             tun_interface = line[start+1:end]
             break
@@ -122,14 +122,14 @@ def remove_unused_ue_resources():
     global ue_processes
     processes_to_remove = []
     for ue_metadata in ue_processes:
-        print(f'Will remove UE {ue_metadata["imsi"]}, {ue_metadata["interface"]}\n')
-
         cmd_process: subprocess.Popen = ue_metadata['ue_command']
         if cmd_process is not None and cmd_process.poll() is not None:
+            print(f'Will remove UE {ue_metadata["imsi"]}, {ue_metadata["interface"]}')
             # poll not none indicates command exit, can safely remove device
             processes_to_remove.append(ue_metadata)
 
-    global available_imsis
+    global available_imsis, cur_device_count
+    cur_device_count -= len(processes_to_remove)
     for ue_to_remove in processes_to_remove:
         ue_processes.remove(ue_to_remove)
 
@@ -143,8 +143,6 @@ def remove_unused_ue_resources():
         ue_process: subprocess.Popen = ue_to_remove['process']
         if ue_process is not None and ue_process.poll() is None:
             ue_process.terminate()
-
-        ue_processes.remove(ue_to_remove)
 
         imsi_number = int(ue_to_remove['imsi'][5:])
         available_imsis.append(imsi_number)
@@ -179,14 +177,14 @@ def current_time_to_device_count():
 
 def signal_handler(sig, frame):
     global running
-    print('\nExit signal received. Shutting down...')
+    print('\nExit signal received. Shutting down...\n')
     running = False
 
 def main_simulation():
     # Spawn GNB and check they are no errors
     gnb_ok = run_gnb()
     if not gnb_ok:
-        print('GNB could not start, returning main sim ... \n')
+        print('GNB could not start, returning main sim ...\n')
         return
 
     global running
@@ -198,7 +196,7 @@ def main_simulation():
         remove_unused_ue_resources()
 
         time.sleep(sleep_time)
-    print('Main Simulation Loop Exit\n')
+    print('Main Simulation Loop Exit')
 
 
 def main():
