@@ -18,7 +18,7 @@ wave_period_seconds = 600
 max_device_spawn_in_second = 1
 gnb_process: subprocess.Popen = None
 ue_processes = []
-starting_imsi = 208930100007488
+starting_imsi = 208930100007487
 available_imsis = []
 
 def run_process(executable_path, args=None):
