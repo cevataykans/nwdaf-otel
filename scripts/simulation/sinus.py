@@ -74,32 +74,37 @@ def run_ue():
         os.path.join('..', ueransim_executable_path, 'nr-ue'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg]
     )
+
     # Check if successful registration
     tun_interface = ''
     start = time.monotonic()
+    success = False
     for line in ue.stdout:
         line = line.strip()
 
-        # Detect an error message
         if "error" in line.lower():
             print(line)
-            return False
+            break
 
         if 'is successful' in line and 'is up' in line:
             start = line.rfind('[')
             end = line.rfind(',')
-            if start == -1 or end == -1:
+            if start != -1 and end != -1:
+                tun_interface = line[start+1:end]
+                success = True
+            else:
                 print(f'ERROR Device interface cannot be found in line: {line}\n')
-                return False
-            tun_interface = line[start+1:end]
             break
 
         # Apply 5 second deadline
         if time.monotonic() - start > 5:
             print('UE timed out for starting ... ')
-            if ue.poll() is None:
-                ue.terminate()
-            return False
+            break
+
+    if not success:
+        if ue.poll() is None:
+            ue.terminate()
+        return False
 
     print(f'UE tun interface: {tun_interface}\n')
     # Run ping command with deadline
@@ -139,8 +144,6 @@ def remove_unused_ue_resources():
     for ue_metadata in ue_processes:
         cmd_process: subprocess.Popen = ue_metadata['ue_command']
         if cmd_process is not None and cmd_process.poll() is not None:
-            for line in cmd_process.stdout:
-                print(line)
             print(f'Will remove UE {ue_metadata["imsi"]}, {ue_metadata["interface"]}')
             # poll not none indicates command exit, can safely remove device
             processes_to_remove.append(ue_metadata)
