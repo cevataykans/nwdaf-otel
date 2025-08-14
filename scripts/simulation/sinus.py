@@ -1,3 +1,4 @@
+import random
 import time
 import signal
 import math
@@ -15,7 +16,7 @@ max_device_count = 300
 min_device_count = 20
 cur_device_count = 0
 wave_period_seconds = 600
-max_device_spawn_in_second = 1
+max_device_spawn_in_second = 0.1
 gnb_process: subprocess.Popen = None
 ue_processes = []
 starting_imsi = 208930100007487
@@ -75,6 +76,7 @@ def run_ue():
     )
     # Check if successful registration
     tun_interface = ''
+    start = time.monotonic()
     for line in ue.stdout:
         line = line.strip()
 
@@ -92,9 +94,19 @@ def run_ue():
             tun_interface = line[start+1:end]
             break
 
+        # Apply 5 second deadline
+        if time.monotonic() - start > 5:
+            print('UE timed out for starting ... ')
+            if ue.poll() is None:
+                ue.terminate()
+            return False
+
     print(f'UE tun interface: {tun_interface}\n')
     # Run ping command with deadline
-    ping_process = run_process('ping', args=['-I', tun_interface, '8.8.8.8', '-c', '5'])
+    min_ping_duration = 1
+    max_ping_duration = 60
+    counter = random.randint(min_ping_duration, max_ping_duration)
+    ping_process = run_process('ping', args=['-I', tun_interface, '8.8.8.8', '-c', f'{counter}'])
 
     # Save everything in list
     global ue_processes
@@ -124,6 +136,8 @@ def remove_unused_ue_resources():
     for ue_metadata in ue_processes:
         cmd_process: subprocess.Popen = ue_metadata['ue_command']
         if cmd_process is not None and cmd_process.poll() is not None:
+            for line in cmd_process.stdout:
+                print(line)
             print(f'Will remove UE {ue_metadata["imsi"]}, {ue_metadata["interface"]}')
             # poll not none indicates command exit, can safely remove device
             processes_to_remove.append(ue_metadata)
