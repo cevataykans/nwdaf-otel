@@ -18,11 +18,12 @@ wave_period_seconds = 600
 max_device_spawn_in_second = 1
 gnb_process: subprocess.Popen = None
 ue_processes = []
+starting_imsi = 208930100007488
+available_imsis = []
 
-def run_process(process_type, executable_path, args=None):
+def run_process(executable_path, args=None):
     if args is None:
         args = []
-    global gnb_process, ue_processes
     process = subprocess.Popen(
         [executable_path] + args,
         stdout=subprocess.PIPE,
@@ -30,17 +31,16 @@ def run_process(process_type, executable_path, args=None):
         text=True,
         bufsize=1
     )
-    if process_type == 'gnb':
-        gnb_process = process
-    else:
-        ue_processes.append({'process': process, 'device_id': None})
     return process
 
 def run_gnb():
     print('Spawning GNB Process\n')
-    gnb = run_process('gnb',
-                os.path.join('..', ueransim_executable_path, 'nr-gnb'),
-                args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')])
+    gnb = run_process(
+        os.path.join('..', ueransim_executable_path, 'nr-gnb'),
+        args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')]
+    )
+    global gnb_process
+    gnb_process = gnb
     start = time.monotonic()
     # Process stdout
     for line in gnb.stdout:
@@ -51,7 +51,6 @@ def run_gnb():
 
         # Detect an error message
         if 'error' in line.lower():
-            print(line, end='\n')
             return False
 
         # Apply 10 second deadline
@@ -59,25 +58,113 @@ def run_gnb():
             return False
     return False
 
-def run_ue(process):
-    print('Starting UE')
-    # # Process stdout
-    # for line in process.stdout:
-    #     line = line.strip()
-    #
-    #     # Extract an ID if present
-    #     match = id_pattern.search(line)
-    #     if match:
-    #         process_id = match.group(1)
-    #         print(f"Found ID: {process_id}")
-    #
-    #     # Detect an error message
-    #     if "error" in line.lower():
-    #         print(f"Error detected: {line}")
-    #
-    # # Optionally handle stderr separately
-    # for err_line in process.stderr:
-    #     print(f"[stderr] {err_line.strip()}")
+def run_ue():
+    global available_imsis
+    if len(available_imsis) > 0:
+        cur_imsi = available_imsis.pop()
+    else:
+        global starting_imsi
+        cur_imsi = starting_imsi
+        starting_imsi += 1
+
+    imsi_arg = f'imsi-{cur_imsi}'
+    print(f'Starting UE with imsi: {imsi_arg}\n')
+    ue = run_process(
+        os.path.join('..', ueransim_executable_path, 'nr-ue'),
+        args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg]
+    )
+    # Check if successful registration
+    tun_interface = ''
+    for line in ue.stdout:
+        line = line.strip()
+        print(line, end='\n')
+
+        # Detect an error message
+        if "error" in line.lower():
+            return False
+
+        if 'is successful' in line and 'is up' in line:
+            print('Device is alive\n')
+            start = line.rfind('[')
+            end = line.rfind(',')
+            if start == -1 or end == -1:
+                return False
+            tun_interface = line[start+1:end]
+            break
+
+    print(f'UE tun interface: {tun_interface}\n')
+    # Run ping command with deadline
+    ping_process = run_process('ping', args=['-I', tun_interface, '8.8.8.8', '-c', '5'])
+
+    # Save everything in list
+    global ue_processes
+    ue_metadata = {
+        'process': ue,
+        'ue_command': ping_process,
+        'imsi': imsi_arg,
+        'interface': tun_interface,
+    }
+    ue_processes.append(ue_metadata)
+    return True
+
+def spawn_ue():
+    global cur_device_count
+    target_device_count = current_time_to_device_count()
+    success = False
+    if cur_device_count < target_device_count:
+        # spawn another UE
+        success = run_ue()
+
+    if success:
+        cur_device_count += 1
+
+def remove_unused_ue_resources():
+    global ue_processes
+    processes_to_remove = []
+    for ue_metadata in ue_processes:
+        print(f'Will remove UE {ue_metadata["imsi"]}, {ue_metadata["interface"]}\n')
+
+        cmd_process: subprocess.Popen = ue_metadata['ue_command']
+        if cmd_process is not None and cmd_process.poll() is not None:
+            # poll not none indicates command exit, can safely remove device
+            processes_to_remove.append(ue_metadata)
+
+    global available_imsis
+    for ue_to_remove in processes_to_remove:
+        ue_processes.remove(ue_to_remove)
+
+        # send deregister signal via nr-cli
+        deregister = run_process(
+            os.path.join('..', ueransim_executable_path, 'nr-cli'),
+            args=[ue_to_remove['imsi'], '--exec', 'deregister normal']
+        )
+        deregister.wait()
+
+        ue_process: subprocess.Popen = ue_to_remove['process']
+        if ue_process is not None and ue_process.poll() is None:
+            ue_process.terminate()
+
+        ue_processes.remove(ue_to_remove)
+
+        imsi_number = int(ue_to_remove['imsi'][5:])
+        available_imsis.append(imsi_number)
+
+def kill_all_ue():
+    global ue_processes
+    for ue_metadata in ue_processes:
+        cmd_process: subprocess.Popen = ue_metadata['ue_command']
+        if cmd_process is not None and cmd_process.poll() is None:
+            cmd_process.terminate()
+
+        deregister = run_process(
+            os.path.join('..', ueransim_executable_path, 'nr-cli'),
+            args=[ue_metadata['imsi'], '--exec', 'deregister normal']
+        )
+        deregister.wait()
+
+        ue_process: subprocess.Popen = ue_metadata['process']
+        if ue_process is not None and ue_process.poll() is None:
+            ue_process.terminate()
 
 def current_time_to_device_count():
     global max_device_count, min_device_count, wave_period_seconds
@@ -102,13 +189,14 @@ def main_simulation():
         print('GNB could not start, returning main sim ... \n')
         return
 
-    global cur_device_count, running
+    global running
     sleep_time = 1 / max_device_spawn_in_second
     while running:
-        target_device_count = current_time_to_device_count()
-        if cur_device_count < target_device_count:
-            # spawn another UE
-            print('TODO, SPAWN UE')
+        spawn_ue()
+
+        # Check out devices that have reached their lifespan and should deregister before exiting
+        remove_unused_ue_resources()
+
         time.sleep(sleep_time)
     print('Main Simulation Loop Exit\n')
 
@@ -121,7 +209,10 @@ def main():
     print('Program started. Press Ctrl+C to exit.')
     main_simulation()
 
-    # Cleanup resources, make every device disconnect, then stop gnb
+    # Cleanup all devices first
+    kill_all_ue()
+
+    # stop gnb lastly
     global gnb_process
     if gnb_process is not None and gnb_process.poll() is None:
         gnb_process.terminate()
