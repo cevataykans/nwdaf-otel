@@ -20,3 +20,9 @@ install:
 
 uninstall:
 	bash scripts/infra/uninstall.sh
+
+start-analytics:
+	helm install -f helm/analyticsinfo_values.yaml nwdaf-analytics-info ./helm -n aether-5gc
+
+stop-analytics:
+	helm uninstall nwdaf-analytics-info -n aether-5gc

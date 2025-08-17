@@ -81,6 +81,29 @@ func (r sqlLiteRepo) InsertBatch(metrics []prometheus.MetricResults) error {
 	return tx.Commit()
 }
 
+func (r sqlLiteRepo) Size() (int, error) {
+	rows, err := r.Query("SELECT COUNT(*) AS row_count FROM series")
+	if err != nil {
+		return -1, err
+	}
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
+	var count int
+	if !rows.Next() {
+		return -1, fmt.Errorf("no series found")
+	}
+	err = rows.Scan(&count)
+	if err != nil {
+		err = fmt.Errorf("error scanning row count: %v", err)
+	}
+	return count, err
+}
+
 func (r sqlLiteRepo) Debug() error {
 	rows, err := r.Query("SELECT * FROM series")
 	if err != nil {
