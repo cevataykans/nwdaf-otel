@@ -52,22 +52,9 @@ def run_gnb():
     global gnb_process
     gnb_process['process'] = gnb
     gnb_process['log_file'] = gnb_log_file
-    start = time.monotonic()
-    # Process stdout
-    for line in gnb_log_file:
-        line = line.strip()
-        if 'NG Setup procedure is successful' in line:
-            return True
-
-        # Detect an error message
-        if 'error' in line.lower():
-            print(line, end='\n')
-            return False
-
-        # Apply 10 second deadline
-        if time.monotonic() - start > 10:
-            return False
-    return False
+    print('sleeping for 5 seconds for gnb to bootup ... ')
+    time.sleep(5)
+    return True
 
 def run_ue():
     global available_imsis
@@ -85,14 +72,13 @@ def run_ue():
     ue, ue_log_file = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-ue'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg],
-        file_name=f'{start_ts}-{imsi_arg}'
     )
 
     # Check if successful registration
     tun_interface = ''
     start = time.monotonic()
     success = False
-    for line in ue_log_file:
+    for line in ue.stdout:
         line = line.strip()
 
         if "error" in line.lower():
@@ -117,7 +103,6 @@ def run_ue():
     if not success:
         if ue.poll() is None:
             ue.terminate()
-        ue_log_file.close()
         return False
 
     print(f'UE tun interface: {tun_interface}\n')
@@ -135,8 +120,7 @@ def run_ue():
         'process': ue,
         'ue_command': ping_process,
         'imsi': imsi_arg,
-        'interface': tun_interface,
-        'log_file': ue_log_file,
+        'interface': tun_interface
     }
     ue_processes.append(ue_metadata)
     return True
@@ -177,7 +161,6 @@ def remove_unused_ue_resources():
         ue_process: subprocess.Popen = ue_to_remove['process']
         if ue_process is not None and ue_process.poll() is None:
             ue_process.terminate()
-        ue_to_remove['log_file'].close()
 
         imsi_number = int(ue_to_remove['imsi'][5:])
         available_imsis.append(imsi_number)
@@ -198,7 +181,6 @@ def kill_all_ue():
         ue_process: subprocess.Popen = ue_metadata['process']
         if ue_process is not None and ue_process.poll() is None:
             ue_process.terminate()
-        ue_metadata['log_file'].close()
 
 def current_time_to_device_count():
     global max_device_count, min_device_count, wave_period_seconds
