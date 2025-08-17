@@ -42,7 +42,7 @@ def run_gnb():
     gnb = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-gnb'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')],
-        file=subprocess.STDOUT
+        file=None
     )
     global gnb_process
     gnb_process = gnb
