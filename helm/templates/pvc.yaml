@@ -4,6 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: nwdaf-analytics-pvc
 spec:
+  storageClassName: ""
   accessModes:
     - {{ .Values.persistence.accessMode }}
   resources:

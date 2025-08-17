@@ -117,13 +117,13 @@ autoscaling:
 
 # Additional volumes on the output Deployment definition.
 volumes:
- - name: data
+ - name: analytics-data-storage
    persistentVolumeClaim:
     claimName: nwdaf-analytics-pvc
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
- - name: data
+ - name: analytics-data-storage
    mountPath: "/data"
 #   readOnly: true
 
