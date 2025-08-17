@@ -23,7 +23,7 @@ def main():
     conn.close()
 
     # Convert timestamp if needed
-    df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], errors="coerce")
+    df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
 
     # Plot
     plt.figure(figsize=(12,6))
