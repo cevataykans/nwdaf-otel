@@ -17,31 +17,41 @@ min_device_count = 20
 cur_device_count = 0
 wave_period_seconds = 600
 max_device_spawn_in_second = 10
-gnb_process: subprocess.Popen = None
+gnb_process = {}
 ue_processes = []
 starting_imsi = 208930100007487
 available_imsis = []
 
-def run_process(executable_path, args=None):
+log_dir = 'all_logs'
+
+def run_process(executable_path, args=None, log_file=subprocess.PIPE, file_name=''):
     if args is None:
         args = []
+
+    if file_name != '':
+        log_file_path = os.path.join(log_dir, f"{file_name}.log")
+        log_file = open(log_file_path, 'w')
+
     process = subprocess.Popen(
         [executable_path] + args,
-        stdout=subprocess.PIPE,
+        stdout=log_file,
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1
     )
-    return process
+    return process, log_file
 
 def run_gnb():
     print('\nSpawning GNB Process')
-    gnb = run_process(
+    gnb_timestamp = time.time()
+    gnb, gnb_log_file = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-gnb'),
-        args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')]
+        args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')],
+        file_name=f'gnb-{gnb_timestamp}'
     )
     global gnb_process
-    gnb_process = gnb
+    gnb_process['process'] = gnb
+    gnb_process['log_file'] = gnb_log_file
     start = time.monotonic()
     # Process stdout
     for line in gnb.stdout:
@@ -69,10 +79,13 @@ def run_ue():
         starting_imsi += 1
 
     imsi_arg = f'imsi-{cur_imsi}'
-    print(f'\nStarting UE with imsi: {imsi_arg}')
-    ue = run_process(
+    start_ts = time.time()
+    print(f'\nStarting UE with imsi: {imsi_arg} with ts: {start_ts}')
+
+    ue, ue_log_file = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-ue'),
-        args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg]
+        args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg],
+        file_name=f'{start_ts}-{imsi_arg}'
     )
 
     # Check if successful registration
@@ -104,6 +117,7 @@ def run_ue():
     if not success:
         if ue.poll() is None:
             ue.terminate()
+        ue_log_file.close()
         return False
 
     print(f'UE tun interface: {tun_interface}\n')
@@ -122,6 +136,7 @@ def run_ue():
         'ue_command': ping_process,
         'imsi': imsi_arg,
         'interface': tun_interface,
+        'log_file': ue_log_file,
     }
     ue_processes.append(ue_metadata)
     return True
@@ -162,6 +177,7 @@ def remove_unused_ue_resources():
         ue_process: subprocess.Popen = ue_to_remove['process']
         if ue_process is not None and ue_process.poll() is None:
             ue_process.terminate()
+        ue_to_remove['log_file'].close()
 
         imsi_number = int(ue_to_remove['imsi'][5:])
         available_imsis.append(imsi_number)
@@ -182,6 +198,7 @@ def kill_all_ue():
         ue_process: subprocess.Popen = ue_metadata['process']
         if ue_process is not None and ue_process.poll() is None:
             ue_process.terminate()
+        ue_metadata['log_file'].close()
 
 def current_time_to_device_count():
     global max_device_count, min_device_count, wave_period_seconds
@@ -219,6 +236,9 @@ def main_simulation():
     print('Main Simulation Loop Exit')
 
 def main():
+    # For Debugging UE logs and gnb after reaching certain threshold
+    os.makedirs(log_dir, exist_ok=True)
+
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)   # Ctrl+C
     signal.signal(signal.SIGTERM, signal_handler)  # Termination signal
@@ -231,8 +251,9 @@ def main():
 
     # stop gnb lastly
     global gnb_process
-    if gnb_process is not None and gnb_process.poll() is None:
-        gnb_process.terminate()
+    if gnb_process is not None and gnb_process['process'].poll() is None:
+        gnb_process['process'].terminate()
+    gnb_process['log_file'].close()
 
 if __name__ == '__main__':
     main()
