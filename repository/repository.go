@@ -13,6 +13,7 @@ type Repository interface {
 	Setup() error
 	InsertBatch(data []prometheus.MetricResults) error
 	Debug() error
+	Size() (int, error)
 }
 
 type sqlLiteRepo struct {
@@ -82,26 +83,12 @@ func (r sqlLiteRepo) InsertBatch(metrics []prometheus.MetricResults) error {
 }
 
 func (r sqlLiteRepo) Size() (int, error) {
-	rows, err := r.Query("SELECT COUNT(*) AS row_count FROM series")
+	var count int64
+	err := r.QueryRow("SELECT COUNT(*) AS row_count FROM series").Scan(&count)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf("error scanning row count: %v", err)
 	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}()
-
-	var count int
-	if !rows.Next() {
-		return -1, fmt.Errorf("no series found")
-	}
-	err = rows.Scan(&count)
-	if err != nil {
-		err = fmt.Errorf("error scanning row count: %v", err)
-	}
-	return count, err
+	return int(count), nil
 }
 
 func (r sqlLiteRepo) Debug() error {

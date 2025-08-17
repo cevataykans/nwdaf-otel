@@ -54,6 +54,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	count, err := repo.Size()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Successfully initialized DB with %d rows", count)
+
 	promClient, err := prometheus.NewClient()
 	if err != nil {
 		log.Fatal(err)
