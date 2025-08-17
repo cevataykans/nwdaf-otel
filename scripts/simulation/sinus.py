@@ -54,7 +54,7 @@ def run_gnb():
     gnb_process['log_file'] = gnb_log_file
     start = time.monotonic()
     # Process stdout
-    for line in gnb.stdout:
+    for line in gnb_log_file:
         line = line.strip()
         if 'NG Setup procedure is successful' in line:
             return True
@@ -92,7 +92,7 @@ def run_ue():
     tun_interface = ''
     start = time.monotonic()
     success = False
-    for line in ue.stdout:
+    for line in ue_log_file:
         line = line.strip()
 
         if "error" in line.lower():
