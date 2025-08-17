@@ -109,7 +109,7 @@ def run_ue():
     # Run ping command with deadline
     global min_device_count, max_device_count
     counter = random.randint(min_device_count, max_device_count)
-    ping_process = run_process(
+    ping_process, ping_log_descriptor = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-binder'),
         args=[tun_interface, 'ping', '8.8.8.8', '-c', f'{counter}']
     )
@@ -152,7 +152,7 @@ def remove_unused_ue_resources():
         ue_processes.remove(ue_to_remove)
 
         # send deregister signal via nr-cli
-        deregister = run_process(
+        deregister, ignore = run_process(
             os.path.join('..', ueransim_executable_path, 'nr-cli'),
             args=[ue_to_remove['imsi'], '--exec', 'deregister normal']
         )
@@ -172,7 +172,7 @@ def kill_all_ue():
         if cmd_process is not None and cmd_process.poll() is None:
             cmd_process.terminate()
 
-        deregister = run_process(
+        deregister, ignore = run_process(
             os.path.join('..', ueransim_executable_path, 'nr-cli'),
             args=[ue_metadata['imsi'], '--exec', 'deregister normal']
         )
