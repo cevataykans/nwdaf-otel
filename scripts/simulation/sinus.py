@@ -17,41 +17,35 @@ min_device_count = 20
 cur_device_count = 0
 wave_period_seconds = 600
 max_device_spawn_in_second = 10
-gnb_process = {}
+gnb_process: subprocess.Popen = None
 ue_processes = []
 starting_imsi = 208930100007487
 available_imsis = []
 
 log_dir = 'all_logs'
 
-def run_process(executable_path, args=None, log_file=subprocess.PIPE, file_name=''):
+def run_process(executable_path, args=None, file=subprocess.PIPE):
     if args is None:
         args = []
 
-    if file_name != '':
-        log_file_path = os.path.join(log_dir, f"{file_name}.log")
-        log_file = open(log_file_path, 'w')
-
     process = subprocess.Popen(
         [executable_path] + args,
-        stdout=log_file,
+        stdout=file,
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1
     )
-    return process, log_file
+    return process
 
 def run_gnb():
     print('\nSpawning GNB Process')
-    gnb_timestamp = time.time()
-    gnb, gnb_log_file = run_process(
+    gnb = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-gnb'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-gnb.yaml')],
-        file_name=f'gnb-{gnb_timestamp}'
+        file=subprocess.STDOUT
     )
     global gnb_process
-    gnb_process['process'] = gnb
-    gnb_process['log_file'] = gnb_log_file
+    gnb_process = gnb
     print('sleeping for 5 seconds for gnb to bootup ... ')
     time.sleep(5)
     return True
@@ -69,7 +63,7 @@ def run_ue():
     start_ts = time.time()
     print(f'\nStarting UE with imsi: {imsi_arg} with ts: {start_ts}')
 
-    ue, ue_log_file = run_process(
+    ue = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-ue'),
         args=['-c', os.path.join('..', ueransim_config_path, 'custom-ue.yaml'), '-i', imsi_arg],
     )
@@ -109,7 +103,7 @@ def run_ue():
     # Run ping command with deadline
     global min_device_count, max_device_count
     counter = random.randint(min_device_count, max_device_count)
-    ping_process, ping_log_descriptor = run_process(
+    ping_process = run_process(
         os.path.join('..', ueransim_executable_path, 'nr-binder'),
         args=[tun_interface, 'ping', '8.8.8.8', '-c', f'{counter}']
     )
@@ -152,7 +146,7 @@ def remove_unused_ue_resources():
         ue_processes.remove(ue_to_remove)
 
         # send deregister signal via nr-cli
-        deregister, ignore = run_process(
+        deregister = run_process(
             os.path.join('..', ueransim_executable_path, 'nr-cli'),
             args=[ue_to_remove['imsi'], '--exec', 'deregister normal']
         )
@@ -172,7 +166,7 @@ def kill_all_ue():
         if cmd_process is not None and cmd_process.poll() is None:
             cmd_process.terminate()
 
-        deregister, ignore = run_process(
+        deregister = run_process(
             os.path.join('..', ueransim_executable_path, 'nr-cli'),
             args=[ue_metadata['imsi'], '--exec', 'deregister normal']
         )
@@ -233,9 +227,8 @@ def main():
 
     # stop gnb lastly
     global gnb_process
-    if gnb_process is not None and gnb_process['process'].poll() is None:
-        gnb_process['process'].terminate()
-    gnb_process['log_file'].close()
+    if gnb_process is not None and gnb_process.poll() is None:
+        gnb_process.terminate()
 
 if __name__ == '__main__':
     main()
