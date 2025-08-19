@@ -24,7 +24,7 @@ def unquote_jinja_vars(yaml_text: str) -> str:
 
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
-    gnb_count = 0
+    gnb_count = 1
     imsi_start = 208930100007487
 
     with open(core_values_path, 'r') as f:
