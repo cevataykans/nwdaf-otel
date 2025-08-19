@@ -1,11 +1,28 @@
 import yaml
 import sys
+import re
+
+def quote_jinja_vars(yaml_text: str) -> str:
+    """
+    Wrap unquoted {{ ... }} placeholders in double quotes
+    so YAML parsers won't choke, while keeping Ansible templating intact.
+    """
+    # Matches {{ ... }} that are not already inside quotes
+    pattern = r'(?<!["\'])({{.*?}})(?!["\'])'
+    return re.sub(pattern, r'"\1"', yaml_text)
 
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
     imsi_start = 208930100007487
 
-    # Load existing YAML
+    with open(core_values_path, 'r') as f:
+        text = f.read()
+
+    fixed_text = quote_jinja_vars(text)
+
+    with open(core_values_path, 'w') as f:
+        f.write(fixed_text)
+
     with open(core_values_path, 'r') as f:
         data = yaml.safe_load(f)
 
