@@ -143,5 +143,5 @@ except ValueError:
 
 print(f'Creating imsi for devices up to: {ue_count}')
 
-file_path = '../../Thesis/aether-onramp/deps/5gc/roles/core/templates/sdcore-5g-values.yaml'
+file_path = '../aether-onramp/deps/5gc/roles/core/templates/sdcore-5g-values.yaml'
 edit_imsi_lines(file_path, ue_count)
