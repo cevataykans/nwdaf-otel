@@ -16,9 +16,12 @@ def unquote_jinja_vars(yaml_text: str) -> str:
     Remove quotes around {{ ... }} placeholders
     so Ansible can correctly resolve them.
     """
-    # Match double or single quotes wrapping a {{ ... }} block
-    pattern = r'(["\'])({{.*?}})\1'
-    return re.sub(pattern, r'\2', yaml_text)
+    # Match a quote (single or double) that wraps a {{ ... }} block entirely
+    pattern = r'''(?P<quote>["'])(?P<jinja>{{.*?}})(?P=quote)'''
+
+    def replacer(match):
+        return match.group('jinja')  # return only the {{ ... }} part
+    return re.sub(pattern, replacer, yaml_text)
 
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
