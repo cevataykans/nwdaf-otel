@@ -11,6 +11,15 @@ def quote_jinja_vars(yaml_text: str) -> str:
     pattern = r'(?<!["\'])({{.*?}})(?!["\'])'
     return re.sub(pattern, r'"\1"', yaml_text)
 
+def unquote_jinja_vars(yaml_text: str) -> str:
+    """
+    Remove quotes around {{ ... }} placeholders
+    so Ansible can correctly resolve them.
+    """
+    # Match double or single quotes wrapping a {{ ... }} block
+    pattern = r'(["\'])({{.*?}})\1'
+    return re.sub(pattern, r'\2', yaml_text)
+
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
     imsi_start = 208930100007487
@@ -63,6 +72,14 @@ def edit_imsi_lines(core_values_path, total_requested_ues):
     # Write it back to the YAML file
     with open(core_values_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+    with open(core_values_path, 'r') as f:
+        text = f.read()
+
+    reverted_text = unquote_jinja_vars(text)
+
+    with open(core_values_path, 'w') as f:
+        f.write(reverted_text)
 
 # def filter_ueid_lines(file_path,total_requested_ues):
 #     try:
