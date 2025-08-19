@@ -45,7 +45,7 @@ def edit_imsi_lines(core_values_path, total_requested_ues):
         remaining_count = total_requested_ues - cur_device_count
         subscribers.append({
             "ueId-start": f"{new_imsi_start}",
-            "ueId-end": f"{new_imsi_start + remaining_count}",
+            "ueId-end": f"{new_imsi_start + remaining_count - 1}",
             "plmnId": "20893",
             "opc": "981d464c7c52eb6e5036234984ad0bcf",
             "op": "",
