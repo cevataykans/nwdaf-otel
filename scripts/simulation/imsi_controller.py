@@ -24,6 +24,7 @@ def unquote_jinja_vars(yaml_text: str) -> str:
 
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
+    gnb_count = 0
     imsi_start = 208930100007487
 
     with open(core_values_path, 'r') as f:
@@ -56,7 +57,7 @@ def edit_imsi_lines(core_values_path, total_requested_ues):
         remaining_count = total_requested_ues - cur_device_count
         subscribers.append({
             "ueId-start": f"{new_imsi_start}",
-            "ueId-end": f"{new_imsi_start + remaining_count}",
+            "ueId-end": f"{new_imsi_start + remaining_count + gnb_count - 1}",
             "plmnId": "20893",
             "opc": "981d464c7c52eb6e5036234984ad0bcf",
             "op": "",
@@ -66,7 +67,7 @@ def edit_imsi_lines(core_values_path, total_requested_ues):
     config['subscribers'] = subscribers
 
     available_imsis = []
-    for i in range(0, total_requested_ues):
+    for i in range(0, total_requested_ues + gnb_count):
         available_imsis.append(f'{imsi_start + i}')
 
     config['device-groups'][0]['imsis'] = available_imsis
