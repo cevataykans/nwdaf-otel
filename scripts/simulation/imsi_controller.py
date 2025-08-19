@@ -8,19 +8,19 @@ def quote_jinja_vars(yaml_text: str) -> str:
     so YAML parsers won't choke, while keeping Ansible templating intact.
     """
     # Matches {{ ... }} that are not already inside quotes
-    pattern = r'^(?P<indent>\s*)(?P<key>[^:#\n]+):\s*(?P<value>{{.*?}})\s*$'
-    def replacer(m):
-        return f'{m.group("indent")}{m.group("key")}: "{m.group("value")}"'
-    return re.sub(pattern, replacer, yaml_text, flags=re.MULTILINE)
+    pattern = r'(?<!["\'])({{.*?}})(?!["\'])'
+    return re.sub(pattern, r'"\1"', yaml_text)
 
 def unquote_jinja_vars(yaml_text: str) -> str:
     """
     Remove quotes around {{ ... }} placeholders
     so Ansible can correctly resolve them.
     """
-    # Match a quote (single or double) that wraps a {{ ... }} block entirely
-    pattern = r'(["\'])(\{\{.*?\}\})\1'
-    return re.sub(pattern, r'\2', yaml_text)
+    # Match double or single quotes wrapping a {{ ... }} block
+    pattern = r'(["\'])({{.*?}})\1'
+    first_pass = re.sub(pattern, r'\2', yaml_text)
+    fixed_text = re.sub(r"''(?!$)", r"'", first_pass, flags=re.MULTILINE)
+    return fixed_text
 
 def edit_imsi_lines(core_values_path, total_requested_ues):
     initial_device_count = 14
@@ -143,5 +143,5 @@ except ValueError:
 
 print(f'Creating imsi for devices up to: {ue_count}')
 
-file_path = '../aether-onramp/deps/5gc/roles/core/templates/sdcore-5g-values.yaml'
+file_path = '../../Thesis/aether-onramp/deps/5gc/roles/core/templates/sdcore-5g-values.yaml'
 edit_imsi_lines(file_path, ue_count)
