@@ -11,7 +11,7 @@ info:
 
 configuration:
   runConfigProfilesAtStart: true
-  singleInterface: true #default value
+  singleInterface: false #default value
   execInParallel: true #run all profiles in parallel
   httpServer: # Serves APIs to create/control profiles on the go
     enable: false
