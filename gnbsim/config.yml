@@ -100,6 +100,7 @@ configuration:
       plmnId: # Public Land Mobile Network ID, <PLMN ID> = <MCC><MNC>
         mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+
     - profileType: pdusessest # profile type
       profileName: profile2 # uniqely identifies a profile within application
       enable: true # Set true to execute the profile, false otherwise.
@@ -119,6 +120,7 @@ configuration:
         mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
       dataPktCount: 5 # Number of UL user data packets to be transmitted. Common for all UEs
+
     - profileType: anrelease # profile type
       profileName: profile3 # uniqely identifies a profile within application
       enable: false # Set true to execute the profile, false otherwise.

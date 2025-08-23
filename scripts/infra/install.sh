@@ -57,7 +57,8 @@ make aether-5gc-install
 echo "****** AETHER AMP INSTALLATION ******"
 make aether-amp-install
 echo "****** AETHER UERANSIM INSTALLATION ******"
-make aether-ueransim-install
+#make aether-ueransim-install
+make aether-gnbsim-install
 cd "$current_dir"
 
 echo "****** REMOVING ISTIO FROM MET ******"
