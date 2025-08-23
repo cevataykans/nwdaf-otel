@@ -96,6 +96,6 @@ except ValueError:
 print(f'Creating {gnb_count} with {ue_count} per gnb...')
 
 #onramp_path = '../../Thesis/test/aether-onramp'
-onramp_path = '../aether-onramp/deps/5gc/roles/core/templates/sdcore-5g-values.yaml'
+onramp_path = '../aether-onramp'
 file_path = onramp_path
 edit_gnbsim_config(file_path, gnb_count, ue_count)
