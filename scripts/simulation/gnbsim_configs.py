@@ -22,11 +22,17 @@ def unquote_jinja_vars(yaml_text: str) -> str:
     fixed_text = re.sub(r"''(?!$)", r"'", first_pass, flags=re.MULTILINE)
     return fixed_text
 
-def edit_config(data, start_imsi, ue_count):
+def edit_config(data, start_imsi, ue_count, cur_gnb):
     pdu_test = data['configuration']['profiles'][1]
     pdu_test['ueCount'] = ue_count
     pdu_test['startImsi'] = f'{start_imsi + 1}' # assume this gnb takes one imsi
     data['configuration']['profiles'][1] = pdu_test
+
+    base_gnb_id = '001001'
+    gnb_id = int(base_gnb_id, 16)
+    gnb_id += cur_gnb
+    gnb_id_hex = f'{gnb_id:0x}'
+    data['configuration']['gnbs']['gnb1']['globalRanId']['gNbId']['gNBValue'] = f'00{gnb_id_hex}'
 
 def get_config_name(prefix, index):
     return f'{prefix}-{index}.yaml'
@@ -36,7 +42,7 @@ def create_gnbsim_custom_configs(folder_path, template_path, prefix, start_imsi,
         data = yaml.safe_load(f)
 
     for i in range(gnb_count):
-        edit_config(data, start_imsi, ue_count)
+        edit_config(data, start_imsi, ue_count, i)
 
         config_name = get_config_name(prefix, i)
         with open(f'{folder_path}/{config_name}', 'w') as f:
@@ -95,7 +101,7 @@ except ValueError:
 
 print(f'Creating {gnb_count} with {ue_count} per gnb...')
 
-#onramp_path = '../../Thesis/test/aether-onramp'
-onramp_path = '../aether-onramp'
+onramp_path = '../../Thesis/test/aether-onramp'
+#onramp_path = '../aether-onramp'
 file_path = onramp_path
 edit_gnbsim_config(file_path, gnb_count, ue_count)
