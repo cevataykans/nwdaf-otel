@@ -25,7 +25,9 @@ def unquote_jinja_vars(yaml_text: str) -> str:
 def edit_config(data, start_imsi, ue_count, cur_gnb, is_parallel):
     pdu_test = data['configuration']['profiles'][1]
     pdu_test['ueCount'] = ue_count
-    pdu_test['execInParallel'] = is_parallel
+    pdu_test['execInParallel'] = True
+    if not is_parallel:
+        pdu_test['execInParallel'] = False
     pdu_test['startImsi'] = f'{start_imsi + 1}' # assume this gnb takes one imsi
     data['configuration']['profiles'][1] = pdu_test
 
@@ -86,9 +88,12 @@ if len(sys.argv) != 4:
     print('Usage: python3 gnbsim_configs.py <exec_parallel> <gnb_count> <ue_count_per_gnb>')
     sys.exit(1)
 
+def parse_str(arg):
+    return arg.lower() in ('yes', 'true', '1', 'True', 't')
+
 parallel = False
 try:
-    parallel = bool(sys.argv[1])
+    parallel = parse_str(sys.argv[1])
 except ValueError:
     print('Error: argument must be a bool: true, false')
     sys.exit(1)
