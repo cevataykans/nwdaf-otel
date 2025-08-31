@@ -23,33 +23,26 @@ def unquote_jinja_vars(yaml_text: str) -> str:
     return fixed_text
 
 def edit_config(data, start_imsi, ue_count, cur_gnb, is_parallel):
-    pdu_test = data['configuration']['profiles'][1]
-    pdu_test['ueCount'] = ue_count
-    pdu_test['execInParallel'] = True
-    if not is_parallel:
-        pdu_test['execInParallel'] = False
-    pdu_test['startImsi'] = f'{start_imsi + 1}' # assume this gnb takes one imsi
-    data['configuration']['profiles'][1] = pdu_test
-
-    base_gnb_id = '001001'
-    gnb_id = int(base_gnb_id, 16)
-    gnb_id += cur_gnb
-    gnb_id_hex = f'{gnb_id:0x}'
-    data['configuration']['gnbs']['gnb1']['globalRanId']['gNbId']['gNBValue'] = f'00{gnb_id_hex}'
+    imsi_pattern = r'{{START_IMSI}}'
+    ue_pattern = r'{{UE_COUNT}}'
+    imsi_replaced = re.sub(imsi_pattern, rf'{start_imsi + 1}', data)
+    ue_replaced = re.sub(ue_pattern, rf'{ue_count}', imsi_replaced)
+    return ue_replaced
 
 def get_config_name(prefix, index):
     return f'{prefix}-{index}.yaml'
 
 def create_gnbsim_custom_configs(folder_path, template_path, prefix, start_imsi, gnb_count, ue_count, is_parallel):
     with open(template_path, 'r') as f:
-        data = yaml.safe_load(f)
+        data = f.read()
 
     for i in range(gnb_count):
-        edit_config(data, start_imsi, ue_count, i, is_parallel)
+        new_config = edit_config(data, start_imsi, ue_count, i, is_parallel)
 
         config_name = get_config_name(prefix, i)
         with open(f'{folder_path}/{config_name}', 'w') as f:
-            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+            print(new_config)
+            #f.write(new_config)
 
         start_imsi = start_imsi + 1 + ue_count # assume each gnb is also one imsi
 
