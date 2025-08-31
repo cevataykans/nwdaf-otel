@@ -41,8 +41,8 @@ def create_gnbsim_custom_configs(folder_path, template_path, prefix, start_imsi,
 
         config_name = get_config_name(prefix, i)
         with open(f'{folder_path}/{config_name}', 'w') as f:
-            print(new_config)
-            #f.write(new_config)
+            #print(new_config)
+            f.write(new_config)
 
         start_imsi = start_imsi + 1 + ue_count # assume each gnb is also one imsi
 
