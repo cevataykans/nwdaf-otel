@@ -125,7 +125,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 	}
 
 	prettyJSON, _ := json.MarshalIndent(result, "", "  ")
-	fmt.Println(string(prettyJSON))
+	log.Println(string(prettyJSON))
 
 	return 0, nil
 	//var avgRes ElasticsearchResponse
