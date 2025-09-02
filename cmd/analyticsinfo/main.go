@@ -80,7 +80,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 	//nextMin := curSeconds + remainingSeconds
 	//log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
 	//time.Sleep(time.Duration(remainingSeconds) * time.Second)
-	nextSeconds := curSeconds.Add(time.Second)
+	//nextSeconds := curSeconds.Add(time.Second)
 
 	// services is a list of container names used for filtering queried metrics.
 	services := []string{
@@ -104,7 +104,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			//start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
 			//metrics, err := client.QueryMetrics(service, start, end, time.Minute)
 
-			start, end := nextSeconds.Add(-1*time.Second), nextSeconds
+			start, end := curSeconds.Add(-1*time.Second), curSeconds
 			metrics, err := client.QueryMetrics(service, start, end, time.Second)
 			if err != nil {
 				log.Printf("Error querying metrics %v for service %v\n", err, service)
@@ -116,7 +116,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			//log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
 			curMetrics := prometheus.MetricResults{
 				Service:                     service,
-				Timestamp:                   nextSeconds.UTC().Unix(),
+				Timestamp:                   curSeconds.Unix(),
 				CpuTotalSeconds:             metrics.CpuTotalSeconds,
 				MemoryTotalBytes:            metrics.MemoryTotalBytes,
 				NetworkReceiveBytesTotal:    metrics.NetworkReceiveBytesTotal,
@@ -142,7 +142,8 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		//	log.Printf("Error debug reading statistics: %v\n", err)
 		//}
 
-		nextSeconds = nextSeconds.Add(time.Second)
+		//nextSeconds = nextSeconds.Add(time.Second)
+		curSeconds = curSeconds.Add(time.Second)
 		cur := time.Now()
 		//log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		if cur.Sub(old).Seconds() < 1.0 {
