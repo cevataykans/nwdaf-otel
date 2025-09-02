@@ -37,12 +37,10 @@ jobs:
         id: vars
         run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_ENV
       - name: Build & Publish
-        env:
-          PLATFORM_TAG: ${{ matrix.os == 'ubuntu-latest' && 'amd-latest' || 'arm-latest' }}
         run: |
           docker build -f cmd/${{ matrix.server }}/Dockerfile \
-          -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }} \
-          -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.sha_short }} \
+          -t ${{ env.DOCKER_USERNAME }}/nwdaf:latest \
+          -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.sha_short }} \
           --target release .
-          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}
-          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.sha_short }}
+          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:latest
+          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.sha_short }}
