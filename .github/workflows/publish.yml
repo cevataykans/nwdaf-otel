@@ -41,6 +41,7 @@ jobs:
           docker build -f cmd/${{ matrix.server }}/Dockerfile \
           -t ${{ env.DOCKER_USERNAME }}/nwdaf:latest \
           -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.sha_short }} \
+          --platform ${{ matrix.os == 'ubuntu-latest' && 'linux/amd64' || 'linux/arm64' }}
           --target release .
           docker push ${{ env.DOCKER_USERNAME }}/nwdaf:latest
           docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ env.sha_short }}
