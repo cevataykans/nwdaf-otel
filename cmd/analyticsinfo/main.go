@@ -76,10 +76,11 @@ func main() {
 
 func queryResources(client *prometheus.Client, repo repository.Repository) {
 	curSeconds := time.Now().UTC().Unix()
-	remainingSeconds := 60 - (curSeconds % 60)
-	nextMin := curSeconds + remainingSeconds
-	log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
-	time.Sleep(time.Duration(remainingSeconds) * time.Second)
+	//remainingSeconds := 60 - (curSeconds % 60)
+	//nextMin := curSeconds + remainingSeconds
+	//log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
+	//time.Sleep(time.Duration(remainingSeconds) * time.Second)
+	nextSeconds := curSeconds + 1
 
 	// services is a list of container names used for filtering queried metrics.
 	services := []string{
@@ -94,15 +95,18 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		"udr",
 	}
 
-	// print for one hour metrics
-	for i := 0; i < 60; i++ {
+	hours := 5
+	// print for hour(s) metrics
+	for i := 0; i < 3600*hours; i++ {
 		old := time.Now()
 		log.Printf("Current Time: %v\n", old)
 		statistics := make([]prometheus.MetricResults, 0)
 		for _, service := range services {
 			log.Printf("Querying service: %v\n", service)
-			start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
-			metrics, err := client.QueryMetrics(service, start, end, time.Minute)
+			//start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
+			//metrics, err := client.QueryMetrics(service, start, end, time.Minute)
+			start, end := time.Unix(nextSeconds-1, 0), time.Unix(nextSeconds, 0)
+			metrics, err := client.QueryMetrics(service, start, end, time.Second)
 			if err != nil {
 				log.Printf("Error querying metrics %v\n", err)
 			}
@@ -113,7 +117,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
 			statistics = append(statistics, prometheus.MetricResults{
 				Service:                     service,
-				Timestamp:                   nextMin,
+				Timestamp:                   nextSeconds,
 				CpuTotalSeconds:             metrics.CpuTotalSeconds,
 				MemoryTotalBytes:            metrics.MemoryTotalBytes,
 				NetworkReceiveBytesTotal:    metrics.NetworkReceiveBytesTotal,
@@ -134,10 +138,12 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			log.Printf("Error debug reading statistics: %v\n", err)
 		}
 
-		nextMin += 60
+		nextSeconds += 1
 		cur := time.Now()
 		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
-		time.Sleep(time.Minute - cur.Sub(old))
+		if cur.Sub(old).Seconds() < 1.0 {
+			time.Sleep(time.Second - cur.Sub(old))
+		}
 	}
 	log.Println("Loop Complete!")
 }
