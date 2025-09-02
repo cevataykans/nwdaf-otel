@@ -99,23 +99,21 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 	// print for hour(s) metrics
 	for i := 0; i < 3600*hours; i++ {
 		old := time.Now()
-		log.Printf("Current Time: %v\n", old)
 		statistics := make([]prometheus.MetricResults, 0)
 		for _, service := range services {
-			log.Printf("Querying service: %v\n", service)
 			//start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
 			//metrics, err := client.QueryMetrics(service, start, end, time.Minute)
 			start, end := time.Unix(nextSeconds-1, 0), time.Unix(nextSeconds, 0)
 			metrics, err := client.QueryMetrics(service, start, end, time.Second)
 			if err != nil {
-				log.Printf("Error querying metrics %v\n", err)
+				log.Printf("Error querying metrics %v for service %v\n", err, service)
 			}
 			avgDuration, err := client.QueryTraces(service, start, end)
 			if err != nil {
-				log.Printf("Error querying traces: %v\n", err)
+				log.Printf("Error querying traces: %v for service %v\n", err, service)
 			}
 			log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
-			statistics = append(statistics, prometheus.MetricResults{
+			curMetrics := prometheus.MetricResults{
 				Service:                     service,
 				Timestamp:                   nextSeconds,
 				CpuTotalSeconds:             metrics.CpuTotalSeconds,
@@ -125,7 +123,12 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 				NetworkReceivePacketsTotal:  metrics.NetworkReceivePacketsTotal,
 				NetworkTransmitPacketsTotal: metrics.NetworkTransmitPacketsTotal,
 				AvgTraceDuration:            avgDuration,
-			})
+			}
+			statistics = append(statistics, curMetrics)
+
+			if service == "amf" {
+				log.Println(curMetrics)
+			}
 		}
 
 		err := repo.InsertBatch(statistics)
