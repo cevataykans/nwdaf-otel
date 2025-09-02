@@ -136,10 +136,10 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			log.Printf("Error inserting batch: %v\n", err)
 		}
 
-		err = repo.Debug()
-		if err != nil {
-			log.Printf("Error debug reading statistics: %v\n", err)
-		}
+		//err = repo.Debug()
+		//if err != nil {
+		//	log.Printf("Error debug reading statistics: %v\n", err)
+		//}
 
 		nextSeconds += 1
 		cur := time.Now()
