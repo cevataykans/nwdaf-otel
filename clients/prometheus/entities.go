@@ -13,33 +13,29 @@ func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
 	endMicro := end.UnixNano() / int64(time.Microsecond)
 	return ESQuery{
 		Size: 0,
-		Aggs: Aggregations{
-			Duration: DurationAgg{
-				Filter: BoolFilterAgg{
-					Bool: BoolQuery{
-						Must: []interface{}{
-							WildcardQuery{
-								Wildcard: map[string]WildcardField{
-									"process.serviceName": {Value: fmt.Sprintf("%s*", service)},
-								},
-							},
-							RangeQuery{
-								Range: map[string]RangeField{
-									"startTime": {
-										Gte: startMicro,
-										Lte: endMicro,
-									},
-								},
+		Query: SearchQuery{
+			Bool: BoolQuery{
+				Must: []interface{}{
+					WildcardQuery{
+						Wildcard: map[string]WildcardField{
+							"process.serviceName": {Value: fmt.Sprintf("%s*", service)},
+						},
+					},
+					RangeQuery{
+						Range: map[string]RangeField{
+							"startTime": {
+								Gte: startMicro,
+								Lte: endMicro,
 							},
 						},
 					},
 				},
-				Aggs: AvgAggs{
-					AvgDuration: AvgField{
-						Avg: AvgFieldInner{
-							Field: "duration",
-						},
-					},
+			},
+		},
+		Aggs: Aggregations{
+			AvgDuration: DurationQuery{
+				Avg: AvgAgg{
+					AvgField: "duration",
 				},
 			},
 		},
@@ -47,20 +43,12 @@ func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
 }
 
 type ESQuery struct {
-	Size int          `json:"size"`
-	Aggs Aggregations `json:"aggs"`
+	Size  int          `json:"size"`
+	Query SearchQuery  `json:"query"`
+	Aggs  Aggregations `json:"aggs"`
 }
 
-type Aggregations struct {
-	Duration DurationAgg `json:"duration"`
-}
-
-type DurationAgg struct {
-	Filter BoolFilterAgg `json:"filter"`
-	Aggs   AvgAggs       `json:"aggs"`
-}
-
-type BoolFilterAgg struct {
+type SearchQuery struct {
 	Bool BoolQuery `json:"bool"`
 }
 
@@ -85,16 +73,16 @@ type RangeField struct {
 	Lte int64 `json:"lte"`
 }
 
-type AvgAggs struct {
-	AvgDuration AvgField `json:"avg_duration"`
+type Aggregations struct {
+	AvgDuration DurationQuery `json:"avg_duration"`
 }
 
-type AvgField struct {
-	Avg AvgFieldInner `json:"avg"`
+type DurationQuery struct {
+	Avg AvgAgg `json:"avg"`
 }
 
-type AvgFieldInner struct {
-	Field string `json:"field"`
+type AvgAgg struct {
+	AvgField string `json:"field"`
 }
 
 // Response received from AVG duration for service traces
@@ -108,11 +96,8 @@ type ElasticsearchResponse struct {
 		} `json:"total"`
 	} `json:"hits"`
 	Aggregations struct {
-		DurationAgg struct {
-			DocCount    int `json:"doc_count"`
-			AvgDuration struct {
-				Value *float64 `json:"value"`
-			} `json:"avg_duration"`
-		} `json:"duration"`
+		AvgDuration struct {
+			Value *float64 `json:"value"`
+		} `json:"avg_duration"`
 	} `json:"aggregations"`
 }
