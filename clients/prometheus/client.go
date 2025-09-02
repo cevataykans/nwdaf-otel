@@ -69,22 +69,44 @@ func NewClient() (*Client, error) {
 }
 
 func (c *Client) QueryTraces(service string, start, end time.Time) (float64, error) {
-	queryEntity, err := CreateESAvgQuery(service, start, end)
-	if err != nil {
-		return 0, fmt.Errorf("error creating query entity: %v", err)
-	}
-	// Encode query to JSON
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(queryEntity); err != nil {
-		return 0, fmt.Errorf("error encoding query: %s", err)
-	}
+	//queryEntity, err := CreateESAvgQuery(service, start, end)
+	//if err != nil {
+	//	return 0, fmt.Errorf("error creating query entity: %v", err)
+	//}
 
+	startMicro := start.UnixNano() / int64(time.Microsecond)
+	endMicro := end.UnixNano() / int64(time.Microsecond)
+	query := fmt.Sprintf(`{
+		"size": 0,
+		"query": {
+			"bool": {
+				"must": [
+					{ "wildcard": { "process.serviceName": "%s*" } },
+					{
+						"range": {
+							"startTime": {
+								"gte": %v,
+								"lte": %v
+							}
+						}
+					}
+				]
+			}
+		},
+		"aggs": {
+			"avg_duration": {
+				"avg": { "field": "duration" }
+			}
+		}
+	}`, service, startMicro, endMicro)
+
+	buf := bytes.NewBufferString(query)
 	// Perform the search request
 	es := c.esClient
 	res, err := es.Search(
 		es.Search.WithContext(context.Background()),
 		es.Search.WithIndex("jaeger-span-*"),
-		es.Search.WithBody(&buf),
+		es.Search.WithBody(buf),
 		es.Search.WithTrackTotalHits(true),
 	)
 	if err != nil {
