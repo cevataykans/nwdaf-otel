@@ -85,8 +85,8 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
                  {
                    "range": {
                      "startTime": {
-                       "gte": 1756829551012391,
-                       "lte": 1756829552012391
+                       "gte": %d,
+                       "lte": %d
                      }
                    }
                  }
@@ -98,7 +98,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
                "avg": { "field": "duration" }
              }
            }
-         }`, service))
+         }`, service, startMicro, endMicro))
 	log.Println(startMicro, endMicro)
 
 	buf := bytes.NewBuffer(query)

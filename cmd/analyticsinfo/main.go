@@ -84,15 +84,15 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 
 	// services is a list of container names used for filtering queried metrics.
 	services := []string{
-		"bessd",
+		//"bessd",
 		"amf",
-		"ausf",
-		"nrf",
-		"nssf",
-		"pcf",
-		"smf",
-		"udm",
-		"udr",
+		//"ausf",
+		//"nrf",
+		//"nssf",
+		//"pcf",
+		//"smf",
+		//"udm",
+		//"udr",
 	}
 
 	hours := 5
