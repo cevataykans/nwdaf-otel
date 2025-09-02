@@ -76,7 +76,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 
 	startMicro := start.UnixNano() / int64(time.Microsecond)
 	endMicro := end.UnixNano() / int64(time.Microsecond)
-	query := fmt.Sprintf(`{
+	query := []byte(fmt.Sprintf(`{
 		"size": 0,
 		"query": {
 			"bool": {
@@ -98,10 +98,10 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 				"avg": { "field": "duration" }
 			}
 		}
-	}`, service, startMicro, endMicro)
+	}`, service, startMicro, endMicro))
 	log.Println(query)
 
-	buf := bytes.NewBufferString(query)
+	buf := bytes.NewBuffer(query)
 	// Perform the search request
 	client := http.DefaultClient
 	res, err := client.Post(fmt.Sprintf("%s/jaeger-span-*/_search", ElasticAddress), "application/json", buf)
