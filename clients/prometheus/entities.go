@@ -9,6 +9,8 @@ func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
 	if service == UPFContainer {
 		service = UPFPod
 	}
+	startMicro := start.UnixNano() / int64(time.Microsecond)
+	endMicro := end.UnixNano() / int64(time.Microsecond)
 	return ESQuery{
 		Size: 0,
 		Aggs: Aggregations{
@@ -23,9 +25,9 @@ func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
 							},
 							RangeQuery{
 								Range: map[string]RangeField{
-									"startTimeMillis": {
-										Gte: start.Unix() * 1000,
-										Lte: end.Unix() * 1000,
+									"startTime": {
+										Gte: startMicro,
+										Lte: endMicro,
 									},
 								},
 							},

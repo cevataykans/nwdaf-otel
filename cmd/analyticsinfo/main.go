@@ -75,12 +75,12 @@ func main() {
 }
 
 func queryResources(client *prometheus.Client, repo repository.Repository) {
-	curSeconds := time.Now().UTC().Unix()
+	curSeconds := time.Now().UTC()
 	//remainingSeconds := 60 - (curSeconds % 60)
 	//nextMin := curSeconds + remainingSeconds
 	//log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
 	//time.Sleep(time.Duration(remainingSeconds) * time.Second)
-	nextSeconds := curSeconds + 1
+	nextSeconds := curSeconds.Add(time.Second)
 
 	// services is a list of container names used for filtering queried metrics.
 	services := []string{
@@ -103,7 +103,8 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		for _, service := range services {
 			//start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
 			//metrics, err := client.QueryMetrics(service, start, end, time.Minute)
-			start, end := time.Unix(nextSeconds-1, 0), time.Unix(nextSeconds, 0)
+
+			start, end := nextSeconds.Add(-1*time.Second), nextSeconds
 			metrics, err := client.QueryMetrics(service, start, end, time.Second)
 			if err != nil {
 				log.Printf("Error querying metrics %v for service %v\n", err, service)
@@ -115,7 +116,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			//log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
 			curMetrics := prometheus.MetricResults{
 				Service:                     service,
-				Timestamp:                   nextSeconds,
+				Timestamp:                   nextSeconds.UTC().Unix(),
 				CpuTotalSeconds:             metrics.CpuTotalSeconds,
 				MemoryTotalBytes:            metrics.MemoryTotalBytes,
 				NetworkReceiveBytesTotal:    metrics.NetworkReceiveBytesTotal,
@@ -141,7 +142,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		//	log.Printf("Error debug reading statistics: %v\n", err)
 		//}
 
-		nextSeconds += 1
+		nextSeconds = nextSeconds.Add(time.Second)
 		cur := time.Now()
 		//log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		if cur.Sub(old).Seconds() < 1.0 {
