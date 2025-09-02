@@ -81,6 +81,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 		"query": {
 			"bool": {
 				"must": [
+					{ "wildcard": { "process.serviceName": "%s*" } },
 					{
 						"range": {
 							"startTime": {
@@ -97,18 +98,13 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 				"avg": { "field": "duration" }
 			}
 		}
-	}`, startMicro, endMicro)
+	}`, service, startMicro, endMicro)
 	log.Println(query)
 
 	buf := bytes.NewBufferString(query)
 	// Perform the search request
-	es := c.esClient
-	res, err := es.Search(
-		es.Search.WithContext(context.Background()),
-		es.Search.WithIndex("jaeger-span-*"),
-		es.Search.WithBody(buf),
-		es.Search.WithTrackTotalHits(true),
-	)
+	client := http.DefaultClient
+	res, err := client.Post(fmt.Sprintf("%s/jaeger-span-*/_search", ElasticAddress), "application/json", buf)
 	if err != nil {
 		return 0, fmt.Errorf("error getting response: %v", err)
 	}
