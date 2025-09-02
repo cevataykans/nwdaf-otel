@@ -81,7 +81,6 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 		"query": {
 			"bool": {
 				"must": [
-					{ "wildcard": { "process.serviceName": "%s*" } },
 					{
 						"range": {
 							"startTime": {
@@ -98,7 +97,8 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 				"avg": { "field": "duration" }
 			}
 		}
-	}`, service, startMicro, endMicro)
+	}`, startMicro, endMicro)
+	log.Println(query)
 
 	buf := bytes.NewBufferString(query)
 	// Perform the search request
