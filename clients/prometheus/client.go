@@ -101,13 +101,13 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 	if avgRes.TimedOut {
 		return 0, fmt.Errorf("avg query timed out for service: %s", service)
 	}
-	log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
+	//log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
 
 	avgDuration := avgRes.Aggregations.DurationAgg.AvgDuration.Value
 	if avgRes.Aggregations.DurationAgg.DocCount == 0 || avgDuration == nil {
 		return 0, nil
 	}
-	log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
+	//log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
 	return *avgDuration, nil
 }
 

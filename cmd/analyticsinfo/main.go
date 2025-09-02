@@ -112,7 +112,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			if err != nil {
 				log.Printf("Error querying traces: %v for service %v\n", err, service)
 			}
-			log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
+			//log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
 			curMetrics := prometheus.MetricResults{
 				Service:                     service,
 				Timestamp:                   nextSeconds,
@@ -143,7 +143,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 
 		nextSeconds += 1
 		cur := time.Now()
-		log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
+		//log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		if cur.Sub(old).Seconds() < 1.0 {
 			time.Sleep(time.Second - cur.Sub(old))
 		}
