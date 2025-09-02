@@ -44,4 +44,5 @@ jobs:
           -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }} \
           -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.sha_short }} \
           --target release .
-          docker push -a ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}
+          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}
+          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.sha_short }}
