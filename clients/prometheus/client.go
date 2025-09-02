@@ -69,11 +69,14 @@ func NewClient() (*Client, error) {
 }
 
 func (c *Client) QueryTraces(service string, start, end time.Time) (float64, error) {
-	queryEntity := CreateESAvgQuery(service, start, end)
+	queryEntity, err := CreateESAvgQuery(service, start, end)
+	if err != nil {
+		return 0, fmt.Errorf("error creating query entity: %v", err)
+	}
 	// Encode query to JSON
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(queryEntity); err != nil {
-		return 0, fmt.Errorf("Error encoding query: %s", err)
+		return 0, fmt.Errorf("error encoding query: %s", err)
 	}
 
 	// Perform the search request
@@ -105,7 +108,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 
 	avgDuration := avgRes.Aggregations.AvgDuration.Value
 	if avgDuration == nil {
-		return 0, nil
+		return 0, fmt.Errorf("avg duration returned null for service: %s", service)
 	}
 	//log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
 	return *avgDuration, nil

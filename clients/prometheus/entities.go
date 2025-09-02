@@ -1,35 +1,44 @@
 package prometheus
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
 
-func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
+func CreateESAvgQuery(service string, start, end time.Time) (ESQuery, error) {
 	if service == UPFContainer {
 		service = UPFPod
 	}
 	startMicro := start.UnixNano() / int64(time.Microsecond)
 	endMicro := end.UnixNano() / int64(time.Microsecond)
+
+	wildcard, err := json.Marshal(WildcardQuery{
+		Wildcard: map[string]WildcardField{
+			"process.serviceName": {Value: fmt.Sprintf("%s*", service)},
+		},
+	})
+	if err != nil {
+		return ESQuery{}, fmt.Errorf("error, cannot serialize wildcard query into raw bytes")
+	}
+
+	rangeQ, err := json.Marshal(RangeQuery{
+		Range: map[string]RangeField{
+			"startTime": {
+				Gte: startMicro,
+				Lte: endMicro,
+			},
+		},
+	})
+	if err != nil {
+		return ESQuery{}, fmt.Errorf("error, cannot serialize range query into raw bytes")
+	}
+
 	return ESQuery{
 		Size: 0,
 		Query: SearchQuery{
 			Bool: BoolQuery{
-				Must: []interface{}{
-					WildcardQuery{
-						Wildcard: map[string]WildcardField{
-							"process.serviceName": {Value: fmt.Sprintf("%s*", service)},
-						},
-					},
-					RangeQuery{
-						Range: map[string]RangeField{
-							"startTime": {
-								Gte: startMicro,
-								Lte: endMicro,
-							},
-						},
-					},
-				},
+				Must: []json.RawMessage{wildcard, rangeQ},
 			},
 		},
 		Aggs: Aggregations{
@@ -39,7 +48,7 @@ func CreateESAvgQuery(service string, start, end time.Time) ESQuery {
 				},
 			},
 		},
-	}
+	}, nil
 }
 
 type ESQuery struct {
@@ -53,7 +62,7 @@ type SearchQuery struct {
 }
 
 type BoolQuery struct {
-	Must []interface{} `json:"must"`
+	Must []json.RawMessage `json:"must"`
 }
 
 type WildcardQuery struct {
