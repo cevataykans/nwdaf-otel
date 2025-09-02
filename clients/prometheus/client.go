@@ -122,6 +122,7 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 	if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
 		return 0, fmt.Errorf("failed to decode response: %v", err)
 	}
+	log.Println(avgRes)
 
 	if avgRes.TimedOut {
 		return 0, fmt.Errorf("avg query timed out for service: %s", service)
