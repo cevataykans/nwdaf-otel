@@ -19,7 +19,7 @@ jobs:
   publish_image:
     strategy:
       matrix:
-        os: [ ubuntu-24.04-arm, ubuntu-latest ]
+        os: [ ubuntu-latest ]
         server: [ analyticsinfo ]
     timeout-minutes: 10
     permissions:

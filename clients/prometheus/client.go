@@ -225,8 +225,8 @@ func (c *Client) queryPrometheus(ctx context.Context, query string, r v1.Range) 
 	if len(matrix) > 0 && len(matrix[0].Values) > 0 {
 		end := len(matrix[0].Values) - 1
 		value = float64(matrix[0].Values[end].Value)
-		ts := int64(matrix[0].Values[end].Timestamp)
-		log.Printf("Timestamp: %v - Value: %v\n", ts, value)
+		//ts := int64(matrix[0].Values[end].Timestamp)
+		//log.Printf("Timestamp: %v - Value: %v\n", ts, value)
 	}
 	return value, nil
 }
