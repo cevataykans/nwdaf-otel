@@ -77,28 +77,28 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 	startMicro := start.UnixNano() / int64(time.Microsecond)
 	endMicro := end.UnixNano() / int64(time.Microsecond)
 	query := []byte(fmt.Sprintf(`{
-		"size": 0,
-		"query": {
-			"bool": {
-				"must": [
-					{ "wildcard": { "process.serviceName": "%s*" } },
-					{
-						"range": {
-							"startTime": {
-								"gte": %v,
-								"lte": %v
-							}
-						}
-					}
-				]
-			}
-		},
-		"aggs": {
-			"avg_duration": {
-				"avg": { "field": "duration" }
-			}
-		}
-	}`, service, startMicro, endMicro))
+           "size": 0,
+           "query": {
+             "bool": {
+               "must": [
+                 { "wildcard": { "process.serviceName": "amf*" } },
+                 {
+                   "range": {
+                     "startTime": {
+                       "gte": 1756829551012391 ,
+                       "lte": 1756829552012391
+                     }
+                   }
+                 }
+               ]
+             }
+           },
+           "aggs": {
+             "avg_duration": {
+               "avg": { "field": "duration" }
+             }
+           }
+         }`, service, startMicro, endMicro))
 	log.Println(startMicro, endMicro)
 
 	buf := bytes.NewBuffer(query)
