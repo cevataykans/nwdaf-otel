@@ -33,9 +33,15 @@ jobs:
         with:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_BOT_ACCESS }}
+      - name: Extract short SHA
+        id: vars
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_ENV
       - name: Build & Publish
         env:
           PLATFORM_TAG: ${{ matrix.os == 'ubuntu-latest' && 'amd-latest' || 'arm-latest' }}
         run: |
-          docker build -f cmd/${{ matrix.server }}/Dockerfile -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }} --target release .
-          docker push ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}
+          docker build -f cmd/${{ matrix.server }}/Dockerfile \
+          -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }} \
+          -t ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.sha_short }} \
+          --target release .
+          docker push -a ${{ env.DOCKER_USERNAME }}/nwdaf:${{ matrix.server }}-${{ env.PLATFORM_TAG }}
