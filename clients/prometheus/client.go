@@ -103,8 +103,8 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 	}
 	//log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
 
-	avgDuration := avgRes.Aggregations.DurationAgg.AvgDuration.Value
-	if avgRes.Aggregations.DurationAgg.DocCount == 0 || avgDuration == nil {
+	avgDuration := avgRes.Aggregations.AvgDuration.Value
+	if avgDuration == nil {
 		return 0, nil
 	}
 	//log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
