@@ -2,9 +2,6 @@
 
 current_dir=$(pwd)
 
-# Adjust device imsi size accordingly
-python3 scripts/simulation/imsi_controller.py
-
 # Paths to the directories for the corresponding application (Path ending in the directory)
 # Manually adapt to local setup (TODO: Clone istio and Aether if necessary BUT: Values still need to be adapted manually)
 ISTIO_DIR=/home/sevinc/jungmann/istio
