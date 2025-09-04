@@ -146,8 +146,9 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 		curSeconds = curSeconds.Add(time.Second)
 		cur := time.Now()
 		//log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
-		if cur.Sub(old).Seconds() < 1.0 {
-			time.Sleep(time.Second - cur.Sub(old))
+		diff := cur.Sub(old)
+		if diff < time.Second {
+			time.Sleep(time.Second - diff)
 		}
 	}
 	log.Println("Loop Complete!")

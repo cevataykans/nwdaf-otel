@@ -115,32 +115,20 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
 		}
 	}()
 
-	var result map[string]interface{}
-	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
-		panic(err)
+	var avgRes ElasticsearchResponse
+	if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
+		return 0, fmt.Errorf("failed to decode response: %v", err)
 	}
 
-	prettyJSON, _ := json.MarshalIndent(result, "", "  ")
-	log.Println(string(prettyJSON))
+	if avgRes.TimedOut {
+		return 0, fmt.Errorf("avg query timed out for service: %s", service)
+	}
 
-	return 0, nil
-	//var avgRes ElasticsearchResponse
-	//if err := json.NewDecoder(res.Body).Decode(&avgRes); err != nil {
-	//	return 0, fmt.Errorf("failed to decode response: %v", err)
-	//}
-	//log.Println(avgRes)
-	//
-	//if avgRes.TimedOut {
-	//	return 0, fmt.Errorf("avg query timed out for service: %s", service)
-	//}
-	////log.Printf("Query took %v, scanned documents: %v\n", avgRes.Took, avgRes.Hits.Total.Value)
-	//
-	//avgDuration := avgRes.Aggregations.AvgDuration.Value
-	//if avgDuration == nil {
-	//	return 0, fmt.Errorf("avg duration returned null for service: %s", service)
-	//}
-	////log.Printf("Avg duration of service '%s' traces: %v\n", service, *avgDuration)
-	//return *avgDuration, nil
+	avgDuration := avgRes.Aggregations.AvgDuration.Value
+	if avgDuration == nil {
+		return 0, nil
+	}
+	return *avgDuration, nil
 }
 
 func (c *Client) QueryMetrics(service string, start, end time.Time, step time.Duration) (MetricResults, error) {
