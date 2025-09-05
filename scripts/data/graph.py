@@ -76,7 +76,6 @@ def main():
 
         query = f"SELECT * FROM {TABLE} WHERE service='{service}' AND ts BETWEEN {start_ts} AND {end_ts} ORDER BY {TIME_COLUMN}"
         df = pd.read_sql_query(query, conn)
-        conn.close()
 
         # Convert timestamp if needed
         df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
@@ -93,6 +92,7 @@ def main():
             graph_path = service_folder_path / column
             plt.savefig(graph_path)
             print(f"✅ Saved plot to {graph_path}")
+    conn.close()
 
 if __name__ == "__main__":
     main()
