@@ -99,7 +99,6 @@ func (c *Client) QueryTraces(service string, start, end time.Time) (float64, err
              }
            }
          }`, service, startMicro, endMicro))
-	log.Println(startMicro, endMicro)
 
 	buf := bytes.NewBuffer(query)
 	// Perform the search request
