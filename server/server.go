@@ -1,16 +1,19 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	analyticsinfoAPI "nwdaf-otel/generated/analyticsinfo"
 	"nwdaf-otel/server/analyticsinfo"
+	"time"
 )
 
 type Server interface {
 	Setup()
-	Start() chan error
+	Start(shutdownChn chan struct{}) chan error
 }
 
 func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +31,7 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 // TODO: accept a config, that will point to port, certificate e.g. options
 type analyticsInfoServer struct {
 	mux *mux.Router
+	srv *http.Server
 }
 
 func NewAnalyticsInfoServer() Server {
@@ -43,20 +47,33 @@ func (s *analyticsInfoServer) Setup() {
 
 	// Handle health check probes
 	s.mux.HandleFunc("/health", handleHealthCheck)
-	log.Println("AnalyticsInfo Server setup complete")
 }
 
-func (s *analyticsInfoServer) Start() chan error {
+func (s *analyticsInfoServer) Start(shutdownChn chan struct{}) chan error {
 	errChan := make(chan error)
-	go func() {
-		srv := http.Server{
-			Addr:    ":8080",
-			Handler: s.mux,
-		}
-		log.Println("Listening and serving HTTP on " + srv.Addr)
-		err := srv.ListenAndServe()
-		log.Println("Server stopped")
-		errChan <- err
-	}()
+	go s.serve(errChan)
+	go s.stopGracefully(shutdownChn)
 	return errChan
+}
+
+func (s *analyticsInfoServer) serve(errChan chan error) {
+	s.srv = &http.Server{
+		Addr:    ":8080",
+		Handler: s.mux,
+	}
+	log.Println("Listening and serving HTTP on " + s.srv.Addr)
+	if err := s.srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		errChan <- err
+	}
+	close(errChan)
+}
+
+func (s *analyticsInfoServer) stopGracefully(shutdownChn chan struct{}) {
+	<-shutdownChn
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
+
+	if err := s.srv.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("server http shutdown error: %v", err)
+	}
 }

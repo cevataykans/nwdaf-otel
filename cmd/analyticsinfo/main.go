@@ -8,6 +8,9 @@ import (
 	"nwdaf-otel/clients/prometheus"
 	"nwdaf-otel/repository"
 	"nwdaf-otel/server"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -15,11 +18,17 @@ import (
 func main() {
 	// TODO: parse flags -> path for config
 
-	log.Println("Hello World")
+	shutdownChn := make(chan struct{})
+	go func() {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+		<-sigChan
+		close(shutdownChn)
+	}()
 
 	srv := server.NewAnalyticsInfoServer()
 	srv.Setup()
-	errChan := srv.Start()
+	errChan := srv.Start(shutdownChn)
 	log.Println("Server started")
 
 	nrfClientTransport := &http.Transport{
@@ -65,45 +74,43 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go queryResources(promClient, repo)
+	go queryResources(promClient, repo, shutdownChn)
 
 	err = <-errChan
 	if err != nil {
-		log.Printf("server shutdown err: %v\n", err)
+		log.Printf("server listen err: %v\n", err)
 	}
 	log.Println("Application Finished!")
 }
 
-func queryResources(client *prometheus.Client, repo repository.Repository) {
+func queryResources(client *prometheus.Client, repo repository.Repository, shutdownChn chan struct{}) {
 	curSeconds := time.Now().UTC()
-	//remainingSeconds := 60 - (curSeconds % 60)
-	//nextMin := curSeconds + remainingSeconds
-	//log.Printf("Sleeping for %v seconds\nCalculated query time for next min is: %v\n", remainingSeconds, time.Unix(nextMin, 0))
-	//time.Sleep(time.Duration(remainingSeconds) * time.Second)
-	//nextSeconds := curSeconds.Add(time.Second)
+	startDelay := time.Second * 30
 
 	// services is a list of container names used for filtering queried metrics.
 	services := []string{
-		//"bessd",
+		"bessd",
 		"amf",
-		//"ausf",
-		//"nrf",
-		//"nssf",
-		//"pcf",
-		//"smf",
-		//"udm",
-		//"udr",
+		"ausf",
+		"nrf",
+		"nssf",
+		"pcf",
+		"smf",
+		"udm",
+		"udr",
 	}
 
-	hours := 5
-	// print for hour(s) metrics
-	time.Sleep(time.Second * 5)
-	for i := 0; i < 3600*hours; i++ {
+	time.Sleep(startDelay)
+	for {
+		select {
+		case <-shutdownChn:
+			return
+		default:
+		}
+
 		old := time.Now()
 		statistics := make([]prometheus.MetricResults, 0)
 		for _, service := range services {
-			//start, end := time.Unix(nextMin-60, 0), time.Unix(nextMin, 0)
-			//metrics, err := client.QueryMetrics(service, start, end, time.Minute)
 
 			start, end := curSeconds.Add(-1*time.Second), curSeconds
 			metrics, err := client.QueryMetrics(service, start, end, time.Second)
@@ -114,7 +121,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			if err != nil {
 				log.Printf("Error querying traces: %v for service %v\n", err, service)
 			}
-			//log.Printf("Metrics %v, avg dur.: %v\n", metrics, avgDuration)
+
 			curMetrics := prometheus.MetricResults{
 				Service:                     service,
 				Timestamp:                   curSeconds.Unix(),
@@ -127,10 +134,6 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 				AvgTraceDuration:            avgDuration,
 			}
 			statistics = append(statistics, curMetrics)
-
-			if service == "amf" {
-				log.Println(curMetrics)
-			}
 		}
 
 		err := repo.InsertBatch(statistics)
@@ -138,19 +141,11 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 			log.Printf("Error inserting batch: %v\n", err)
 		}
 
-		//err = repo.Debug()
-		//if err != nil {
-		//	log.Printf("Error debug reading statistics: %v\n", err)
-		//}
-
-		//nextSeconds = nextSeconds.Add(time.Second)
 		curSeconds = curSeconds.Add(time.Second)
 		cur := time.Now()
-		//log.Printf("Query Time: %v, sleep time: %v\n", cur.Sub(old), time.Minute-cur.Sub(old))
 		diff := cur.Sub(old)
 		if diff < time.Second {
 			time.Sleep(time.Second - diff)
 		}
 	}
-	log.Println("Loop Complete!")
 }
