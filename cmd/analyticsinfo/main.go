@@ -97,6 +97,7 @@ func queryResources(client *prometheus.Client, repo repository.Repository) {
 
 	hours := 5
 	// print for hour(s) metrics
+	time.Sleep(time.Second * 5)
 	for i := 0; i < 3600*hours; i++ {
 		old := time.Now()
 		statistics := make([]prometheus.MetricResults, 0)
