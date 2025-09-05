@@ -100,10 +100,12 @@ func queryResources(client *prometheus.Client, repo repository.Repository, shutd
 		"udr",
 	}
 
+	log.Printf("nwdaf analytics will start recording from: %v seconds (unix) after delay: %v", curSeconds.Unix())
 	time.Sleep(startDelay)
 	for {
 		select {
 		case <-shutdownChn:
+			log.Printf("nwdaf analytics stopped at: %v seconds (unix)", curSeconds.Unix())
 			return
 		default:
 		}
