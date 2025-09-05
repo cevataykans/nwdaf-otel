@@ -25,7 +25,7 @@ end_ts=$(date +%s)
 echo "Start time:  $start_ts"
 echo "Finish time: $end_ts"
 echo "Sleeping for nwdaf..."
-sleep wait_nwdaf
+sleep $wait_nwdaf
 
 # Stop NWDAF
 cd $nwdaf_dir

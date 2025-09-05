@@ -34,6 +34,7 @@ def parse_args():
     except ValueError:
         print('Error: end_ts_utc_unix must be an integer')
         sys.exit(1)
+
     return start_ts, end_ts
 
 def main():
@@ -80,7 +81,7 @@ def main():
         # Convert timestamp if needed
         df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
         # draw each graph at the folder
-        for (column, title) in columns:
+        for column, title in columns.items():
             plt.figure(figsize=(12,6))
             plt.plot(df[TIME_COLUMN], df[column], marker="o", linestyle="-")
             plt.xlabel("Time")
