@@ -17,20 +17,20 @@ OUTPUT_FILE = "cpu_vs_time.png"
 
 def parse_args():
     # usage gnb_count, ue_count per gnb
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print('Usage: python3 graph.py <start_ts_utc_unix> <end_ts_utc_unix>')
         sys.exit(1)
 
     start_ts = -1
     try:
-        start_ts = int(sys.argv[2])
+        start_ts = int(sys.argv[1])
     except ValueError:
         print('Error: start_ts_utc_unix must be an integer')
         sys.exit(1)
 
     end_ts = -1
     try:
-        end_ts = int(sys.argv[3])
+        end_ts = int(sys.argv[2])
     except ValueError:
         print('Error: end_ts_utc_unix must be an integer')
         sys.exit(1)
