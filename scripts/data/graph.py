@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,6 +11,7 @@ DB_FILE = "series.db"
 TABLE = "series"
 TIME_COLUMN = "ts"
 VALUE_COLUMN = "cpu_usage"
+OUTPUT_FOLDER = '../graphs'
 OUTPUT_FILE = "cpu_vs_time.png"
 
 def parse_args():
@@ -60,9 +62,12 @@ def main():
     plt.grid(True)
     plt.tight_layout()
 
+    folder_path = Path(OUTPUT_FOLDER)
+    folder_path.mkdir(exist_ok=True)
     # Save to file
-    plt.savefig(OUTPUT_FILE)
-    print(f"✅ Saved plot to {OUTPUT_FILE}")
+    joined_path = folder_path / OUTPUT_FILE
+    plt.savefig(joined_path)
+    print(f"✅ Saved plot to {joined_path}")
 
 
 if __name__ == "__main__":
