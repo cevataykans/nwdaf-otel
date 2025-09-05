@@ -212,7 +212,7 @@ func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) (f
 }
 
 func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.Range) (float64, error) {
-	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m])", service)
+	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m]) * 100", service)
 	return c.queryPrometheus(ctx, query, r)
 }
 

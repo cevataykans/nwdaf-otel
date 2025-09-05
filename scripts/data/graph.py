@@ -1,5 +1,6 @@
-import os
 import sqlite3
+import time
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -11,16 +12,14 @@ DB_FILE = "series.db"
 TABLE = "series"
 TIME_COLUMN = "ts"
 VALUE_COLUMN = "cpu_usage"
-OUTPUT_FOLDER = '../graphs'
+OUTPUT_FOLDER = 'graphs'
 OUTPUT_FILE = "cpu_vs_time.png"
 
 def parse_args():
     # usage gnb_count, ue_count per gnb
     if len(sys.argv) != 4:
-        print('Usage: python3 graph.py <service_name> <start_ts_utc_unix> <end_ts_utc_unix>')
+        print('Usage: python3 graph.py <start_ts_utc_unix> <end_ts_utc_unix>')
         sys.exit(1)
-
-    service_name = sys.argv[1]
 
     start_ts = -1
     try:
@@ -35,40 +34,64 @@ def parse_args():
     except ValueError:
         print('Error: end_ts_utc_unix must be an integer')
         sys.exit(1)
-    return service_name, start_ts, end_ts
+    return start_ts, end_ts
 
 def main():
 
-    service_name, start_ts, end_ts = parse_args()
+    start_ts, end_ts = parse_args()
     db_path = Path(DB_FOLDER) / DB_FILE
 
     # Connect to SQLite
     conn = sqlite3.connect(db_path)
+    services = [
+        'bessd',
+        'amf',
+        'ausf',
+        'nrf',
+        'nssf',
+        'pcf',
+        'smf',
+        'udm',
+        'udr',
+    ]
 
-    # Query data
-    query = f"SELECT {TIME_COLUMN}, {VALUE_COLUMN} FROM {TABLE} WHERE service='amf' AND ts BETWEEN {start_ts} AND {end_ts} ORDER BY {TIME_COLUMN}"
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    # column name -> title of plot
+    columns = {
+        'cpu_usage': 'CPU Total Seconds',
+        'memory_usage': 'Memory',
+        'total_bytes_sent': 'Network Bytes Sent',
+        'total_bytes_received': 'Network Bytes Received',
+        'total_packets_sent': 'Network Packets Sent',
+        'total_packets_received': 'Network Packets Received',
+        'avg_trace_duration': 'Average Trace Duration'
+    }
 
-    # Convert timestamp if needed
-    df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
+    cur_time = int(time.time())
+    folder_path = Path.home() / OUTPUT_FOLDER / str(cur_time)
+    folder_path.mkdir(parents=True, exist_ok=True)
+    for service in services:
+        service_folder_path = folder_path / service
+        service_folder_path.mkdir(exist_ok=True)
 
-    # Plot
-    plt.figure(figsize=(12,6))
-    plt.plot(df[TIME_COLUMN], df[VALUE_COLUMN], marker="o", linestyle="-")
-    plt.xlabel("Time")
-    plt.ylabel("CPU Usage")
-    plt.title("AMF CPU Usage")
-    plt.grid(True)
-    plt.tight_layout()
+        query = f"SELECT * FROM {TABLE} WHERE service='{service}' AND ts BETWEEN {start_ts} AND {end_ts} ORDER BY {TIME_COLUMN}"
+        df = pd.read_sql_query(query, conn)
+        conn.close()
 
-    folder_path = Path(OUTPUT_FOLDER)
-    folder_path.mkdir(exist_ok=True)
-    # Save to file
-    joined_path = folder_path / OUTPUT_FILE
-    plt.savefig(joined_path)
-    print(f"✅ Saved plot to {joined_path}")
+        # Convert timestamp if needed
+        df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
+        # draw each graph at the folder
+        for (column, title) in columns:
+            plt.figure(figsize=(12,6))
+            plt.plot(df[TIME_COLUMN], df[column], marker="o", linestyle="-")
+            plt.xlabel("Time")
+            plt.ylabel(column)
+            plt.title(title)
+            plt.grid(True)
+            plt.tight_layout()
 
+            graph_path = service_folder_path / column
+            plt.savefig(graph_path)
+            print(f"✅ Saved plot to {graph_path}")
 
 if __name__ == "__main__":
     main()
