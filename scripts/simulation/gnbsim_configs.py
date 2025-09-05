@@ -2,26 +2,6 @@ import yaml
 import sys
 import re
 
-def quote_jinja_vars(yaml_text: str) -> str:
-    """
-    Wrap unquoted {{ ... }} placeholders in double quotes
-    so YAML parsers won't choke, while keeping Ansible templating intact.
-    """
-    # Matches {{ ... }} that are not already inside quotes
-    pattern = r'(?<!["\'])({{.*?}})(?!["\'])'
-    return re.sub(pattern, r'"\1"', yaml_text)
-
-def unquote_jinja_vars(yaml_text: str) -> str:
-    """
-    Remove quotes around {{ ... }} placeholders
-    so Ansible can correctly resolve them.
-    """
-    # Match double or single quotes wrapping a {{ ... }} block
-    pattern = r'(["\'])({{.*?}})\1'
-    first_pass = re.sub(pattern, r'\2', yaml_text)
-    fixed_text = re.sub(r"''(?!$)", r"'", first_pass, flags=re.MULTILINE)
-    return fixed_text
-
 def edit_config(data, start_imsi, ue_count, cur_gnb, is_parallel):
     imsi_pattern = r'{{START_IMSI}}'
     ue_pattern = r'{{UE_COUNT}}'
@@ -72,7 +52,7 @@ def edit_gnbsim_config(aether_path, is_parallel, gnb_count, ue_count_per_gnb):
     config_name_prefix = 'gnbsim-custom'
     gnbsim_template_config_path = f'scripts/simulation/{config_name_prefix}.yaml'
 
-    edit_gnbsim_main_config(gnbsim_main_config_path, gnb_count, config_name_prefix)
+    #edit_gnbsim_main_config(gnbsim_main_config_path, gnb_count, config_name_prefix)
     create_gnbsim_custom_configs(gnbsim_gnb_configs_folder, gnbsim_template_config_path,
                                  config_name_prefix, imsi_start, gnb_count, ue_count_per_gnb, is_parallel)
 
