@@ -81,7 +81,7 @@ def main():
         df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
         # draw each graph at the folder
         for column, title in columns.items():
-            plt.figure(figsize=(12,6))
+            fig = plt.figure(figsize=(12,6))
             plt.plot(df[TIME_COLUMN], df[column], marker="o", linestyle="-")
             plt.xlabel("Time")
             plt.ylabel(column)
@@ -91,6 +91,7 @@ def main():
 
             graph_path = service_folder_path / column
             plt.savefig(graph_path)
+            plt.close(fig)
             print(f"✅ Saved plot to {graph_path}")
     conn.close()
 

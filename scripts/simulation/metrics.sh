@@ -1,6 +1,6 @@
 #!bin/bash
 
-ue_values=(16 32) #64 128 256 512 1024 1256)
+ue_values=(16) #32 64 128 256 512 1024 1256)
 repetition_count=5
 gnbsim_wait_time=5
 wait_nwdaf=60
