@@ -84,7 +84,7 @@ configuration:
   profiles: # profile information
     - profileType: register # profile type
       profileName: profile1 # uniqely identifies a profile within application
-      enable: false # Set true to execute the profile, false otherwise.
+      enable: true # Set true to execute the profile, false otherwise.
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "{{START_IMSI}}" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: {{UE_COUNT}} # Number of UEs for for which the profile will be executed
@@ -103,7 +103,7 @@ configuration:
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
     - profileType: pdusessest # profile type
       profileName: profile2 # uniqely identifies a profile within application
-      enable: true # Set true to execute the profile, false otherwise.
+      enable: false # Set true to execute the profile, false otherwise.
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "208930100007488" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: {{UE_COUNT}} # Number of UEs for for which the profile will be executed
