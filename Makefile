@@ -26,3 +26,9 @@ start-analytics:
 
 stop-analytics:
 	helm uninstall nwdaf-analytics-info -n aether-5gc
+
+venv:
+	source ../nwdaf-python3-venv/bin/activate
+
+get-plots:
+	scp -r sevinc@131.159.25.36:/home/sevinc/graphs ./graphs
