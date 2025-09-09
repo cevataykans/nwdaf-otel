@@ -4,7 +4,7 @@ source ../nwdaf-python3-venv/bin/activate
 
 ue_values=(16 32 64 128 256 512 1024 1256 1512)
 repetition_count=5
-gnbsim_wait_time=5
+gnbsim_wait_time=10
 wait_nwdaf=60
 aether_dir="$HOME/aether-onramp/"
 nwdaf_dir="$HOME/nwdaf-otel/"
