@@ -1,5 +1,7 @@
 #!bin/bash
 
+source ../nwdaf-python3-venv/bin/activate
+
 ue_values=(16 32 64 128 256 512 1024 1256 1512)
 repetition_count=5
 gnbsim_wait_time=5
@@ -29,8 +31,8 @@ sleep $wait_nwdaf
 
 # Stop NWDAF
 cd $nwdaf_dir
-make stop-analytics
 sleep $gnbsim_wait_time
 
 # Plot graphs
 python3 scripts/data/graph.py "$start_ts" "$end_ts"
+exit
