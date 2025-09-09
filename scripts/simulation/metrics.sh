@@ -2,7 +2,7 @@
 
 ue_values=(16 32 64 128 256 512 1024 1256 1512)
 repetition_count=5
-gnbsim_wait_time=10
+gnbsim_wait_time=5
 wait_nwdaf=60
 aether_dir="$HOME/aether-onramp/"
 nwdaf_dir="$HOME/nwdaf-otel/"
@@ -16,6 +16,10 @@ for cur_ue_count in "${ue_values[@]}"; do
     cd $aether_dir
     for ((i=1; i<=repetition_count; i++)); do
         echo "iteration $i"
+        make aether-gnbsim-uninstall
+        sleep $gnbsim_wait_time
+        make aether-gnbsim-install
+        sleep $gnbsim_wait_time
         make aether-gnbsim-run
         sleep $gnbsim_wait_time
     done
