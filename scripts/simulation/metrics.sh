@@ -33,6 +33,7 @@ sleep $wait_nwdaf
 
 # Stop NWDAF
 cd $nwdaf_dir
+make stop-analytics
 sleep $gnbsim_wait_time
 
 # Plot graphs
