@@ -7,6 +7,10 @@ wait_nwdaf=60
 aether_dir="$HOME/aether-onramp/"
 nwdaf_dir="$HOME/nwdaf-otel/"
 
+cd $nwdaf_dir
+make start-analytics
+sleep $wait_nwdaf
+
 # save starting time for graph reference
 start_ts=$(date +%s)
 for cur_ue_count in "${ue_values[@]}"; do
