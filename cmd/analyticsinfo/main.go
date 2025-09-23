@@ -1,10 +1,8 @@
 package main
 
 import (
-	"crypto/tls"
-	"io"
 	"log"
-	"net/http"
+	"nwdaf-otel/clients/nrf"
 	"nwdaf-otel/clients/prometheus"
 	"nwdaf-otel/repository"
 	"nwdaf-otel/server"
@@ -14,9 +12,9 @@ import (
 	"time"
 )
 
-// TODO: add logger & metrics
+// TODO: add logger library & export own metrics?
 func main() {
-	// TODO: parse flags -> path for config
+	// TODO: have some configuration options, parse flags -> path for config
 
 	shutdownChn := make(chan struct{})
 	go func() {
@@ -29,28 +27,10 @@ func main() {
 	srv := server.NewAnalyticsInfoServer()
 	srv.Setup()
 	errChan := srv.Start(shutdownChn)
-	log.Println("Server started")
+	log.Println("Analytics Server started")
 
-	nrfClientTransport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	nrfClient := http.Client{
-		Timeout:   time.Second * 5,
-		Transport: nrfClientTransport,
-	}
-	res, err := nrfClient.Get("http://nrf:29510/nnrf-nfm/v1/nf-instances?limit=10")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func(Body io.ReadCloser) {
-		_, _ = io.Copy(io.Discard, Body)
-		err := Body.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(res.Body)
-	log.Println(res.StatusCode)
-	log.Println("Successfully connected NRF client and ready to register.")
+	nrfClient := nrf.NewNFClient()
+	nrfClient.StartNFRegistration(shutdownChn)
 
 	log.Println("Creating DB")
 	repo, err := repository.NewSQLiteRepo()
