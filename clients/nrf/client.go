@@ -99,7 +99,7 @@ func (c *NRFClient) registerNWDAF(stop chan struct{}) {
 		}
 
 		registrationMsg := c.createRegistrationMsg()
-		nrfRegistrationURL := fmt.Sprintf("http://nrf:29510/nnrf-nfm/v1/nf-instances/%s", registrationMsg.NfInstanceId)
+		nrfRegistrationURL := fmt.Sprintf("http://nrf:29510/nnrf-nfm/v1/nf-instances/%s", c.id.String())
 		registrationBody, err := json.Marshal(registrationMsg)
 		if err != nil {
 			log.Printf("failed to marshal NFInstance: %v", err)
@@ -112,14 +112,17 @@ func (c *NRFClient) registerNWDAF(stop chan struct{}) {
 		}
 		req.Header.Set("Content-Type", "application/json")
 
-		resp, err := c.httpClient.Do(req)
+		res, err := c.httpClient.Do(req)
 		if err != nil {
 			log.Printf("registration request failed: %w", err)
 			return
 		}
-		defer resp.Body.Close()
+		defer func() {
+			_, _ = io.Copy(io.Discard, res.Body)
+			_ = res.Body.Close()
+		}()
 
-		switch resp.StatusCode {
+		switch res.StatusCode {
 		case http.StatusOK:
 			log.Println("NWDAF profile successfully updated")
 		case http.StatusCreated:
@@ -131,10 +134,47 @@ func (c *NRFClient) registerNWDAF(stop chan struct{}) {
 			return
 		}
 
-		// TODO: start pinging
+		go c.startHeartbeat(stop)
 	}
 }
 
 func (c *NRFClient) startHeartbeat(stop chan struct{}) {
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			heartbeatMsg := NRFHeartBeat{NfStatus: "REGISTERED"}
+			data, err := json.Marshal(heartbeatMsg)
+			if err != nil {
+				log.Printf("failed to marshal NRFHeartBeat: %v, exiting keep alive loop", err)
+				return
+			}
+			nrfKeepAliveURL := fmt.Sprintf("http://nrf:29510/nnrf-nfm/v1/nf-instances/%s", c.id.String())
 
+			req, err := http.NewRequest(http.MethodPatch, nrfKeepAliveURL, bytes.NewBuffer(data))
+			if err != nil {
+				log.Printf("failed to create keep-alive request: %v, exiting keep alive loop", err)
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+
+			res, err := c.httpClient.Do(req)
+			if err != nil {
+				log.Printf("failed to communicate with NRF: %v, starting registration again", err)
+				go c.registerNWDAF(stop)
+				return
+			}
+			_, _ = io.Copy(io.Discard, res.Body)
+			_ = res.Body.Close()
+
+			if res.StatusCode != http.StatusOK {
+				log.Printf("Keep-alive failed. NRF server returned status %d, starting registration", res.StatusCode)
+				go c.registerNWDAF(stop)
+				return
+			}
+		case <-stop:
+			return
+		}
+	}
 }
