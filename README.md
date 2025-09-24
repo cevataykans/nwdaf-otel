@@ -15,6 +15,11 @@ As of now, only analytics-info is configured to serve requests.
   * make uninstall to erase the cluster
   * make stop to stop the instance of the **NWDAF** launched before
 
+## How to Build
+
+* Changes made to code trigger CI, which then builds up a Docker image.
+* Local helm chart always deploys the latest image.
+
 ## Packages
 
 * clients -> contains code related to communciation with other services: NRF, prometheus ...
