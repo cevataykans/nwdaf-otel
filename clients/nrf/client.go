@@ -128,7 +128,7 @@ func (c *NRFClient) registerNWDAF(stop chan struct{}) {
 		case http.StatusCreated:
 			log.Println("NWDAF profile successfully created")
 		default:
-			log.Printf("registration request returned status %d, retring after 5 sec", resp.StatusCode)
+			log.Printf("registration request returned status %d, retring after 5 sec", res.StatusCode)
 			time.Sleep(5 * time.Second)
 			go c.registerNWDAF(stop)
 			return
