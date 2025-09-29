@@ -2,6 +2,9 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: simplest
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9089"
 spec:
   managementState: managed
   image: "otel/opentelemetry-collector:latest"
@@ -13,13 +16,13 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
-      prometheus:
-        config:
-          scrape_configs:
-            - job_name: 'otel-collector'
-              scrape_interval: 10s
-              static_configs:
-                - targets: ['otel-collector:8888']
+#      prometheus:
+#        config:
+#          scrape_configs:
+#            - job_name: 'otel-collector'
+#              scrape_interval: 10s
+#              static_configs:
+#                - targets: ['otel-collector:8888']
     processors:
       batch:
         timeout: 1s            # Adjust the timeout to allow more time for processing
@@ -83,9 +86,9 @@ spec:
         #queue_size: 10000  # Increase queue size
     exporters:
       prometheus:
-        endpoint: "0.0.0.0:9090" #"http://prometheus.monitoring.svc.cluster.local:9090"
+        endpoint: "0.0.0.0:9089" #"http://prometheus.monitoring.svc.cluster.local:9090"
           #tls:
-        #insecure: true
+        insecure: true
       otlp:
         endpoint: "http://jaeger-collector.default.svc.cluster.local:4317"
         tls:
@@ -110,8 +113,8 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch, filter/traces, attributes/trace , memory_limiter ]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp]
+          exporters: [otlp, prometheus]
         metrics:
-          receivers: [otlp, prometheus]
+          receivers: [otlp]
           processors: [batch]
           exporters: [prometheus]
