@@ -23,6 +23,35 @@ spec:
 #              scrape_interval: 10s
 #              static_configs:
 #                - targets: ['otel-collector:8888']
+
+    # connectors to generate metrics from the incoming spans
+    connectors:
+      # basic service graph
+#      servicegraph:
+#        latency_histogram_buckets: [100ms, 250ms, 1s, 5s, 10s]
+      # a bit more elaborate spanmetrics
+      spanmetrics:
+        # this is relevant, since grafana expects the traces_spanmetrics_ prefix
+        namespace: traces.spanmetrics
+        # this is relevant, since grafana expects the historgram metrics in seconds
+        histogram:
+          unit: "s"
+        # the rest is close to default with some minor QoL additions
+        dimensions:
+          - name: http.method
+            default: GET
+          - name: http.status_code
+        exemplars:
+          enabled: true
+        events:
+          enabled: true
+          dimensions:
+            - name: exception.type
+            - name: exception.message
+        resource_metrics_key_attributes:
+          - service.name
+          - telemetry.sdk.language
+          - telemetry.sdk.name
     processors:
       batch:
         timeout: 1s            # Adjust the timeout to allow more time for processing
@@ -112,8 +141,8 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch, filter/traces, attributes/trace , memory_limiter ]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp, prometheus]
+          exporters: [otlp, spanmetrics]
         metrics:
-          receivers: [otlp]
+          receivers: [otlp, spanmetrics]
           processors: [batch]
           exporters: [prometheus]
