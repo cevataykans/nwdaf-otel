@@ -134,12 +134,12 @@ spec:
           num_consumers: 4       # Number of workers retrying spans
           queue_size: 10000      # Large buffer to store spans before dropping
     service:
-      telemetry:
-        metrics:
-          level: detailed
-#          address: "0.0.0.0:9090"
-        logs:
-          level: info #debug
+#      telemetry:
+#        metrics:
+#          level: detailed
+##          address: "0.0.0.0:9090"
+#        logs:
+#          level: info #debug
       pipelines:
         traces:
           receivers: [otlp]
