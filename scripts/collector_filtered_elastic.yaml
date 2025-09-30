@@ -88,7 +88,6 @@ spec:
       prometheus:
         endpoint: "0.0.0.0:9089" #"http://prometheus.monitoring.svc.cluster.local:9090"
           #tls:
-        insecure: true
       otlp:
         endpoint: "http://jaeger-collector.default.svc.cluster.local:4317"
         tls:
