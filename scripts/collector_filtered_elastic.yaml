@@ -7,7 +7,7 @@ metadata:
     prometheus.io/port: "9089"
 spec:
   managementState: managed
-  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.100.0"
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.136.0"
   ports:
     - name: http-metrics # For prometheus exporter port
       port: 9089
@@ -151,7 +151,7 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch, filter/traces, attributes/trace , memory_limiter ]    # filter/traces] #, queued_retry] #, resource]
+          processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
           exporters: [otlp, spanmetrics]
         metrics:
           receivers: [otlp, spanmetrics]
