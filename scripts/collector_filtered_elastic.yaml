@@ -20,6 +20,7 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
       # For collecting own metrics
+      # as this is not used in a pipeline, is ignored during startup
       prometheus/own:
         config:
           scrape_configs:
@@ -155,6 +156,6 @@ spec:
           processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
           exporters: [otlp/jaegar, spanmetrics]
         metrics:
-          receivers: [otlp, prometheus/own, spanmetrics] # prometheus scrapes its own metrics
+          receivers: [otlp, spanmetrics] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]
