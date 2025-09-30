@@ -8,6 +8,9 @@ metadata:
 spec:
   managementState: managed
   image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.100.0"
+  ports:
+    - name: http-metrics # For prometheus exporter port
+      port: 9089
   config:
     receivers:
       otlp:
