@@ -34,11 +34,13 @@ sleep 1m
 
 echo "****** OTEL INSTALLATION ******"
 #kubectl apply -f otel_operator_go_dec.yaml
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.131.0/opentelemetry-operator.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.136.0/opentelemetry-operator.yaml
 sleep 5m
 
 echo "****** FILTERED ELASTIC INSTALLATION ******"
 kubectl apply -f scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
+echo "****** TEMPOOOOOOO ******"
+kubectl apply -f scripts/tempo.yaml
 echo "****** JAEGER CONFIG INSTALLATION ******"
 kubectl apply -f scripts/jaeger_config.yaml
 
@@ -53,7 +55,8 @@ cd "$AETHER_DIR"
 echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
 echo "****** AETHER AMP INSTALLATION ******"
-make aether-amp-install
+make monitor-install
+make monitor-load
 echo "****** AETHER GNBSIM INSTALLATION ******"
 make aether-gnbsim-install
 cd "$current_dir"
