@@ -9,7 +9,7 @@ spec:
   managementState: managed
   image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.136.0"
   ports:
-    - name: http-metrics # For prometheus exporter port
+    - name: trace-metrics # For prometheus exporter port
       port: 9089
   config:
     receivers:
@@ -32,8 +32,8 @@ spec:
     # connectors to generate metrics from the incoming spans
     connectors:
       # basic service graph
-#      servicegraph:
-#        latency_histogram_buckets: [100ms, 250ms, 1s, 5s, 10s]
+      servicegraph:
+        latency_histogram_buckets: [100ms, 250ms, 1s, 5s, 10s]
       # a bit more elaborate spanmetrics
       spanmetrics:
         # this is relevant, since grafana expects the traces_spanmetrics_ prefix
@@ -136,6 +136,11 @@ spec:
           enabled: true
           num_consumers: 4       # Number of workers retrying spans
           queue_size: 10000      # Large buffer to store spans before dropping
+      otlp/tempo:
+        endpoint: "http://tempo.default.svc.cluster.local:4317"
+        tls:
+          insecure: true
+
     service:
       # values from: https://opentelemetry.io/docs/collector/internal-telemetry/#activate-internal-telemetry-in-the-collector
       telemetry:
@@ -154,8 +159,27 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp/jaegar, spanmetrics]
+          exporters: [otlp/jaegar, spanmetrics, otlp/tempo, servicegraph]
         metrics:
-          receivers: [otlp, spanmetrics] # prometheus scrapes its own metrics
+          receivers: [otlp, spanmetrics, servicegraph] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: otel-simplest-spanmetrics
+spec:
+  # point to the headless service
+  selector:
+    matchLabels:
+      operator.opentelemetry.io/collector-service-type: headless
+  endpoints:
+    # port name should match the one defined in the collector CRD
+    - port: trace-metrics
+      interval: 30s
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          targetLabel: __name__
+          regex: 'traces_spanmetrics_duration_seconds(_bucket|_sum|_count)?'
+          replacement: 'traces_spanmetrics_latency${1}'
