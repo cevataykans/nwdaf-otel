@@ -2,9 +2,10 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: simplest
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "9089"
+# Annotations for PROM is disabled, because ServiceMonitor is introduced for changing Tracing labels.
+#  annotations:
+#    prometheus.io/scrape: "true"
+#    prometheus.io/port: "9089"
 spec:
   managementState: managed
   image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.136.0"
@@ -164,22 +165,3 @@ spec:
           receivers: [otlp, spanmetrics, servicegraph] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: otel-simplest-spanmetrics
-spec:
-  # point to the headless service
-  selector:
-    matchLabels:
-      operator.opentelemetry.io/collector-service-type: headless
-  endpoints:
-    # port name should match the one defined in the collector CRD
-    - port: trace-metrics
-      interval: 30s
-      metricRelabelings:
-        - sourceLabels: [__name__]
-          targetLabel: __name__
-          regex: 'traces_spanmetrics_duration_seconds(_bucket|_sum|_count)?'
-          replacement: 'traces_spanmetrics_latency${1}'
