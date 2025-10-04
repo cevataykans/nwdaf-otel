@@ -15,20 +15,23 @@ generate_all:
 	openapi-generator generate -i templates/5G_APIs/TS29520_Nnwdaf_MLModelProvision.yaml -g go-server -o ./generated/temp --additional-properties=packageName=mlmodelprovision
 	mv ./generated/temp/go/* ./generated/mlmodelprovision
 
-install:
-	bash scripts/infra/install.sh
+install-nuc2:
+	bash scripts/infra/nuc2/install.sh
 
-uninstall:
-	bash scripts/infra/uninstall.sh
+uninstall-nuc2:
+	bash scripts/infra/nuc2/uninstall.sh
+
+install-nuc1:
+	bash scripts/infra/nuc1/install.sh
+
+uninstall-nuc1:
+	bash scripts/infra/nuc1/uninstall.sh
 
 start-analytics:
 	helm install -f helm/analyticsinfo_values.yaml nwdaf-analytics-info ./helm -n aether-5gc
 
 stop-analytics:
 	helm uninstall nwdaf-analytics-info -n aether-5gc
-
-venv:
-	source ../nwdaf-python3-venv/bin/activate
 
 get-plots:
 	scp -r sevinc@131.159.25.36:/home/sevinc/graphs ./graphs
