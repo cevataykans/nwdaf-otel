@@ -160,8 +160,8 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp/jaegar, otlp/tempo]
+          exporters: [otlp/jaegar, otlp/tempo, servicegraph, spanmetrics]
         metrics:
-          receivers: [otlp] # prometheus scrapes its own metrics
+          receivers: [otlp, servicegraph, spanmetrics] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]

@@ -24,24 +24,6 @@ data:
         backend: local
         local:
           path: /var/tempo/traces
-    # -- Instead of using OTEL connector(s), use already Grafana competible Tempo metric processors
-    metrics_generator:
-      #enabled: true
-      registry:
-        external_labels:
-          source: tempo
-      storage:
-        path: /var/tempo/generator/wal
-        remote_write:
-          - url: "http://rancher-monitoring-prometheus.cattle-monitoring-system.svc.cluster.local:9090"
-            send_exemplars: true
-      traces_storage:
-        path: /var/tempo/generator/traces
-    overrides:
-      defaults:
-        metrics_generator:
-          processors: [ 'service-graphs', 'span-metrics' ]
-          #generate_native_histograms: both
 ---
 apiVersion: apps/v1
 kind: Deployment
