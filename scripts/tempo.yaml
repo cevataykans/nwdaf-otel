@@ -30,7 +30,7 @@ data:
         compacted_block_retention: 24h
     querier:
       frontend_worker:
-        frontend_address: "127.0.0.1:3200"
+        frontend_address: "127.0.0.1:9095"
     storage:
       trace:
         backend: local
@@ -38,8 +38,7 @@ data:
           path: /var/tempo/wal # where to store the wal locally
         local:
           path: /var/tempo/blocks # where traces are stored in blocks, search backend keeps metadata pointing to blocks
-    overrides:
-      defaults:
+
 ---
 apiVersion: apps/v1
 kind: Deployment
