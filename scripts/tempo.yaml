@@ -34,10 +34,6 @@ data:
           path: /var/tempo/blocks # where traces are stored in blocks, search backend keeps metadata pointing to blocks
     overrides:
       defaults:
-    search:
-      backend: local
-      index:
-        path: /var/tempo/search
 ---
 apiVersion: apps/v1
 kind: Deployment
