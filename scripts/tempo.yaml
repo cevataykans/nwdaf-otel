@@ -58,7 +58,7 @@ spec:
           image: grafana/tempo:2.8.2
           args: ["-config.file=/etc/tempo/tempo.yaml"]
           ports:
-            - containerPort: 3100 #Grafana GETS traces from here
+            - containerPort: 3200 #Grafana GETS traces from here
             - containerPort: 4317 #OTEL gRPC
             - containerPort: 4318 #OTEL HTTP
           volumeMounts:
@@ -80,8 +80,8 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 3100 # Grafana scraps this port
-      targetPort: 3100
+      port: 3200 # Grafana scraps this port
+      targetPort: 3200
     - name: otlp-grpc
       port: 4317 # receiver
       targetPort: 4317
