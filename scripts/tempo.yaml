@@ -10,7 +10,7 @@ data:
       reporting_enabled: false
     server:
       http_listen_port: 3200
-      log_level: debug
+      log_level: info
     distributor:
       log_received_spans:
         enabled: true
@@ -36,10 +36,6 @@ data:
           path: /var/tempo/wal # where to store the wal locally
         local:
           path: /var/tempo/blocks # where traces are stored in blocks, search backend keeps metadata pointing to blocks
-    metrics_generator:
-      ring:
-        kvstore:
-          store: inmemory
 
 ---
 apiVersion: apps/v1
