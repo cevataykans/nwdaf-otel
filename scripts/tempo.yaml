@@ -12,10 +12,6 @@ data:
       http_listen_port: 3200
       log_level: info
     distributor:
-      log_received_spans:
-        enabled: true
-      log_discarded_spans:
-        enabled: true
       receivers:
         otlp:
           protocols:

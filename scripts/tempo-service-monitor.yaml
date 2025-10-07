@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tempo-own-metrics
+spec:
+  selector:
+    matchLabels:
+      app: tempo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 10s
