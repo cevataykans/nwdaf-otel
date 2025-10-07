@@ -23,10 +23,8 @@ data:
           protocols:
             grpc:
               endpoint: "0.0.0.0:4317"
-              enabled: true
             http:
               endpoint: "0.0.0.0:4318"
-              enabled: true
     compactor:
       compaction:
         compacted_block_retention: 24h
