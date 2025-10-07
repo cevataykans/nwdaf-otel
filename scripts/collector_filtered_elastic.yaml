@@ -84,8 +84,6 @@ spec:
             action: delete
           - key: zone
             action: delete
-          - key: span.kind
-            action: delete
           - key: istio.namespace
             action: delete
           - key: guid:x-request-id
