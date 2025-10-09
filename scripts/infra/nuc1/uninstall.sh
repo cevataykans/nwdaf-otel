@@ -9,6 +9,9 @@ AETHER_DIR=/home/sevinc/aether-onramp-3-1-0
 # AETHER_DIR=/home/sevinc/aether-onramp/
 
 echo "****** AETHER UNINSTALLATION ******"
+cd "$current_dir"
+kubectl delete -f scripts/tempo-service-monitor.yaml
+kubectl delete -f scripts/otel-service-monitor.yaml
 cd "$AETHER_DIR"
 make monitor-uninstall
 make aether-5gc-uninstall
@@ -19,8 +22,8 @@ echo "****** REMOVE ISTIO ******"
 kubectl delete -f istio-1.17.8/istio-telemetry.yaml -n istio-system
 cd "$current_dir"
 
-echo "****** REMOVE JAEGER CONFIG ******"
-kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
+#echo "****** REMOVE JAEGER CONFIG ******"
+#kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
 
 echo "****** REMOVE TEMPOOOOO ******"
 kubectl delete -f scripts/tempo.yaml
