@@ -2,6 +2,116 @@
 
 As of now, only analytics-info is configured to serve requests.
 
+## How to Configure Aether Core
+
+* Download your core and cd into.
+* Edit settings under hosts.ini
+* Open deps/5gc/roles/core/templates/sdcore-5g-values.yaml and add the following telemetry to amf settings while setting SBIs to **HTTP** for **each NF**
+  * Optionally deploy sctplb but setting deploy to **true** depending on your use case.
+  * Without SBI being set to HTTP, we cannot trace requests from ISTIO proxy.
+    * We do not yet support HTTPS in ISTIO.
+* Depending on your use case, increase, decrease the number of UEs the core supports.
+```yaml
+# Remember the configure every SBI for each NF
+    amf:
+      ngapp:
+        externalIp: {{ core.amf.ip }}
+      cfgFiles:
+        amfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+          
+    smf:
+      cfgFiles:
+        smfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+
+    pcf:
+      cfgFiles:
+        pcfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+              
+    ausf:
+      cfgFiles:
+        ausfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+
+    nssf:
+      cfgFiles:
+        nssfcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+
+    udr:
+      cfgFiles:
+        udrcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+
+    udm:
+      cfgFiles:
+        udmcfg.yaml:
+          configuration:
+            nrfUri: http://nrf:29510
+            sbi:
+              scheme: http
+
+    nrf:
+      cfgFiles:
+        nrfcfg.yaml:
+          configuration:
+            sbi:
+              scheme: http
+
+# Add the telemetry option
+  amf:
+	  cfgFiles:
+		  configuration:
+			  telemetry:
+				  enabled: true
+				  otlp_endpoint: "simplest-collector.default.svc.cluster.local:4317"
+				  ratio: 0.4      # use 1.0 for debugging                          # Optional; defaults to 1.0. If set to 0, AMF assumes 1.0.
+...
+```
+* Open vars/main.yaml and configure monitoring version (notice the fix typo "-" to "_" in moniroing-crd -> monitoring_crd)
+```yaml
+...
+  monitor:
+    helm:
+      chart_ref: rancher/rancher-monitoring
+      chart_version: 104.1.4+up57.0.3
+
+  monitor_crd:
+    helm:
+      chart_ref: rancher/rancher-monitoring-crd
+      chart_version: 104.1.4+up57.0.3
+```
+* Open deps/amp/roles/monitor/templates/monitor-values.yaml and add the following:
+```yaml
+rancherMonitoring:
+  enabled: false
+
+grafana:
+  service:
+    type: NodePort
+```
+* Core is ready to be deployed!
+
 ## How to Install
 
 * Log in to the node in which the project needs to be installed.
@@ -11,8 +121,8 @@ As of now, only analytics-info is configured to serve requests.
   * AETHER_DIR="your aether installation directory"
 * In the root of this project, run:
   * make install to setup aether cluster
-  * make start to deploy an instance of this **NWDAF** project
   * make uninstall to erase the cluster
+  * make start to deploy an instance of this **NWDAF** project
   * make stop to stop the instance of the **NWDAF** launched before
 
 ## How to Build
@@ -22,7 +132,7 @@ As of now, only analytics-info is configured to serve requests.
 
 ## Packages
 
-* clients -> contains code related to communciation with other services: NRF, prometheus ...
+* clients -> contains code related to communication with other services: NRF, prometheus ...
 * server -> contains server code of NWDAF
 * cmd -> entry point for NWDAF
 * scripts -> contains various scripts for benchmarks, infrastructure ...
