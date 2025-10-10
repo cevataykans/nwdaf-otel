@@ -5,6 +5,34 @@ As of now, only analytics-info is configured to serve requests.
 ## How to Configure Aether Core
 
 * Download your core and cd into.
+* Configure the settings according to the [official doc](https://docs.aetherproject.org/master/onramp/start.html)
+* For our nuc nodes, you will most probably use these as they are:
+```yaml
+data_iface: enp86s0 # can double check with "ip a"
+amf:
+   ip: "IP of the NUC core is being installed on"
+```
+* I also change these IPs to have multiple core deployments not clashing with other people working simultaneously
+```yaml
+# Notice how my subnets for UPF differ from the default subnet, I recommend changing your own subnets to a range unique to your deployment
+  upf:
+    access_subnet: "192.168.202.1/24"	# access subnet & gateway
+    core_subnet: "192.168.200.1/24"	# core subnet & gateway
+    mode: af_packet			# Options: af_packet or dpdk
+    multihop_gnb: false			# set to true to override default N3 subnet
+    default_upf:
+      ip:
+        access: "192.168.202.3"
+        core:   "192.168.200.3"
+      ue_ip_pool: "172.250.0.0/16"
+
+#...gnbsim
+  router:
+    data_iface: enp86s0
+    macvlan:
+      iface: gnbaccess
+      subnet_prefix: "172.30"
+```
 * Edit settings under hosts.ini
 * Open deps/5gc/roles/core/templates/sdcore-5g-values.yaml and add the following telemetry to amf settings while setting SBIs to **HTTP** for **each NF**
   * Optionally deploy sctplb but setting deploy to **true** depending on your use case.
