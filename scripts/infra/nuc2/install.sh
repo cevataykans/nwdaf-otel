@@ -41,8 +41,8 @@ echo "****** FILTERED ELASTIC INSTALLATION ******"
 kubectl apply -f scripts/collector_filtered_elastic.yaml   # collector_filtered.yaml
 echo "****** TEMPOOOOOOO ******"
 kubectl apply -f scripts/tempo.yaml
-echo "****** JAEGER CONFIG INSTALLATION ******"
-kubectl apply -f scripts/jaeger_config.yaml
+#echo "****** JAEGER CONFIG INSTALLATION ******"
+#kubectl apply -f scripts/jaeger_config.yaml
 
 cd "$ISTIO_DIR"
 echo "****** ISTIO INSTALLATION ******"
@@ -56,6 +56,10 @@ echo "****** AETHER 5GC INSTALLATION ******"
 make aether-5gc-install
 echo "****** AETHER AMP INSTALLATION ******"
 make monitor-install
+cd "$current_dir"
+kubectl apply -f scripts/otel-service-monitor.yaml
+kubectl apply -f scripts/tempo-service-monitor.yaml
+cd "$AETHER_DIR"
 make monitor-load
 echo "****** AETHER GNBSIM INSTALLATION ******"
 make aether-gnbsim-install
