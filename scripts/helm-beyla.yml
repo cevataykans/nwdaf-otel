@@ -1,3 +1,5 @@
+extraCapabilities:
+  - SYS_ADMIN
 config:
   # All values REF https://github.com/grafana/beyla/blob/main/charts/beyla/values.yaml
   data:
