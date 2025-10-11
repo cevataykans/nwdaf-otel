@@ -2,9 +2,6 @@
 
 current_dir=$(pwd)
 
-# Paths to the directories for the corresponding application (Path ending in the directory)
-# Manually adapt to local setup (TODO: Clone istio and Aether if necessary BUT: Values still need to be adapted manually)
-ISTIO_DIR=/home/sevinc/nuc2-istio
 AETHER_DIR=/home/sevinc/aether-onramp-3-1-0
 # AETHER_DIR=/home/sevinc/aether-onramp/
 
@@ -17,10 +14,8 @@ make monitor-uninstall
 make aether-5gc-uninstall
 cd "$current_dir"
 
-cd "$ISTIO_DIR"
 echo "****** REMOVE ISTIO ******"
-kubectl delete -f istio-1.17.8/istio-telemetry.yaml -n istio-system
-cd "$current_dir"
+sh scripts/infra/istio_uninstall.sh
 
 #echo "****** REMOVE JAEGER CONFIG ******"
 #kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
