@@ -8,8 +8,7 @@ config:
     # REF https://grafana.com/docs/beyla/latest/configure/service-discovery/#k8s-namespace
     discovery:
       instrument:
-        - k8s_namespace: aether-5gc
-          k8s_deployment_name: amf
+        - open_ports: 9089,29518,38412,9000
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
 #    otel_metrics_export:
 #      endpoint: http://simplest-collector.default.svc.cluster.local:4317
