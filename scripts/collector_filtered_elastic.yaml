@@ -98,11 +98,11 @@ spec:
         trace_statements:
           - context: span
             statements:
-              - set(attributes["http.target"], extract_regex(attributes["http.url"], "https?://[^/]+(/.*)", "path"))
-              - set(attributes["http.target"], replace_regex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
-              - set(attributes["http.target"], replace_regex(attributes["http.target"], "/imsi-[0-9]+", "/{imsi-param}"))
-              - set(attributes["http.target"], replace_regex(attributes["http.target"], "/supi-[0-9]+", "/{supi-param}"))
-              - set(name, concat([attributes["http.method"], " ", attributes["http.target"]], ""))
+              - set(attributes["http.target"], ExtractRegex(attributes["http.url"], "https?://[^/]+(/.*)", "path"))
+              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
+              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/imsi-[0-9]+", "/{imsi-param}"))
+              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/supi-[0-9]+", "/{supi-param}"))
+              - set(name, Concat([attributes["http.method"], " ", attributes["http.target"]], ""))
 
 #      span/rename_http:
 #        # Use the span processor for renaming
