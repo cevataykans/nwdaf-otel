@@ -47,6 +47,8 @@ spec:
           - name: http.method
             default: GET
           - name: http.status_code
+#          - name: http.route
+#          - name: service.name
         exemplars:
           enabled: true
         events:
@@ -158,8 +160,8 @@ spec:
         traces:
           receivers: [otlp]
           processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp/tempo, servicegraph, spanmetrics]
+          exporters: [otlp/tempo]
         metrics:
-          receivers: [otlp, servicegraph, spanmetrics] # prometheus scrapes its own metrics
+          receivers: [otlp] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]

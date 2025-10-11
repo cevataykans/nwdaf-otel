@@ -44,10 +44,10 @@ kubectl apply -f scripts/tempo.yaml
 #echo "****** JAEGER CONFIG INSTALLATION ******"
 #kubectl apply -f scripts/jaeger_config.yaml
 
-cd "$ISTIO_DIR"
-echo "****** ISTIO INSTALLATION ******"
-sh install_istio.sh
-cd "$current_dir"
+#cd "$ISTIO_DIR"
+#echo "****** ISTIO INSTALLATION ******"
+#sh install_istio.sh
+#cd "$current_dir"
 
 sleep 1m
 
