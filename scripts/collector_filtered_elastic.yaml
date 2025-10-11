@@ -93,14 +93,25 @@ spec:
           - key: component
             action: delete
 
-      span/rename_http:
-        # Use the span processor for renaming
-        name:
-          # A list of attributes to pull values from to generate the new span name
-          from_attributes:
-            - http.request.method
-            - http.route
-          separator: " "
+      transform:
+#        error_mode: ignore
+        trace_statements:
+          - context: span
+            statements:
+              - set(attributes["http.target"], extract_regex(attributes["http.url"], `https?:\/\/[^\/]+(\/.*)`, "path"))
+              - set(attributes["http.target"], replace_regex(attributes["http.target"], `\/[0-9a-fA-F-]{8,}`, "/{id-param}"))
+              - set(attributes["http.target"], replace_regex(attributes["http.target"], `\/imsi-[0-9]+`, "/{imsi-param}"))
+              - set(attributes["http.target"], replace_regex(attributes["http.target"], `\/supi-[0-9]+`, "/{supi-param}"))
+              - set(name, concat([attributes["http.method"], " ", attributes["http.target"]], ""))
+
+#      span/rename_http:
+#        # Use the span processor for renaming
+#        name:
+#          # A list of attributes to pull values from to generate the new span name
+#          from_attributes:
+#            - http.request.method
+#            - http.target
+#          separator: " "
 
       filter/traces:
         spans:
@@ -168,7 +179,7 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch, filter/traces, attributes/trace, span/rename_http, memory_limiter]    # filter/traces] #, queued_retry] #, resource]
+          processors: [batch, filter/traces, attributes/trace, transform, memory_limiter]    # filter/traces] #, queued_retry] #, resource]
           exporters: [otlp/tempo, servicegraph, spanmetrics]
         metrics:
           receivers: [otlp, servicegraph, spanmetrics] # prometheus scrapes its own metrics
