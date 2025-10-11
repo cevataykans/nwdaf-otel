@@ -96,18 +96,17 @@ spec:
       transform:
 #        error_mode: ignore
         trace_statements:
-          - context: span
             statements:
-              - set(attributes["http.target"], attributes["http.url"])
+              - set(resource.attributes["http.target"], resource.attributes["http.url"])
               # this alone would create a lot of cardinality explosion
-              - replace_pattern(attributes["http.target"], "^https?://[^/]+", "")
+              - replace_pattern(resource.attributes["http.url"], "^https?://[^/]+", ""))
 #              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "\?.*$", ""))
 #              -
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/imsi-[0-9]+", "/{imsi-param}"))
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/supi-[0-9]+", "/{supi-param}"))
 #              - Concat([attributes["http.method"], attributes["http.target"] ], " ")
-              - set(name, Concat([attributes["http.method"], attributes["http.target"] ], " "))
+              - set(span.name, Concat([resource.attributes["http.method"], resource.attributes["http.target"] ], " "))
 
 #      span/rename_http:
 #        # Use the span processor for renaming
