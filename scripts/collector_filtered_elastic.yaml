@@ -92,6 +92,7 @@ spec:
             action: delete
           - key: component
             action: delete
+
       span/rename_http:
         # Use the span processor for renaming
         name:
@@ -101,7 +102,7 @@ spec:
             - http.route
           separator: " "
 
-    filter/traces:
+      filter/traces:
         spans:
           exclude:
             match_type: strict
