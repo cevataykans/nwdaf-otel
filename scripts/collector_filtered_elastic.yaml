@@ -92,8 +92,16 @@ spec:
             action: delete
           - key: component
             action: delete
+      span/rename_http:
+        # Use the span processor for renaming
+        name:
+          # A list of attributes to pull values from to generate the new span name
+          from_attributes:
+            - http.request.method
+            - http.route
+          separator: " "
 
-      filter/traces:
+    filter/traces:
         spans:
           exclude:
             match_type: strict
@@ -159,9 +167,9 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch, filter/traces, attributes/trace , memory_limiter]    # filter/traces] #, queued_retry] #, resource]
-          exporters: [otlp/tempo]
+          processors: [batch, filter/traces, attributes/trace, span/rename_http, memory_limiter]    # filter/traces] #, queued_retry] #, resource]
+          exporters: [otlp/tempo, servicegraph, spanmetrics]
         metrics:
-          receivers: [otlp] # prometheus scrapes its own metrics
+          receivers: [otlp, servicegraph, spanmetrics] # prometheus scrapes its own metrics
           processors: [batch]
           exporters: [prometheus/aether]
