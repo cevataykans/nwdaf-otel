@@ -100,7 +100,7 @@ spec:
             statements:
               - set(attributes["http.target"], attributes["http.url"])
               # this alone would create a lot of cardinality explosion
-              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "^https?://[^/]+", ""))
+              - replace_pattern(attributes["http.target"], "^https?://[^/]+", "")
 #              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "\?.*$", ""))
 #              -
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
