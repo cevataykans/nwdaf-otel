@@ -11,14 +11,13 @@ config:
         - k8s_namespace: aether-5gc
           k8s_deployment_name: amf
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
-    otel_metrics_export:
-      endpoint: https://simplest-collector.default.svc.cluster.local:4317
-      protocol: grpc
-      features: ["application_span", "application_service_graph"]
-      insecure_skip_verify: true
-      interval: 5s
-      allow_service_graph_self_references: false
-      instrumentations: ["*"]
+#    otel_metrics_export:
+#      endpoint: http://simplest-collector.default.svc.cluster.local:4317
+#      features: ["application_span", "application_service_graph"]
+##      insecure_skip_verify: true
+#      interval: 5s
+#      allow_service_graph_self_references: false
+#      instrumentations: ["*"]
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
 #    prometheus_export:
 #      port: 8999
@@ -34,9 +33,9 @@ config:
 #      instrumentations: ["*"]
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_traces_export:
-      endpoint: https://simplest-collector.default.svc.cluster.local:4317
+      endpoint: http://tempo.default.svc.cluster.local:4317
       protocol: grpc
-      insecure_skip_verify: true
+#      insecure_skip_verify: true
       instrumentations: ["*"]
     trace_printer: text
     routes:
