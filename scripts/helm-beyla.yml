@@ -12,7 +12,7 @@ config:
           k8s_deployment_name: amf
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_metrics_export:
-      endpoint: http://simplest-collector.default.svc.cluster.local:4317
+      endpoint: simplest-collector.default.svc.cluster.local:4317
       protocol: grpc
       features: ["application_span", "application_service_graph"]
       insecure_skip_verify: true
@@ -34,7 +34,7 @@ config:
 #      instrumentations: ["*"]
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_traces_export:
-      endpoint: http://simplest-collector.default.svc.cluster.local:4317
+      endpoint: simplest-collector.default.svc.cluster.local:4317
       protocol: grpc
       insecure_skip_verify: true
       instrumentations: ["*"]
