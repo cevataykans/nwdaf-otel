@@ -9,6 +9,7 @@ config:
     discovery:
       instrument:
         - k8s_namespace: aether-5gc
+          k8s_deployment_name: amf
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_metrics_export:
       endpoint: http://simplest-collector.default.svc.cluster.local:4317
@@ -45,3 +46,9 @@ config:
         dns: true
       kubernetes:
         enable: true
+    filter:
+      network:
+        k8s_dst_owner_name:
+          not_match: '{kube*,*jaeger-agent*,*prometheus*,*promtail*,*grafana-agent*}'
+        k8s_src_owner_name:
+          not_match: '{kube*,*jaeger-agent*,*prometheus*,*promtail*,*grafana-agent*}'
