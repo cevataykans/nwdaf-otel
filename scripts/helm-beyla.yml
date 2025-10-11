@@ -3,6 +3,7 @@ extraCapabilities:
 config:
   # All values REF https://github.com/grafana/beyla/blob/main/charts/beyla/values.yaml
   data:
+    log_level: DEBUG
     # Contents of the actual Beyla configuration file
     # REF https://grafana.com/docs/beyla/latest/configure/service-discovery/#k8s-namespace
     discovery:
@@ -10,7 +11,8 @@ config:
         - k8s_namespace: aether-5gc
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_metrics_export:
-      endpoint: http://simplest-collector.default.svc.cluster.local:4318
+      endpoint: http://simplest-collector.default.svc.cluster.local:4317
+      protocol: grpc
       features: ["application_span", "application_service_graph"]
       insecure_skip_verify: true
       interval: 5s
@@ -31,10 +33,11 @@ config:
 #      instrumentations: ["*"]
     # Ref: https://grafana.com/docs/beyla/latest/configure/export-data/
     otel_traces_export:
-      endpoint: http://simplest-collector.default.svc.cluster.local:4318
+      endpoint: http://simplest-collector.default.svc.cluster.local:4317
+      protocol: grpc
       insecure_skip_verify: true
       instrumentations: ["*"]
-    trace_printer: disabled
+    trace_printer: text
     routes:
       unmatched: heuristic
     attributes:
@@ -42,9 +45,3 @@ config:
         dns: true
       kubernetes:
         enable: false
-    filter:
-      network:
-        k8s_dst_owner_name:
-          not_match: '{kube*,*jaeger-agent*,*prometheus*,*promtail*,*grafana-agent*}'
-        k8s_src_owner_name:
-          not_match: '{kube*,*jaeger-agent*,*prometheus*,*promtail*,*grafana-agent*}'
