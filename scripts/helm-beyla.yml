@@ -44,4 +44,4 @@ config:
       instance_id:
         dns: true
       kubernetes:
-        enable: false
+        enable: true
