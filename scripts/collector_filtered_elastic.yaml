@@ -98,7 +98,7 @@ spec:
         trace_statements:
           - set(span.attributes["http.target"], span.attributes["http.url"])
               # this alone would create a lot of cardinality explosion
-          - replace_pattern(span.attributes["http.url"], "^https?://[^/]+", "")
+          - replace_pattern(span.attributes["http.target"], "^https?://[^/]+", "")
 #              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "\?.*$", ""))
 #              -
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
@@ -116,17 +116,18 @@ spec:
 #            - http.target
 #          separator: " "
 
-      filter/traces:
-        spans:
-          exclude:
-            match_type: strict
-            attributes:
-              #- key: grpc.authority
-              # value: "webui:9876"
-              #- key: k8s.pod.service_name
-              #  value: "webui.aether-5gc"
-              - key: istio.canonical_service
-                value: "simapp"
+# DISABLED as we do not put Envoy proxy in front of Simapp
+#      filter/traces:
+#        spans:
+#          exclude:
+#            match_type: strict
+#            attributes:
+#              #- key: grpc.authority
+#              # value: "webui:9876"
+#              #- key: k8s.pod.service_name
+#              #  value: "webui.aether-5gc"
+#              - key: istio.canonical_service
+#                value: "simapp"
 
               #error_mode: ignore
               #traces:
@@ -182,7 +183,7 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch, filter/traces, attributes/trace, transform, memory_limiter]    # filter/traces] #, queued_retry] #, resource]
+          processors: [batch, attributes/trace, transform, memory_limiter]    # filter/traces] #, queued_retry] #, resource]
           exporters: [otlp/tempo, servicegraph, spanmetrics]
         metrics:
           receivers: [otlp, servicegraph, spanmetrics] # prometheus scrapes its own metrics
