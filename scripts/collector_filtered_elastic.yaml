@@ -97,16 +97,20 @@ spec:
 #        error_mode: ignore
         trace_statements:
           - set(span.attributes["http.target"], span.attributes["http.url"])
-              # this alone would create a lot of cardinality explosion
+          # Remove host
           - replace_pattern(span.attributes["http.target"], "^https?://[^/]+", "")
+          # Remove Query parameters
+          - replace_pattern(span.attributes["http.target"], "\\?.*$", "")
 #              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "\?.*$", ""))
 #              -
+          # Remove path variables (most of them?)
           - replace_pattern(span.attributes["http.target"], "/[0-9a-zA-Z-]{16,}", "/{var}")
 #          - replace_pattern(span.attributes["http.target"], "/imsi-[0-9]+", "/{param}")
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/imsi-[0-9]+", "/{imsi-param}"))
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/supi-[0-9]+", "/{supi-param}"))
 #              - Concat([attributes["http.method"], attributes["http.target"] ], " ")
+          # Set span name as the endpoint for aggregation
           - set(span.name, Concat([span.attributes["http.method"], span.attributes["http.target"] ], " ")) where span.attributes["service.name"] != "amf"
 
 #      span/rename_http:
