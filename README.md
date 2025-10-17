@@ -130,6 +130,7 @@ amf:
       chart_version: 104.1.4+up57.0.3
 ```
 * Copy scripts/data/grafana-observability.json to deps/amp/roles/monitor-load/templates/5g-monitoring/observability.json
+* Copy scripts/data/nf-metrics.json to deps/amp/roles/monitor-load/templates/5g-monitoring/nf-metrics.json
 * Open deps/amp/roles/monitor-load/templates/5g-monitoring/kustomization.yaml and add the copied dashboard:
 ```yaml
 resources:
@@ -142,6 +143,7 @@ configMapGenerator:
     files:
       - ./5g-dashboard.json
       - ./observability.json
+      - ./nf-metrics.json
 generatorOptions:
   labels:
     grafana_dashboard: "1"
