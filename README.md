@@ -129,15 +129,47 @@ amf:
       chart_ref: rancher/rancher-monitoring-crd
       chart_version: 104.1.4+up57.0.3
 ```
+* Copy scripts/data/grafana-observability.json to deps/amp/roles/monitor-load/templates/5g-monitoring/observability.json
+* Open deps/amp/roles/monitor-load/templates/5g-monitoring/kustomization.yaml and add the copied dashboard:
+```yaml
+resources:
+  - ./metricfunc-monitor.yaml
+  - ./upf-monitor.yaml
+
+configMapGenerator:
+  - name: grafana-ops-dashboards
+    namespace: cattle-dashboards
+    files:
+      - ./5g-dashboard.json
+      - ./observability.json
+generatorOptions:
+  labels:
+    grafana_dashboard: "1"
+```
 * Open deps/amp/roles/monitor/templates/monitor-values.yaml and add the following:
 ```yaml
 rancherMonitoring:
   enabled: false
 
 grafana:
+  additionalDataSources:
+    - name: Tempo
+      type: tempo
+      uid: df14gae7gchkwf
+      url: http://tempo.default.svc.cluster.local:3200
+      basicAuth: false
+      editable: true
+      jsonData:
+        serviceMap:
+          datasourceUid: 'prometheus'
+        nodeGraph:
+          enabled: true
+        search:
+          hide: false
   service:
     type: NodePort
 ```
+
 * Core is ready to be deployed!
 
 ## How to Install

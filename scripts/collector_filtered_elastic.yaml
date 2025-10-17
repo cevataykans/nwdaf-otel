@@ -111,7 +111,7 @@ spec:
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/supi-[0-9]+", "/{supi-param}"))
 #              - Concat([attributes["http.method"], attributes["http.target"] ], " ")
           # Set span name as the endpoint for aggregation
-          - set(span.name, Concat([span.attributes["http.method"], span.attributes["http.target"] ], " ")) where span.attributes["service.name"] != "amf"
+          - set(span.name, Concat([span.attributes["http.method"], span.attributes["http.target"] ], " ")) where resource.attributes["service.name"] != "amf"
 
 #      span/rename_http:
 #        # Use the span processor for renaming
