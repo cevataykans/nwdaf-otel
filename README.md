@@ -129,7 +129,7 @@ amf:
       chart_ref: rancher/rancher-monitoring-crd
       chart_version: 104.1.4+up57.0.3
 ```
-* Copy scripts/data/grafana-observability.json to deps/amp/roles/monitor-load/templates/5g-monitoring/observability.json
+* Copy scripts/data/observability.json to deps/amp/roles/monitor-load/templates/5g-monitoring/observability.json
 * Copy scripts/data/nf-metrics.json to deps/amp/roles/monitor-load/templates/5g-monitoring/nf-metrics.json
 * Open deps/amp/roles/monitor-load/templates/5g-monitoring/kustomization.yaml and add the copied dashboard:
 ```yaml
