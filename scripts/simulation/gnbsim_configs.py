@@ -90,6 +90,7 @@ except ValueError:
 print(f'Creating {gnb_count} with {ue_count} per gnb... parallel -> {parallel}')
 
 #onramp_path = '../../Thesis/test/aether-onramp'
-onramp_path = '../aether-onramp'
+# onramp_path = '../aether-onramp'
+onramp_path = '../cores/aether-onramp-3-1-0'
 file_path = onramp_path
 edit_gnbsim_config(file_path, parallel, gnb_count, ue_count)
