@@ -104,7 +104,7 @@ spec:
 #              - set(attributes["http.target"], replace_pattern(attributes["http.target"], "\?.*$", ""))
 #              -
           # Remove path variables (most of them?)
-          - replace_pattern(span.attributes["http.target"], "/[0-9a-zA-Z-]{16,}", "/{var}")
+          - replace_pattern(span.attributes["http.target"], "/(?=[0-9A-Za-z-]*[0-9])[0-9A-Za-z-]{16,}", "/{var}")
 #          - replace_pattern(span.attributes["http.target"], "/imsi-[0-9]+", "/{param}")
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/[0-9a-fA-F-]{8,}", "/{id-param}"))
 #              - set(attributes["http.target"], ReplaceRegex(attributes["http.target"], "/imsi-[0-9]+", "/{imsi-param}"))

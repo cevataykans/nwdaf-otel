@@ -1132,10 +1132,12 @@
         "current": {
           "selected": true,
           "text": [
-            "nrf.aether-5gc"
+            "amf",
+            "amf.aether-5gc"
           ],
           "value": [
-            "nrf.aether-5gc"
+            "amf",
+            "amf.aether-5gc"
           ]
         },
         "datasource": {
@@ -1163,10 +1165,12 @@
         "current": {
           "selected": true,
           "text": [
-            "amf"
+            "amf",
+            "sctplb"
           ],
           "value": [
-            "amf"
+            "amf",
+            "sctplb"
           ]
         },
         "datasource": {
@@ -1194,10 +1198,10 @@
         "current": {
           "selected": true,
           "text": [
-            "amf-797c9c48bd-782ws"
+            "amf-797c9c48bd-jlvfg"
           ],
           "value": [
-            "amf-797c9c48bd-782ws"
+            "amf-797c9c48bd-jlvfg"
           ]
         },
         "datasource": {
