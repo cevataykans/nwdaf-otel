@@ -172,6 +172,9 @@ grafana:
     type: NodePort
 ```
 
+Configuring Subnets for Extended UE Benchmarking
+
+
 * Core is ready to be deployed!
 
 ## How to Install
