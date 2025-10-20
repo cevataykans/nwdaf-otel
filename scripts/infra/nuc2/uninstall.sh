@@ -15,8 +15,8 @@ cd "$current_dir"
 echo "****** REMOVE ISTIO ******"
 sh scripts/infra/istio_uninstall.sh
 
-echo "****** REMOVE JAEGER CONFIG ******"
-kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
+#echo "****** REMOVE JAEGER CONFIG ******"
+#kubectl delete -f scripts/jaeger_config.yaml       #jaeger_config.yaml
 
 echo "****** REMOVE TEMPOOOOO ******"
 kubectl delete -f scripts/tempo.yaml
