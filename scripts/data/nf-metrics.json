@@ -21,112 +21,12 @@
   "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 7,
-        "x": 0,
-        "y": 0
-      },
-      "id": 19,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "(\n  sum by (span_name) ( rate(traces_spanmetrics_latency_sum{service_name=~\"$nf_name\"}[$__rate_interval]) )\n  /\n  sum by (span_name) ( rate(traces_spanmetrics_latency_count{service_name=~\"$nf_name\"}[$__rate_interval]) )\n) *\nsum by (span_name) (\n  rate(traces_spanmetrics_calls_total{service_name=~\"$nf_name\"}[$__rate_interval])\n)",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Concurrency Limit",
-      "type": "timeseries"
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 0
       },
       "id": 8,
       "panels": [],
@@ -197,7 +97,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 8
+        "y": 1
       },
       "id": 9,
       "interval": "30s",
@@ -297,7 +197,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 8
+        "y": 1
       },
       "id": 12,
       "options": {
@@ -393,7 +293,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 8
+        "y": 1
       },
       "id": 13,
       "options": {
@@ -489,7 +389,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 16
+        "y": 9
       },
       "id": 10,
       "options": {
@@ -600,7 +500,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 16
+        "y": 9
       },
       "id": 11,
       "options": {
@@ -696,7 +596,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 16
+        "y": 9
       },
       "id": 14,
       "options": {
@@ -792,7 +692,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 24
+        "y": 17
       },
       "id": 15,
       "options": {
@@ -891,7 +791,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 24
+        "y": 17
       },
       "id": 16,
       "options": {
@@ -985,13 +885,38 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "sum(rate(traces_spanmetrics_latency_sum{service_name=~\"amf\\\\.aether-5gc\"}[2m0s])) / sum(rate(traces_spanmetrics_latency_count{service_name=~\"amf\\\\.aether-5gc\"}[2m0s]))"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 24
+        "y": 17
       },
       "id": 17,
       "options": {
@@ -1082,7 +1007,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
@@ -1090,9 +1016,9 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 24
+        "y": 17
       },
-      "id": 18,
+      "id": 19,
       "options": {
         "legend": {
           "calcs": [],
@@ -1111,15 +1037,19 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service_name=~\"$nf_name\"}[$__rate_interval])) by(span_name)",
+          "expr": "(\n  sum by (span_name) ( rate(traces_spanmetrics_latency_sum{service_name=~\"$nf_name\"}[$__rate_interval]) )\n  /\n  sum by (span_name) ( rate(traces_spanmetrics_latency_count{service_name=~\"$nf_name\"}[$__rate_interval]) )\n) *\nsum by (span_name) (\n  rate(traces_spanmetrics_calls_total{service_name=~\"$nf_name\"}[$__rate_interval])\n) * 1000",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
-      "title": "Requests Per Second",
+      "title": "Concurrency Limit",
       "type": "timeseries"
     }
   ],
@@ -1132,11 +1062,9 @@
         "current": {
           "selected": true,
           "text": [
-            "amf",
             "amf.aether-5gc"
           ],
           "value": [
-            "amf",
             "amf.aether-5gc"
           ]
         },
@@ -1165,12 +1093,10 @@
         "current": {
           "selected": true,
           "text": [
-            "amf",
-            "sctplb"
+            "amf"
           ],
           "value": [
-            "amf",
-            "sctplb"
+            "amf"
           ]
         },
         "datasource": {
@@ -1198,10 +1124,10 @@
         "current": {
           "selected": true,
           "text": [
-            "amf-797c9c48bd-jlvfg"
+            "amf-797c9c48bd-4b627"
           ],
           "value": [
-            "amf-797c9c48bd-jlvfg"
+            "amf-797c9c48bd-4b627"
           ]
         },
         "datasource": {
