@@ -1,8 +1,8 @@
 #!bin/bash
 
-ue_values=(8)#16 32 64 128 256 512)
+ue_values=(8) #16 32 64 128 256 512)
 repetition_count=1
-gnbsim_wait_time=5
+gnbsim_wait_time=30
 wait_nwdaf=1
 aether_dir="$HOME/cores/aether-onramp-3-1-0/"
 nwdaf_dir="$HOME/nwdaf-otel/"
