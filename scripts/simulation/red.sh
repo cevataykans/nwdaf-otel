@@ -14,7 +14,7 @@ mkdir ${archive_folder}
 start_ts=$(date +%s)
 echo "Start time:  $start_ts"
 cd $nwdaf_dir
-python3 scripts/simulation/gnbsim_configs.py "True" "1" "ue_value"
+python3 scripts/simulation/gnbsim_configs.py "True" "1" "$ue_value"
 
 cd $aether_dir
 for ((i=1; i<=repetition_count; i++)); do
