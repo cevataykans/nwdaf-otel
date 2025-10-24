@@ -1,7 +1,7 @@
 #!bin/bash
 
 ue_value=8
-repetition_count=10
+repetition_count=1
 gnbsim_wait_time=30
 aether_dir="$HOME/cores/aether-onramp-3-1-0/"
 nwdaf_dir="$HOME/nwdaf-otel/"
@@ -37,7 +37,7 @@ archive() {
     --data-urlencode "step=30" > "${folder}/${archive_name}.json"
 }
 
-query='histogram_quantile(0.95, sum by(le, span_name) (rate(traces_spanmetrics_latency_bucket{service_name=~"amf.aether-5gc"}[30s])))'
+query="histogram_quantile(0.95, sum by(le, span_name) (rate(traces_spanmetrics_latency_bucket{service_name=~\"amf.aether-5gc\"}[30s])))"
 name='latency_bucket'
 archive $query $name $archive_folder
 
