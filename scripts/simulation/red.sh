@@ -23,7 +23,8 @@ for ((i=1; i<=repetition_count; i++)); do
 done
 end_ts=$(date +%s)
 
-prom_pf_process_id=$(kubectl port-forward service/rancher-monitoring-prometheus -n cattle-monitoring-system 9090:9090 &)
+kubectl port-forward service/rancher-monitoring-prometheus -n cattle-monitoring-system 9090:9090 &
+prom_pf_process_id=$!
 # Function that can query Prometheus
 archive() {
   local query_name=$1
