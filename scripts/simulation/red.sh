@@ -30,11 +30,7 @@ query_prom() {
   local query_name=$1
   local archive_name=$2
   local folder=$3
-  curl -G "http://localhost:9090/api/v1/query_range" \
-    --data-urlencode "query=${query_name}" \
-    --data-urlencode "start=$(date -d '10 minutes ago' +%s)" \
-    --data-urlencode "end=$(date +%s)" \
-    --data-urlencode "step=30" > "${folder}/${archive_name}.json"
+  curl -G "http://localhost:9090/api/v1/query_range" --data-urlencode "query=${query_name}" --data-urlencode "start=$(date -d '10 minutes ago' +%s)" --data-urlencode "end=$(date +%s)" --data-urlencode "step=30" > "${folder}/${archive_name}.json"
 }
 
 query="histogram_quantile(0.95, sum by(le, span_name) (rate(traces_spanmetrics_latency_bucket{service_name=~\"amf.aether-5gc\"}[30s])))"
