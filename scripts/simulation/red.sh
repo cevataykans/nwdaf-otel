@@ -8,7 +8,7 @@ nwdaf_dir="$HOME/nwdaf-otel/"
 
 #TODO: create folder with UE count, save every graph under there
 current_day=$(date '+%d-%m-%Y')
-archive_folder="${current_day}-ue-${ue_value}-$(date +%s)"
+archive_folder="~/datasets/${current_day}-ue-${ue_value}-$(date +%s)"
 mkdir "${archive_folder}"
 
 start_ts=$(date +%s)
@@ -33,7 +33,8 @@ query_prom() {
   curl -G "http://localhost:9090/api/v1/query_range" --data-urlencode "query=${query_name}" --data-urlencode "start=$(date -d '10 minutes ago' +%s)" --data-urlencode "end=$(date +%s)" --data-urlencode "step=30" > "${folder}/${archive_name}.json"
 }
 
-query="histogram_quantile(0.95, sum by(le, span_name) (rate(traces_spanmetrics_latency_bucket{service_name=~\"amf.aether-5gc\"}[30s])))"
+cd ~
+query='histogram_quantile(0.95, sum by(le, span_name) (rate(traces_spanmetrics_latency_bucket{service_name=~"amf.aether-5gc"}[30s])))'
 name="latency_bucket"
 query_prom $query $name $archive_folder
 
