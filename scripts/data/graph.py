@@ -2,18 +2,23 @@ import sqlite3
 import time
 
 import pandas as pd
+from cycler import cycler
+import matplotlib
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
 
 # === Configuration ===
-DB_FOLDER = "../data"
+DB_FOLDER = "/Users/cevataykans/Thesis/test/data"
 DB_FILE = "series.db"
 TABLE = "series"
 TIME_COLUMN = "ts"
 VALUE_COLUMN = "cpu_usage"
 OUTPUT_FOLDER = 'graphs'
 OUTPUT_FILE = "cpu_vs_time.png"
+
+# 1757419200 and 1757422800
 
 def parse_args():
     # usage gnb_count, ue_count per gnb
@@ -45,27 +50,43 @@ def main():
     # Connect to SQLite
     conn = sqlite3.connect(db_path)
     services = [
-        'bessd',
         'amf',
-        'ausf',
-        'nrf',
-        'nssf',
-        'pcf',
-        'smf',
-        'udm',
-        'udr',
+        # 'bessd',
+        # 'ausf',
+        # 'nrf',
+        # 'nssf',
+        # 'pcf',
+        # 'smf',
+        # 'udm',
+        # 'udr',
     ]
 
     # column name -> title of plot
     columns = {
-        'cpu_usage': 'CPU Total Seconds',
-        'memory_usage': 'Memory',
-        'total_bytes_sent': 'Network Bytes Sent',
-        'total_bytes_received': 'Network Bytes Received',
-        'total_packets_sent': 'Network Packets Sent',
-        'total_packets_received': 'Network Packets Received',
+        'cpu_usage': 'CPU Utilization',
+        'memory_usage': 'Memory Utilization',
+        # 'total_bytes_sent': 'Network Bytes Sent',
+        # 'total_bytes_received': 'Network Bytes Received',
+        # 'total_packets_sent': 'Network Packets Sent',
+        # 'total_packets_received': 'Network Packets Received',
         'avg_trace_duration': 'Average Trace Duration'
     }
+
+    metrics = ['(%)', '(bytes)', '($\mu$s)']
+
+    matplotlib.use('pgf')
+    matplotlib.rcParams.update({
+        'pgf.texsystem': 'pdflatex',
+        'text.usetex': True,
+        'pgf.rcfonts': False,
+        'font.family': 'serif',
+        'font.serif': ['Palatino'],
+        'axes.labelsize': 11,
+        'font.size': 11,
+        'legend.fontsize': 10,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+    })
 
     cur_time = int(time.time())
     folder_path = Path.home() / OUTPUT_FOLDER / str(cur_time)
@@ -80,16 +101,22 @@ def main():
         # Convert timestamp if needed
         df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
         # draw each graph at the folder
+        index = 0
         for column, title in columns.items():
             fig = plt.figure(figsize=(12,6))
             plt.plot(df[TIME_COLUMN], df[column], marker="o", linestyle="-")
-            plt.xlabel("Time")
-            plt.ylabel(column)
-            plt.title(title)
-            plt.grid(True)
+            plt.xlabel('Time (s)')
+            plt.ylabel(column + f' {metrics[index]}')
+            index += 1
+            plt.title(title + f' ({service.upper()})')
+            plt.grid(True, which="both", linestyle="--", alpha=0.3)
+            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+            # fig.autofmt_xdate()
+            # plt.rcParams["axes.prop_cycle"] = cycler(color=TUM_COLORS)
             plt.tight_layout()
 
             graph_path = service_folder_path / column
+            # graph_path = service_folder_path / f'{column}.pgf'
             plt.savefig(graph_path)
             plt.close(fig)
             print(f"✅ Saved plot to {graph_path}")
