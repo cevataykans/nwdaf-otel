@@ -1,0 +1,58 @@
+Creating 1 with 16 per gnb... parallel -> True
+running gnbsim with 16 UEs for 5 times
+iteration 1
+ansible-playbook -i /home/sevinc/aether-onramp/hosts.ini \
+	/home/sevinc/aether-onramp/deps/gnbsim/simulator.yml --tags start --extra-vars \
+	"ROOT_DIR=/home/sevinc/aether-onramp" --extra-vars "@/home/sevinc/aether-onramp/vars/main.yml"
+
+PLAY [provision simulator] *****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [nuc1]
+
+TASK [simulator : set_fact] ****************************************************
+ok: [nuc1]
+
+TASK [simulator : get info on gnbsim containers] *******************************
+ok: [nuc1] => (item=[0, 'deps/gnbsim/config/gnbsim-custom-0.yaml'])
+
+TASK [simulator : Remove config file on host] **********************************
+ok: [nuc1] => (item=[0, 'deps/gnbsim/config/gnbsim-custom-0.yaml'])
+
+TASK [simulator : copy config files to gnbsim host] ****************************
+changed: [nuc1] => (item=[0, 'deps/gnbsim/config/gnbsim-custom-0.yaml'])
+
+TASK [simulator : copy config files into gnbsim containers] ********************
+changed: [nuc1] => (item=[0, 'deps/gnbsim/config/gnbsim-custom-0.yaml'])
+
+TASK [simulator : start gnbsim] ************************************************
+changed: [nuc1] => (item=[0, 'deps/gnbsim/config/gnbsim-custom-0.yaml'])
+
+TASK [simulator : pause] *******************************************************
+Pausing for 1 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [nuc1]
+
+TASK [simulator : loop until gnbsim completes] *********************************
+FAILED - RETRYING: [nuc1]: loop until gnbsim completes (100 retries left).
+FAILED - RETRYING: [nuc1]: loop until gnbsim completes (99 retries left).
+changed: [nuc1]
+
+TASK [simulator : show outupt of summary.log from gnbsim Pod] ******************
+changed: [nuc1]
+
+TASK [simulator : Check if simulation failed] **********************************
+ok: [nuc1]
+
+TASK [simulator : debug] *******************************************************
+ok: [nuc1] => {
+    "msg": [
+        "Profile Name: profile1, Profile Type: register",
+        "Ue's Passed: 16, Ue's Failed: 0",
+        "Profile Status: PASS"
+    ]
+}
+
+PLAY RECAP *********************************************************************
+nuc1                       : ok=12   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
