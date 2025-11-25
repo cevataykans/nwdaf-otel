@@ -1,0 +1,50 @@
+﻿"Time","GET /nfconfig/plmn","GET /nnrf-disc/v1/nf-instances","GET /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-subscription","GET /nudr-dr/v1/subscription-data/{var}/context-data/smf-registrations","GET /nudr-dr/v1/subscription-data/{var}/{var}/provisioned-data/am-data","GET /nudr-dr/v1/subscription-data/{var}/{var}/provisioned-data/smf-selection-subscription-data","PATCH /nnrf-nfm/v1/nf-instances/{var}","PATCH /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-subscription","POST /nnrf-nfm/v1/subscriptions","POST /nudr-dr/v1/subscription-data/{var}/context-data/sdm-subscriptions","PUT /nnrf-nfm/v1/nf-instances/{var}","PUT /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-status","PUT /nudr-dr/v1/subscription-data/{var}/context-data/amf-3gpp-access"
+2025-11-18 22:36:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:36:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:37:00,1.90 ms,24.4 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,9.80 ms,8.40 ms,NaN,18.0 ms,NaN,42.0 ms,18.0 ms
+2025-11-18 22:37:30,1.90 ms,24.4 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,9.80 ms,8.40 ms,NaN,18.0 ms,NaN,42.0 ms,18.0 ms
+2025-11-18 22:38:00,1.90 ms,24.4 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,46 ms,8.40 ms,NaN,18.0 ms,NaN,42.0 ms,18.0 ms
+2025-11-18 22:38:30,1.90 ms,24.4 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,46 ms,8.40 ms,NaN,18.0 ms,NaN,42.0 ms,18.0 ms
+2025-11-18 22:39:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:39:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:40:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,9.90 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:40:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,9.90 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:41:00,1.90 ms,37.8 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,46 ms,42.0 ms,NaN,34.0 ms,NaN,5.94 ms,18.0 ms
+2025-11-18 22:41:30,1.90 ms,37.8 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,46 ms,42.0 ms,NaN,34.0 ms,NaN,5.94 ms,18.0 ms
+2025-11-18 22:42:00,1.90 ms,37.8 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,48 ms,42.0 ms,NaN,34.0 ms,NaN,5.94 ms,18.0 ms
+2025-11-18 22:42:30,1.90 ms,37.8 ms,18.0 ms,34.0 ms,28.7 ms,18.0 ms,48 ms,42.0 ms,NaN,34.0 ms,NaN,5.94 ms,18.0 ms
+2025-11-18 22:43:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:43:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:44:00,1.90 ms,14.9 ms,9.60 ms,20.7 ms,7.20 ms,35.8 ms,9.90 ms,24.4 ms,NaN,31.7 ms,NaN,5.83 ms,5.66 ms
+2025-11-18 22:44:30,1.90 ms,14.9 ms,9.60 ms,20.7 ms,7.20 ms,35.8 ms,9.90 ms,24.4 ms,NaN,31.7 ms,NaN,5.83 ms,5.66 ms
+2025-11-18 22:45:00,1.90 ms,14.9 ms,9.60 ms,20.7 ms,7.20 ms,35.8 ms,46 ms,24.4 ms,NaN,31.7 ms,NaN,5.83 ms,5.66 ms
+2025-11-18 22:45:30,1.90 ms,14.9 ms,9.60 ms,20.7 ms,7.20 ms,35.8 ms,46 ms,24.4 ms,NaN,31.7 ms,NaN,5.83 ms,5.66 ms
+2025-11-18 22:46:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,48 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:46:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,48 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:47:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:47:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:48:00,1.90 ms,31.0 ms,38.0 ms,30.3 ms,29.5 ms,31.7 ms,46 ms,77.1 ms,NaN,28.7 ms,NaN,13.4 ms,23.1 ms
+2025-11-18 22:48:30,1.90 ms,31.0 ms,38.0 ms,30.3 ms,29.5 ms,31.7 ms,46 ms,77.1 ms,NaN,28.7 ms,NaN,13.4 ms,23.1 ms
+2025-11-18 22:49:00,1.90 ms,31.0 ms,38.0 ms,30.3 ms,29.5 ms,31.7 ms,48 ms,77.1 ms,NaN,28.7 ms,NaN,13.4 ms,23.1 ms
+2025-11-18 22:49:30,1.90 ms,31.0 ms,38.0 ms,30.3 ms,29.5 ms,31.7 ms,48 ms,77.1 ms,NaN,28.7 ms,NaN,13.4 ms,23.1 ms
+2025-11-18 22:50:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:50:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:51:00,1.90 ms,37.8 ms,5.20 ms,34.3 ms,29.4 ms,32.5 ms,9.80 ms,54.3 ms,NaN,19.9 ms,NaN,21.6 ms,38.2 ms
+2025-11-18 22:51:30,1.90 ms,37.8 ms,5.20 ms,34.3 ms,29.4 ms,32.5 ms,9.80 ms,54.3 ms,NaN,19.9 ms,NaN,21.6 ms,38.2 ms
+2025-11-18 22:52:00,1.90 ms,37.8 ms,5.20 ms,34.3 ms,29.4 ms,32.5 ms,9.90 ms,54.3 ms,NaN,19.9 ms,NaN,21.6 ms,38.2 ms
+2025-11-18 22:52:30,1.90 ms,37.8 ms,5.20 ms,34.3 ms,29.4 ms,32.5 ms,9.90 ms,54.3 ms,NaN,19.9 ms,NaN,21.6 ms,38.2 ms
+2025-11-18 22:53:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:53:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:54:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:54:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,46 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:55:00,1.90 ms,37.2 ms,6.40 ms,32.5 ms,29.5 ms,25.4 ms,9.80 ms,70.0 ms,NaN,18.1 ms,NaN,9.40 ms,62.6 ms
+2025-11-18 22:55:30,1.90 ms,37.2 ms,6.40 ms,32.5 ms,29.5 ms,25.4 ms,9.80 ms,70.0 ms,NaN,18.1 ms,NaN,9.40 ms,62.6 ms
+2025-11-18 22:56:00,1.90 ms,37.2 ms,6.40 ms,32.5 ms,29.5 ms,25.4 ms,7.90 ms,70.0 ms,NaN,18.1 ms,NaN,9.40 ms,62.6 ms
+2025-11-18 22:56:30,1.90 ms,37.2 ms,6.40 ms,32.5 ms,29.5 ms,25.4 ms,7.90 ms,70.0 ms,NaN,18.1 ms,NaN,9.40 ms,62.6 ms
+2025-11-18 22:57:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,9.80 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:57:30,1.90 ms,NaN,NaN,NaN,NaN,NaN,9.80 ms,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:58:00,1.90 ms,35.4 ms,24.5 ms,31.4 ms,18.6 ms,28.6 ms,46 ms,71.6 ms,NaN,10.6 ms,NaN,12.2 ms,22.9 ms
+2025-11-18 22:58:30,1.90 ms,35.4 ms,24.5 ms,31.4 ms,18.6 ms,28.6 ms,46 ms,71.6 ms,NaN,10.6 ms,NaN,12.2 ms,22.9 ms
+2025-11-18 22:59:00,1.90 ms,35.4 ms,24.5 ms,31.4 ms,18.6 ms,28.6 ms,46 ms,71.6 ms,NaN,10.6 ms,NaN,12.2 ms,22.9 ms
+2025-11-18 22:59:30,1.90 ms,35.4 ms,24.5 ms,31.4 ms,18.6 ms,28.6 ms,46 ms,71.6 ms,NaN,10.6 ms,NaN,12.2 ms,22.9 ms
+2025-11-18 23:00:00,1.90 ms,NaN,NaN,NaN,NaN,NaN,9.90 ms,NaN,NaN,NaN,NaN,NaN,NaN

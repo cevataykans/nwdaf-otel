@@ -12,6 +12,9 @@ make monitor-uninstall
 make aether-5gc-uninstall
 cd "$current_dir"
 
+echo "****** REMOVE KEDA ******"
+helm uninstall keda -n keda
+
 echo "****** REMOVE ISTIO ******"
 sh scripts/infra/istio_uninstall.sh
 

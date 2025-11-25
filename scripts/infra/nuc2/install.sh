@@ -28,12 +28,15 @@ echo "****** FILTERED ELASTIC INSTALLATION ******"
 kubectl apply -f scripts/collector_filtered_elastic.yaml
 echo "****** TEMPOOOOOOO ******"
 kubectl apply -f scripts/tempo.yaml
-#echo "****** JAEGER CONFIG INSTALLATION ******"
-#kubectl apply -f scripts/jaeger_config.yaml
 
 echo "****** ISTIO INSTALLATION ******"
 sh scripts/infra/istio_install.sh
+sleep 1m
 
+echo "****** KEDA INSTALLATION ******"
+helm repo add kedacore https://kedacore.github.io/charts
+helm repo update
+helm install keda kedacore/keda --version 2.10.2 --namespace keda --create-namespace
 sleep 1m
 
 cd "$AETHER_DIR"

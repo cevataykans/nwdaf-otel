@@ -1,0 +1,50 @@
+﻿"Time","GET /nudr-dr/v1/policy-data/ues/{var}/am-data","GET /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-subscription","GET /nudr-dr/v1/subscription-data/{var}/context-data/smf-registrations","GET /nudr-dr/v1/subscription-data/{var}/{var}/provisioned-data/am-data","GET /nudr-dr/v1/subscription-data/{var}/{var}/provisioned-data/smf-selection-subscription-data","PATCH /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-subscription","POST /nudr-dr/v1/subscription-data/{var}/context-data/sdm-subscriptions","PUT /nudr-dr/v1/subscription-data/{var}/authentication-data/authentication-status","PUT /nudr-dr/v1/subscription-data/{var}/context-data/amf-3gpp-access"
+2025-11-18 22:36:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:36:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:37:00,1.90 ms,16.0 ms,12.0 ms,1.90 ms,1.90 ms,7.10 ms,1.90 ms,38.0 ms,4.30 ms
+2025-11-18 22:37:30,1.90 ms,16.0 ms,12.0 ms,1.90 ms,1.90 ms,7.10 ms,1.90 ms,38.0 ms,4.30 ms
+2025-11-18 22:38:00,1.90 ms,16.0 ms,12.0 ms,1.90 ms,1.90 ms,7.10 ms,1.90 ms,38.0 ms,4.30 ms
+2025-11-18 22:38:30,1.90 ms,16.0 ms,12.0 ms,1.90 ms,1.90 ms,7.10 ms,1.90 ms,38.0 ms,4.30 ms
+2025-11-18 22:39:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:39:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:40:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:40:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:41:00,1.96 ms,4.60 ms,1.95 ms,1.90 ms,2.83 ms,25.3 ms,1.95 ms,5.75 ms,4.30 ms
+2025-11-18 22:41:30,1.96 ms,4.60 ms,1.95 ms,1.90 ms,2.83 ms,25.3 ms,1.95 ms,5.75 ms,4.30 ms
+2025-11-18 22:42:00,1.96 ms,4.60 ms,1.95 ms,1.90 ms,2.83 ms,25.3 ms,1.95 ms,5.75 ms,4.30 ms
+2025-11-18 22:42:30,1.96 ms,4.60 ms,1.95 ms,1.90 ms,2.83 ms,25.3 ms,1.95 ms,5.75 ms,4.30 ms
+2025-11-18 22:43:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:43:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:44:00,1.93 ms,3.50 ms,1.90 ms,1.90 ms,1.90 ms,17.5 ms,1.90 ms,5.60 ms,3.98 ms
+2025-11-18 22:44:30,1.93 ms,3.50 ms,1.90 ms,1.90 ms,1.90 ms,17.5 ms,1.90 ms,5.60 ms,3.98 ms
+2025-11-18 22:45:00,1.93 ms,3.50 ms,1.90 ms,1.90 ms,1.90 ms,17.5 ms,1.90 ms,5.60 ms,3.98 ms
+2025-11-18 22:45:30,1.93 ms,3.50 ms,1.90 ms,1.90 ms,1.90 ms,17.5 ms,1.90 ms,5.60 ms,3.98 ms
+2025-11-18 22:46:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:46:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:47:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:47:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:48:00,1.98 ms,23.4 ms,1.91 ms,1.91 ms,1.91 ms,73.7 ms,1.93 ms,7.85 ms,16.8 ms
+2025-11-18 22:48:30,1.98 ms,23.4 ms,1.91 ms,1.91 ms,1.91 ms,73.7 ms,1.93 ms,7.85 ms,16.8 ms
+2025-11-18 22:49:00,1.98 ms,23.4 ms,1.91 ms,1.91 ms,1.91 ms,73.7 ms,1.93 ms,7.85 ms,16.8 ms
+2025-11-18 22:49:30,1.98 ms,23.4 ms,1.91 ms,1.91 ms,1.91 ms,73.7 ms,1.93 ms,7.85 ms,16.8 ms
+2025-11-18 22:50:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:50:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:51:00,3.37 ms,1.97 ms,1.90 ms,1.93 ms,1.91 ms,52.1 ms,1.92 ms,18.6 ms,40.7 ms
+2025-11-18 22:51:30,3.37 ms,1.97 ms,1.90 ms,1.93 ms,1.91 ms,52.1 ms,1.92 ms,18.6 ms,40.7 ms
+2025-11-18 22:52:00,3.37 ms,1.97 ms,1.90 ms,1.93 ms,1.91 ms,52.1 ms,1.92 ms,18.6 ms,40.7 ms
+2025-11-18 22:52:30,3.37 ms,1.97 ms,1.90 ms,1.93 ms,1.91 ms,52.1 ms,1.92 ms,18.6 ms,40.7 ms
+2025-11-18 22:53:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:53:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:54:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:54:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:55:00,25.5 ms,1.97 ms,1.91 ms,1.92 ms,1.96 ms,64.1 ms,1.91 ms,7.94 ms,63.3 ms
+2025-11-18 22:55:30,25.5 ms,1.97 ms,1.91 ms,1.92 ms,1.96 ms,64.1 ms,1.91 ms,7.94 ms,63.3 ms
+2025-11-18 22:56:00,25.5 ms,1.97 ms,1.91 ms,1.92 ms,1.96 ms,64.1 ms,1.91 ms,7.94 ms,63.3 ms
+2025-11-18 22:56:30,25.5 ms,1.97 ms,1.91 ms,1.92 ms,1.96 ms,64.1 ms,1.91 ms,7.94 ms,63.3 ms
+2025-11-18 22:57:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:57:30,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2025-11-18 22:58:00,44.3 ms,3.92 ms,1.92 ms,1.95 ms,1.94 ms,67.3 ms,1.91 ms,7.83 ms,17.7 ms
+2025-11-18 22:58:30,44.3 ms,3.92 ms,1.92 ms,1.95 ms,1.94 ms,67.3 ms,1.91 ms,7.83 ms,17.7 ms
+2025-11-18 22:59:00,44.3 ms,3.92 ms,1.92 ms,1.95 ms,1.94 ms,67.3 ms,1.91 ms,7.83 ms,17.7 ms
+2025-11-18 22:59:30,44.3 ms,3.92 ms,1.92 ms,1.95 ms,1.94 ms,67.3 ms,1.91 ms,7.83 ms,17.7 ms
+2025-11-18 23:00:00,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN

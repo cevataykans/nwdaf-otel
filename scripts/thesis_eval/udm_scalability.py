@@ -124,7 +124,7 @@ def main():
     ue_counts = sorted(list(data[1].keys()))
 
     # Figure with 4 subplots
-    fig, axs = plt.subplots(2, 2, figsize=(7.5, 5.8))
+    fig, axs = plt.subplots(2, 2, figsize=(8, 8))
     axs = axs.flatten()
 
     titles = [
@@ -163,7 +163,7 @@ def main():
 
         ax.set_title(titles[plot_idx])
         ax.set_xlabel("User Equipment Count")
-        ax.set_ylabel("Time (s)")
+        ax.set_ylabel("Duration (s)")
         ax.grid(True, linestyle='--', linewidth=0.4, alpha=0.6)
         ax.legend(fontsize=7)
 
