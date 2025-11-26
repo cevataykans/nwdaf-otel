@@ -2,13 +2,7 @@ package externalscaler
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"io"
-	"io/ioutil"
-	"net/http"
+	"math/rand"
 	pb "nwdaf-otel/generated/externalscaler"
 	"time"
 )
@@ -31,16 +25,16 @@ type scaler struct {
 
 func (s *scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
 	// Call your microservice
-	resp, err := http.Get("http://my-microservice.default.svc.cluster.local/my-latency")
-	if err != nil {
-		return &pb.IsActiveResponse{Result: false}, nil
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	//resp, err := http.Get("http://my-microservice.default.svc.cluster.local/my-latency")
+	//if err != nil {
+	//	return &pb.IsActiveResponse{Result: false}, nil
+	//}
+	//defer resp.Body.Close()
+	//
+	//body, err := io.ReadAll(resp.Body)
+	//if err != nil {
+	//	return nil, status.Error(codes.Internal, err.Error())
+	//}
 
 	//payload := USGSResponse{}
 	//err = json.Unmarshal(body, &payload)
@@ -50,7 +44,7 @@ func (s *scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsA
 
 	// Example: Active when latency > 200ms
 	// NWDAF can directly control when scaling should be active!
-	return &pb.IsActiveResponse{Result: value > 0.2}, nil
+	return &pb.IsActiveResponse{Result: rand.Float64()*100 > 0.9}, nil
 }
 
 func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalScaler_StreamIsActiveServer) error {
@@ -68,13 +62,13 @@ func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 			return nil
 		case <-time.Tick(time.Second):
 			//earthquakeCount, err := getEarthQuakeCount(longitude, latitude)
-			if err != nil {
-				// log error
-				continue
-			}
+			//if err != nil {
+			//	// log error
+			//	continue
+			//}
 
-			if earthquakeCount > 2 {
-				err = kedaServer.Send(&pb.IsActiveResponse{
+			if rand.Float64()*100 > 0.9 {
+				_ = kedaServer.Send(&pb.IsActiveResponse{
 					Result: true,
 				})
 			}
@@ -99,7 +93,7 @@ func (s *scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest
 		MetricValues: []*pb.MetricValue{
 			{
 				MetricName:       MetricName,
-				MetricValueFloat: value * 1000,
+				MetricValueFloat: rand.Float64() * 100,
 			},
 		},
 	}, nil
