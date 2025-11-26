@@ -64,8 +64,23 @@ func main() {
 	log.Println("Application Finished!")
 }
 
-func queryUDM(promClient prometheus.Client, shutdownChn chan struct{}) {
+func queryUDM(promClient *prometheus.Client, shutdownChn chan struct{}) {
 
+	timer := time.NewTicker(time.Second)
+	defer timer.Stop()
+	for {
+		select {
+		case <-shutdownChn:
+			return
+		case <-timer.C:
+			val, err := promClient.QueryUDMLatency()
+			if err != nil {
+				log.Printf("query udm err: %v\n", err)
+				continue
+			}
+			log.Printf("query udm latency value: %v\n", val)
+		}
+	}
 }
 
 func queryResources(client *prometheus.Client, repo repository.Repository, shutdownChn chan struct{}) {

@@ -30,12 +30,6 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleUDMMetricRequest(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/metric" {
-
-	}
-}
-
 // TODO: accept a config, that will point to port, certificate e.g. options
 type analyticsInfoServer struct {
 	mux        *mux.Router
