@@ -21,10 +21,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         server: [ analyticsinfo, externalscaler ]
+    continue-on-error: true
     timeout-minutes: 10
     permissions:
       contents: read
-    name: Publish Docker Image ${{ matrix.os == 'ubuntu-latest' && 'AMD' || 'ARM' }}
+    name: Publish ${{ matrix.server }} Image ${{ matrix.os == 'ubuntu-latest' && 'AMD' || 'ARM' }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
