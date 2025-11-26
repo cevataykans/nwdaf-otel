@@ -2,7 +2,10 @@ build_image:
 	docker build -t cevataykans/nwdaf:latest --target release .
 	docker push cevataykans/nwdaf:latest
 
-generate_all:
+generate_external_scaler:
+	protoc --go_out=generated/externalscaler --go-grpc_out=generated/externalscaler server/externalscaler/external_scaler.proto
+
+generate_openapi:
 	openapi-generator generate -i templates/5G_APIs/TS29520_Nnwdaf_AnalyticsInfo.yaml -g go-server -o ./generated/temp --additional-properties=packageName=analyticsinfo
 	cd ./generated/temp
 	go mod tidy

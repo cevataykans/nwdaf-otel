@@ -1,0 +1,28 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: udm-latency-scale
+  namespace: aether-5gc
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: udm
+  pollingInterval: 5       # how often KEDA checks Prometheus
+  cooldownPeriod: 300        # wait time after scale-down conditions are met
+  minReplicaCount: 1
+  maxReplicaCount: 20
+
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-operated.cattle-monitoring-system.svc.cluster.local:9090
+        # 👇 Replace this PromQL with your real latency metric
+        query: |
+          histogram_quantile(0.95, 
+            sum by(le) (
+              rate(
+                traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc", span_name="POST /nudm-ueau/v1/{var}/auth-events"}[1m]
+              )
+            )
+          )
+        threshold: "4.00"  # scale if p95 latency ("0.25" ) > 250ms, "4.00" -> 4 seconds

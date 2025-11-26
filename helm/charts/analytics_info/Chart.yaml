@@ -1,5 +1,5 @@
 apiVersion: v2
-name: nwdaf-otel
+name: nwdaf-analytics-info
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
