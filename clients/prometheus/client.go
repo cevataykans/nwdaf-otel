@@ -68,6 +68,22 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
+func (c *Client) QueryUDMLatency() (float64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	query := `
+      histogram_quantile(0.95,
+        sum by(le) (
+          rate(
+            traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc", span_name="POST /nudm-ueau/v1/{var}/auth-events"}[1m]
+          )
+        )
+      )
+    `
+	return c.queryPrometheus(ctx, query)
+}
+
 func (c *Client) QueryTraces(service string, start, end time.Time) (float64, error) {
 	//queryEntity, err := CreateESAvgQuery(service, start, end)
 	//if err != nil {
@@ -179,7 +195,7 @@ func (c *Client) queryNetworkBytesSent(ctx context.Context, service string, r v1
 		service = UPFPod
 	}
 	query := fmt.Sprintf("rate(container_network_transmit_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
 func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, r v1.Range) (float64, error) {
@@ -187,7 +203,7 @@ func (c *Client) queryNetworkBytesReceived(ctx context.Context, service string, 
 		service = UPFPod
 	}
 	query := fmt.Sprintf("rate(container_network_receive_bytes_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
 func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
@@ -195,7 +211,7 @@ func (c *Client) queryReceivePacketsTotal(ctx context.Context, service string, r
 		service = UPFPod
 	}
 	query := fmt.Sprintf("rate(container_network_receive_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
 func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, r v1.Range) (float64, error) {
@@ -203,20 +219,20 @@ func (c *Client) queryTransmitPacketsTotal(ctx context.Context, service string, 
 		service = UPFPod
 	}
 	query := fmt.Sprintf("rate(container_network_transmit_packets_total{pod=~\"%s.*\", interface=\"eth0\"}[1m])", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
 func (c *Client) queryMemory(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("avg_over_time(container_memory_usage_bytes{container=\"%s\"}[1m])", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
 func (c *Client) queryCPUTotalSeconds(ctx context.Context, service string, r v1.Range) (float64, error) {
 	query := fmt.Sprintf("rate(container_cpu_usage_seconds_total{container=\"%s\"}[1m]) * 100", service)
-	return c.queryPrometheus(ctx, query, r)
+	return c.queryPrometheusRange(ctx, query, r)
 }
 
-func (c *Client) queryPrometheus(ctx context.Context, query string, r v1.Range) (float64, error) {
+func (c *Client) queryPrometheusRange(ctx context.Context, query string, r v1.Range) (float64, error) {
 	results, warnings, err := c.promClient.QueryRange(ctx, query, r)
 	if err != nil {
 		return 0, fmt.Errorf("error querying Prometheus: %v", err)
@@ -248,4 +264,41 @@ func (c *Client) queryPrometheus(ctx context.Context, query string, r v1.Range) 
 		//log.Printf("Timestamp: %v - Value: %v\n", ts, value)
 	}
 	return value, nil
+}
+
+func (c *Client) queryPrometheus(ctx context.Context, query string) (float64, error) {
+	result, warnings, err := c.promClient.Query(ctx, query, time.Now())
+	if err != nil {
+		return 0, fmt.Errorf("error querying Prometheus: %v", err)
+	}
+
+	if len(warnings) > 0 {
+		log.Println("Warnings")
+		for _, w := range warnings {
+			log.Println("w: ", w)
+		}
+	}
+
+	switch r := result.(type) {
+	case model.Vector:
+		if len(r) == 0 {
+			log.Println("No data returned")
+			return 0, nil
+		}
+		if len(r) > 1 {
+			log.Println("Warnings: ", warnings)
+		}
+		// PromQL instant queries return a vector with one sample
+		sample := r[0]
+		value := float64(sample.Value)
+		log.Println("Value:", value)
+		log.Println("Metric Labels:", sample.Metric)
+		return value, nil
+	case *model.Scalar:
+		log.Println("Scalar Value:", r.Value)
+		return float64(r.Value), nil
+	default:
+		log.Printf("Unsupported result type: %T\n", r)
+	}
+	return 0, fmt.Errorf("cannot parse result query: %v", result)
 }

@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"nwdaf-otel/clients/prometheus"
 	analyticsinfoAPI "nwdaf-otel/generated/analyticsinfo"
 	"nwdaf-otel/server/analyticsinfo"
 	"time"
@@ -28,14 +30,72 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: accept a config, that will point to port, certificate e.g. options
-type analyticsInfoServer struct {
-	mux *mux.Router
-	srv *http.Server
+func handleUDMMetricRequest(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/metric" {
+
+	}
 }
 
-func NewAnalyticsInfoServer() Server {
-	return &analyticsInfoServer{mux: nil}
+// TODO: accept a config, that will point to port, certificate e.g. options
+type analyticsInfoServer struct {
+	mux        *mux.Router
+	srv        *http.Server
+	latencySrv latencyHandler
+}
+
+type latencyHandler struct {
+	client *prometheus.Client
+	mux    *mux.Router
+}
+
+func (lh latencyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	lh.mux.ServeHTTP(w, r)
+}
+
+func createLatencyHandler(pClient *prometheus.Client) latencyHandler {
+	latencyMux := mux.NewRouter()
+	latencyMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		// return actual latency value
+		val, err := pClient.QueryUDMLatency()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		bytes, err := json.Marshal(val)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, err = w.Write(bytes)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("err on writing latency response 'ok': " + err.Error())
+		}
+	})
+	latencyMux.HandleFunc("/metricspecs", func(w http.ResponseWriter, r *http.Request) {
+		// return metric specs -> make it static for thesis, dynamic requires a statistical, ML approach
+	})
+	latencyMux.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		// return metrics -> make it static for thesis, dynamic requires a statistical, ML approach
+	})
+	return latencyHandler{
+		client: pClient,
+		mux:    latencyMux,
+	}
+}
+
+func NewAnalyticsInfoServer(pClient *prometheus.Client) Server {
+	return &analyticsInfoServer{
+		mux:        nil,
+		latencySrv: createLatencyHandler(pClient),
+	}
 }
 
 func (s *analyticsInfoServer) Setup() {
@@ -47,6 +107,7 @@ func (s *analyticsInfoServer) Setup() {
 
 	// Handle health check probes
 	s.mux.HandleFunc("/health", handleHealthCheck)
+	s.mux.Handle("/latency/udm", s.latencySrv)
 }
 
 func (s *analyticsInfoServer) Start(shutdownChn chan struct{}) chan error {

@@ -82,7 +82,7 @@ func (s *scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*p
 		MetricSpecs: []*pb.MetricSpec{
 			{
 				MetricName:      MetricName,
-				TargetSizeFloat: 1000, //200, // target: 200ms
+				TargetSizeFloat: 2000, //200, // target: 200ms
 			},
 		},
 	}, nil
@@ -100,9 +100,6 @@ func (s *scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest
 
 	//resp, _ := http.Get("http://my-microservice.default.svc.cluster.local/my-latency")
 	//defer resp.Body.Close()
-	//
-	//var value float64
-	//fmt.Fscan(resp.Body, &value)
 	//
 	//return &pb.GetMetricsResponse{
 	//	MetricValues: []*pb.MetricValue{

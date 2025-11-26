@@ -24,7 +24,12 @@ func main() {
 		close(shutdownChn)
 	}()
 
-	srv := server.NewAnalyticsInfoServer()
+	promClient, err := prometheus.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	srv := server.NewAnalyticsInfoServer(promClient)
 	srv.Setup()
 	errChan := srv.Start(shutdownChn)
 	log.Println("Analytics Server started")
@@ -32,35 +37,35 @@ func main() {
 	nrfClient := nrf.NewNFClient()
 	nrfClient.StartNFRegistration(shutdownChn)
 
-	log.Println("Creating DB")
-	repo, err := repository.NewSQLiteRepo()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//log.Println("Creating DB")
+	//repo, err := repository.NewSQLiteRepo()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//err = repo.Setup()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//count, err := repo.Size()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Printf("Successfully initialized DB with %d rows", count)
+	go queryUDM(promClient, shutdownChn)
 
-	err = repo.Setup()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	count, err := repo.Size()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Successfully initialized DB with %d rows", count)
-
-	promClient, err := prometheus.NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	go queryResources(promClient, repo, shutdownChn)
+	//go queryResources(promClient, repo, shutdownChn)
 
 	err = <-errChan
 	if err != nil {
 		log.Printf("server listen err: %v\n", err)
 	}
 	log.Println("Application Finished!")
+}
+
+func queryUDM(promClient prometheus.Client, shutdownChn chan struct{}) {
+
 }
 
 func queryResources(client *prometheus.Client, repo repository.Repository, shutdownChn chan struct{}) {
