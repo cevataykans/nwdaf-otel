@@ -14,7 +14,7 @@ image:
   tag: "latest"
 
 persistence:
-  enabled: true
+  enabled: false
   accessMode: ReadWriteOnce
   size: 10Gi
   mountPath: /data
