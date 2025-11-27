@@ -32,15 +32,14 @@ kubectl delete -f scripts/collector_filtered_elastic.yaml
 
 echo "****** REMOVE OTEL ******"
 kubectl delete -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.136.0/opentelemetry-operator.yaml
-sleep 2m
 
 echo "****** REMOVE CERT MANAGER ******"
 kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
-sleep 1m
 
 echo "Checking all remaining pods before k8s uninstallation ..."
 kubectl get pods --all-namespaces
 
+sleep 30
 cd "$AETHER_DIR"
 echo "****** REMOVE K8S ******"
 make aether-k8s-uninstall
