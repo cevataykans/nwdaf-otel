@@ -60,6 +60,7 @@ func (s *Scaler) getLatency(ctx context.Context) (float64, error) {
 }
 
 func (s *Scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
+	log.Println("IsActive")
 	// The value can be a latency model that can contain values, thresholds ...
 	value, err := s.getLatency(ctx)
 	if err != nil {
@@ -81,7 +82,7 @@ func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 	//if len(longitude) == 0 || len(latitude) == 0 {
 	//	return status.Error(codes.InvalidArgument, "longitude and latitude must be specified")
 	//}
-
+	log.Println("StreamIsActive")
 	for {
 		select {
 		case <-kedaServer.Context().Done():

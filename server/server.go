@@ -33,22 +33,12 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 
 // TODO: accept a config, that will point to port, certificate e.g. options
 type analyticsInfoServer struct {
-	mux        *mux.Router
-	srv        *http.Server
-	latencySrv latencyHandler
+	mux *mux.Router
+	srv *http.Server
 }
 
-type latencyHandler struct {
-	client *prometheus.Client
-	mux    *mux.Router
-}
-
-func (lh latencyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	lh.mux.ServeHTTP(w, r)
-}
-
-func createLatencyHandler(pClient *prometheus.Client) latencyHandler {
-	latencyMux := mux.NewRouter()
+func registerExternalScalerHandlers(mux *mux.Router, pClient *prometheus.Client) {
+	latencyMux := mux.PathPrefix("/latency/udm").Subrouter()
 	latencyMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -83,16 +73,13 @@ func createLatencyHandler(pClient *prometheus.Client) latencyHandler {
 	latencyMux.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
 		// return metrics -> make it static for thesis, dynamic requires a statistical, ML approach
 	})
-	return latencyHandler{
-		client: pClient,
-		mux:    latencyMux,
-	}
 }
 
 func NewAnalyticsInfoServer(pClient *prometheus.Client) Server {
+	router := mux.NewRouter()
+	registerExternalScalerHandlers(router, pClient)
 	return &analyticsInfoServer{
-		mux:        nil,
-		latencySrv: createLatencyHandler(pClient),
+		mux: router,
 	}
 }
 
@@ -105,7 +92,6 @@ func (s *analyticsInfoServer) Setup() {
 
 	// Handle health check probes
 	s.mux.HandleFunc("/health", handleHealthCheck)
-	s.mux.Handle("/latency/udm", s.latencySrv)
 }
 
 func (s *analyticsInfoServer) Start(shutdownChn chan struct{}) chan error {
