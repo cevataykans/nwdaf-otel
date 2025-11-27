@@ -11,6 +11,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"log"
+	"math"
 	"net/http"
 	"time"
 )
@@ -74,9 +75,9 @@ func (c *Client) QueryUDMLatency() (float64, error) {
 
 	query := `
       histogram_quantile(0.95,
-        sum by(le) (
+        sum by(le, span_name) (
           rate(
-            traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc", span_name="GET /nudm-sdm/v1/{var}/am-data"}[1m]
+            traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc"}[1m]
           )
         )
       )
@@ -285,15 +286,16 @@ func (c *Client) queryPrometheus(ctx context.Context, query string) (float64, er
 			log.Println("No data returned")
 			return 0, nil
 		}
-		if len(r) > 1 {
-			log.Println("Warnings: ", warnings)
+		var maxLatency float64
+		for _, metric := range r {
+			val := float64(metric.Value)
+			if math.IsNaN(val) {
+				val = 0
+			}
+			maxLatency = max(maxLatency, val)
 		}
-		// PromQL instant queries return a vector with one sample
-		sample := r[0]
-		value := float64(sample.Value)
-		log.Println("Value:", value)
-		log.Println("Metric Labels:", sample.Metric)
-		return value, nil
+		log.Println("Largest Latency Value:", maxLatency)
+		return maxLatency, nil
 	case *model.Scalar:
 		log.Println("Scalar Value:", r.Value)
 		return float64(r.Value), nil
