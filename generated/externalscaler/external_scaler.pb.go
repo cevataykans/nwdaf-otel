@@ -170,13 +170,11 @@ func (x *GetMetricSpecResponse) GetMetricSpecs() []*MetricSpec {
 }
 
 type MetricSpec struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	MetricName string                 `protobuf:"bytes,1,opt,name=metricName,proto3" json:"metricName,omitempty"`
-	// deprecated, use targetSizeFloat instead
-	TargetSize      int64   `protobuf:"varint,2,opt,name=targetSize,proto3" json:"targetSize,omitempty"`
-	TargetSizeFloat float64 `protobuf:"fixed64,3,opt,name=targetSizeFloat,proto3" json:"targetSizeFloat,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MetricName    string                 `protobuf:"bytes,1,opt,name=metricName,proto3" json:"metricName,omitempty"`
+	TargetSize    int64                  `protobuf:"varint,2,opt,name=targetSize,proto3" json:"targetSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricSpec) Reset() {
@@ -219,13 +217,6 @@ func (x *MetricSpec) GetMetricName() string {
 func (x *MetricSpec) GetTargetSize() int64 {
 	if x != nil {
 		return x.TargetSize
-	}
-	return 0
-}
-
-func (x *MetricSpec) GetTargetSizeFloat() float64 {
-	if x != nil {
-		return x.TargetSizeFloat
 	}
 	return 0
 }
@@ -327,13 +318,11 @@ func (x *GetMetricsResponse) GetMetricValues() []*MetricValue {
 }
 
 type MetricValue struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	MetricName string                 `protobuf:"bytes,1,opt,name=metricName,proto3" json:"metricName,omitempty"`
-	// deprecated, use metricValueFloat instead
-	MetricValue      int64   `protobuf:"varint,2,opt,name=metricValue,proto3" json:"metricValue,omitempty"`
-	MetricValueFloat float64 `protobuf:"fixed64,3,opt,name=metricValueFloat,proto3" json:"metricValueFloat,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MetricName    string                 `protobuf:"bytes,1,opt,name=metricName,proto3" json:"metricName,omitempty"`
+	MetricValue   int64                  `protobuf:"varint,2,opt,name=metricValue,proto3" json:"metricValue,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricValue) Reset() {
@@ -380,13 +369,6 @@ func (x *MetricValue) GetMetricValue() int64 {
 	return 0
 }
 
-func (x *MetricValue) GetMetricValueFloat() float64 {
-	if x != nil {
-		return x.MetricValueFloat
-	}
-	return 0
-}
-
 var File_server_externalscaler_external_scaler_proto protoreflect.FileDescriptor
 
 const file_server_externalscaler_external_scaler_proto_rawDesc = "" +
@@ -402,7 +384,7 @@ const file_server_externalscaler_external_scaler_proto_rawDesc = "" +
 	"\x10IsActiveResponse\x12\x16\n" +
 	"\x06result\x18\x01 \x01(\bR\x06result\"U\n" +
 	"\x15GetMetricSpecResponse\x12<\n" +
-	"\vmetricSpecs\x18\x01 \x03(\v2\x1a.externalscaler.MetricSpecR\vmetricSpecs\"v\n" +
+	"\vmetricSpecs\x18\x01 \x03(\v2\x1a.externalscaler.MetricSpecR\vmetricSpecs\"L\n" +
 	"\n" +
 	"MetricSpec\x12\x1e\n" +
 	"\n" +
@@ -410,21 +392,19 @@ const file_server_externalscaler_external_scaler_proto_rawDesc = "" +
 	"metricName\x12\x1e\n" +
 	"\n" +
 	"targetSize\x18\x02 \x01(\x03R\n" +
-	"targetSize\x12(\n" +
-	"\x0ftargetSizeFloat\x18\x03 \x01(\x01R\x0ftargetSizeFloat\"~\n" +
+	"targetSize\"~\n" +
 	"\x11GetMetricsRequest\x12I\n" +
 	"\x0fscaledObjectRef\x18\x01 \x01(\v2\x1f.externalscaler.ScaledObjectRefR\x0fscaledObjectRef\x12\x1e\n" +
 	"\n" +
 	"metricName\x18\x02 \x01(\tR\n" +
 	"metricName\"U\n" +
 	"\x12GetMetricsResponse\x12?\n" +
-	"\fmetricValues\x18\x01 \x03(\v2\x1b.externalscaler.MetricValueR\fmetricValues\"{\n" +
+	"\fmetricValues\x18\x01 \x03(\v2\x1b.externalscaler.MetricValueR\fmetricValues\"O\n" +
 	"\vMetricValue\x12\x1e\n" +
 	"\n" +
 	"metricName\x18\x01 \x01(\tR\n" +
 	"metricName\x12 \n" +
-	"\vmetricValue\x18\x02 \x01(\x03R\vmetricValue\x12*\n" +
-	"\x10metricValueFloat\x18\x03 \x01(\x01R\x10metricValueFloat2\xec\x02\n" +
+	"\vmetricValue\x18\x02 \x01(\x03R\vmetricValue2\xec\x02\n" +
 	"\x0eExternalScaler\x12O\n" +
 	"\bIsActive\x12\x1f.externalscaler.ScaledObjectRef\x1a .externalscaler.IsActiveResponse\"\x00\x12W\n" +
 	"\x0eStreamIsActive\x12\x1f.externalscaler.ScaledObjectRef\x1a .externalscaler.IsActiveResponse\"\x000\x01\x12Y\n" +

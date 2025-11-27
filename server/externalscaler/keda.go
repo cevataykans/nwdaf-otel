@@ -21,7 +21,7 @@ External Scaler -> KEDA [Based on the returned values, NWDAF implicitly controls
 */
 
 const (
-	MetricName       = "udm_latency"
+	MetricName       = "udm_max_latency"
 	LatencyEndpoint  = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
 	LatencyThreshold = float64(4.0)
 )
@@ -93,29 +93,29 @@ func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 				log.Printf("error getting latency value when serving StreamIsActive: %v", err)
 				continue
 			}
-
-			if value > LatencyThreshold {
-				_ = kedaServer.Send(&pb.IsActiveResponse{
-					Result: true,
-				})
-			}
+			_ = kedaServer.Send(&pb.IsActiveResponse{
+				Result: value > LatencyThreshold,
+			})
 		}
 	}
 }
 
 func (s *Scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
 	// Provide target value
+	log.Println("GetMetricSpec")
 	return &pb.GetMetricSpecResponse{
 		MetricSpecs: []*pb.MetricSpec{
 			{
-				MetricName:      MetricName,
-				TargetSizeFloat: 4000, //200, // target: 200ms
+				MetricName: MetricName,
+				// 4 seconds
+				TargetSize: 4000, //200, // target: 200ms
 			},
 		},
 	}, nil
 }
 
 func (s *Scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
+	log.Println("GetMetrics")
 	value, err := s.getLatency(ctx)
 	if err != nil {
 		log.Printf("error getting latency value when serving GetMetrics: %v", err)
@@ -124,8 +124,8 @@ func (s *Scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest
 	return &pb.GetMetricsResponse{
 		MetricValues: []*pb.MetricValue{
 			{
-				MetricName:       MetricName,
-				MetricValueFloat: value,
+				MetricName:  MetricName,
+				MetricValue: int64(value * 1000),
 			},
 		},
 	}, nil
