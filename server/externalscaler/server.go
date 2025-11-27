@@ -2,12 +2,18 @@ package externalscaler
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
 	exscaler "nwdaf-otel/generated/externalscaler"
 	"sync"
+)
+
+const (
+	HttpPort = 8080
+	GrpcPort = 8081
 )
 
 type ScalingServer struct {
@@ -20,7 +26,7 @@ func NewExternalScalerServer() *ScalingServer {
 	scalingServer := &ScalingServer{
 		kedaServer: grpc.NewServer(),
 		nwdafServer: &http.Server{
-			Addr: ":8081",
+			Addr: fmt.Sprintf(":%v", HttpPort),
 		},
 	}
 	exscaler.RegisterExternalScalerServer(scalingServer.kedaServer, &scaler{})
@@ -42,7 +48,7 @@ func (s *ScalingServer) serveGrpc() {
 	s.wg.Add(1)
 	defer s.wg.Done()
 
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", GrpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

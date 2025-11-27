@@ -16,7 +16,7 @@ spec:
   triggers:
     - type: external
       metadata:
-        scalerAddress: http://udm-external-scaler.default.svc.cluster.local:8080
+        scalerAddress: external-scaler.aether-5gc.svc.cluster.local:8081
 #        longitude: "-122.335167"
 #        latitude: "47.608013"
 
