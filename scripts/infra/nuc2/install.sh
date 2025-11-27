@@ -55,6 +55,7 @@ make monitor-load
 echo "****** AETHER GNBSIM INSTALLATION ******"
 make aether-gnbsim-install
 cd "$current_dir"
+kubectl apply -f scripts/udm_scaled_object.yaml
 
 echo "****** REMOVING ISTIO FROM MET ******"
 bash scripts/k8s/filter_istio_sidecar.sh

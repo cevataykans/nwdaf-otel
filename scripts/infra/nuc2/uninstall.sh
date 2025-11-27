@@ -1,6 +1,7 @@
 #!/bin/bash
 
 current_dir=$(pwd)
+kubectl delete -f scripts/udm_scaled_object.yaml
 
 AETHER_DIR=/home/sevinc/cores/aether-onramp-3-1-0
 # AETHER_DIR=/home/sevinc/aether-onramp/
@@ -14,6 +15,8 @@ make stop-nwdaf
 cd "$AETHER_DIR"
 make aether-5gc-uninstall
 cd "$current_dir"
+
+helm uninstall keda -n keda
 
 echo "****** REMOVE ISTIO ******"
 sh scripts/infra/istio_uninstall.sh
