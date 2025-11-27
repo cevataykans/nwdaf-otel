@@ -4,7 +4,7 @@
 // 	protoc        v6.33.1
 // source: server/externalscaler/external_scaler.proto
 
-package exscaler
+package externalscaler
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -12,7 +12,6 @@ import (
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
 )
 
 const (
@@ -392,18 +391,18 @@ var File_server_externalscaler_external_scaler_proto protoreflect.FileDescriptor
 
 const file_server_externalscaler_external_scaler_proto_rawDesc = "" +
 	"\n" +
-	"+server/externalscaler/external_scaler.proto\x12\bexscaler\"\xdd\x01\n" +
+	"+server/externalscaler/external_scaler.proto\x12\x0eexternalscaler\"\xe3\x01\n" +
 	"\x0fScaledObjectRef\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12U\n" +
-	"\x0escalerMetadata\x18\x03 \x03(\v2-.exscaler.ScaledObjectRef.ScalerMetadataEntryR\x0escalerMetadata\x1aA\n" +
+	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12[\n" +
+	"\x0escalerMetadata\x18\x03 \x03(\v23.externalscaler.ScaledObjectRef.ScalerMetadataEntryR\x0escalerMetadata\x1aA\n" +
 	"\x13ScalerMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"*\n" +
 	"\x10IsActiveResponse\x12\x16\n" +
-	"\x06result\x18\x01 \x01(\bR\x06result\"O\n" +
-	"\x15GetMetricSpecResponse\x126\n" +
-	"\vmetricSpecs\x18\x01 \x03(\v2\x14.exscaler.MetricSpecR\vmetricSpecs\"v\n" +
+	"\x06result\x18\x01 \x01(\bR\x06result\"U\n" +
+	"\x15GetMetricSpecResponse\x12<\n" +
+	"\vmetricSpecs\x18\x01 \x03(\v2\x1a.externalscaler.MetricSpecR\vmetricSpecs\"v\n" +
 	"\n" +
 	"MetricSpec\x12\x1e\n" +
 	"\n" +
@@ -412,27 +411,26 @@ const file_server_externalscaler_external_scaler_proto_rawDesc = "" +
 	"\n" +
 	"targetSize\x18\x02 \x01(\x03R\n" +
 	"targetSize\x12(\n" +
-	"\x0ftargetSizeFloat\x18\x03 \x01(\x01R\x0ftargetSizeFloat\"x\n" +
-	"\x11GetMetricsRequest\x12C\n" +
-	"\x0fscaledObjectRef\x18\x01 \x01(\v2\x19.exscaler.ScaledObjectRefR\x0fscaledObjectRef\x12\x1e\n" +
+	"\x0ftargetSizeFloat\x18\x03 \x01(\x01R\x0ftargetSizeFloat\"~\n" +
+	"\x11GetMetricsRequest\x12I\n" +
+	"\x0fscaledObjectRef\x18\x01 \x01(\v2\x1f.externalscaler.ScaledObjectRefR\x0fscaledObjectRef\x12\x1e\n" +
 	"\n" +
 	"metricName\x18\x02 \x01(\tR\n" +
-	"metricName\"O\n" +
-	"\x12GetMetricsResponse\x129\n" +
-	"\fmetricValues\x18\x01 \x03(\v2\x15.exscaler.MetricValueR\fmetricValues\"{\n" +
+	"metricName\"U\n" +
+	"\x12GetMetricsResponse\x12?\n" +
+	"\fmetricValues\x18\x01 \x03(\v2\x1b.externalscaler.MetricValueR\fmetricValues\"{\n" +
 	"\vMetricValue\x12\x1e\n" +
 	"\n" +
 	"metricName\x18\x01 \x01(\tR\n" +
 	"metricName\x12 \n" +
 	"\vmetricValue\x18\x02 \x01(\x03R\vmetricValue\x12*\n" +
-	"\x10metricValueFloat\x18\x03 \x01(\x01R\x10metricValueFloat2\xbc\x02\n" +
-	"\x0eExternalScaler\x12C\n" +
-	"\bIsActive\x12\x19.exscaler.ScaledObjectRef\x1a\x1a.exscaler.IsActiveResponse\"\x00\x12K\n" +
-	"\x0eStreamIsActive\x12\x19.exscaler.ScaledObjectRef\x1a\x1a.exscaler.IsActiveResponse\"\x000\x01\x12M\n" +
-	"\rGetMetricSpec\x12\x19.exscaler.ScaledObjectRef\x1a\x1f.exscaler.GetMetricSpecResponse\"\x00\x12I\n" +
+	"\x10metricValueFloat\x18\x03 \x01(\x01R\x10metricValueFloat2\xec\x02\n" +
+	"\x0eExternalScaler\x12O\n" +
+	"\bIsActive\x12\x1f.externalscaler.ScaledObjectRef\x1a .externalscaler.IsActiveResponse\"\x00\x12W\n" +
+	"\x0eStreamIsActive\x12\x1f.externalscaler.ScaledObjectRef\x1a .externalscaler.IsActiveResponse\"\x000\x01\x12Y\n" +
+	"\rGetMetricSpec\x12\x1f.externalscaler.ScaledObjectRef\x1a%.externalscaler.GetMetricSpecResponse\"\x00\x12U\n" +
 	"\n" +
-	"GetMetrics\x12\x1b.exscaler.GetMetricsRequest\x1a\x1c.exscaler.GetMetricsResponse\"\x00B\fZ\n" +
-	".;exscalerb\x06proto3"
+	"GetMetrics\x12!.externalscaler.GetMetricsRequest\x1a\".externalscaler.GetMetricsResponse\"\x00B\x12Z\x10.;externalscalerb\x06proto3"
 
 var (
 	file_server_externalscaler_external_scaler_proto_rawDescOnce sync.Once
@@ -448,28 +446,28 @@ func file_server_externalscaler_external_scaler_proto_rawDescGZIP() []byte {
 
 var file_server_externalscaler_external_scaler_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_server_externalscaler_external_scaler_proto_goTypes = []any{
-	(*ScaledObjectRef)(nil),       // 0: exscaler.ScaledObjectRef
-	(*IsActiveResponse)(nil),      // 1: exscaler.IsActiveResponse
-	(*GetMetricSpecResponse)(nil), // 2: exscaler.GetMetricSpecResponse
-	(*MetricSpec)(nil),            // 3: exscaler.MetricSpec
-	(*GetMetricsRequest)(nil),     // 4: exscaler.GetMetricsRequest
-	(*GetMetricsResponse)(nil),    // 5: exscaler.GetMetricsResponse
-	(*MetricValue)(nil),           // 6: exscaler.MetricValue
-	nil,                           // 7: exscaler.ScaledObjectRef.ScalerMetadataEntry
+	(*ScaledObjectRef)(nil),       // 0: externalscaler.ScaledObjectRef
+	(*IsActiveResponse)(nil),      // 1: externalscaler.IsActiveResponse
+	(*GetMetricSpecResponse)(nil), // 2: externalscaler.GetMetricSpecResponse
+	(*MetricSpec)(nil),            // 3: externalscaler.MetricSpec
+	(*GetMetricsRequest)(nil),     // 4: externalscaler.GetMetricsRequest
+	(*GetMetricsResponse)(nil),    // 5: externalscaler.GetMetricsResponse
+	(*MetricValue)(nil),           // 6: externalscaler.MetricValue
+	nil,                           // 7: externalscaler.ScaledObjectRef.ScalerMetadataEntry
 }
 var file_server_externalscaler_external_scaler_proto_depIdxs = []int32{
-	7, // 0: exscaler.ScaledObjectRef.scalerMetadata:type_name -> exscaler.ScaledObjectRef.ScalerMetadataEntry
-	3, // 1: exscaler.GetMetricSpecResponse.metricSpecs:type_name -> exscaler.MetricSpec
-	0, // 2: exscaler.GetMetricsRequest.scaledObjectRef:type_name -> exscaler.ScaledObjectRef
-	6, // 3: exscaler.GetMetricsResponse.metricValues:type_name -> exscaler.MetricValue
-	0, // 4: exscaler.ExternalScaler.IsActive:input_type -> exscaler.ScaledObjectRef
-	0, // 5: exscaler.ExternalScaler.StreamIsActive:input_type -> exscaler.ScaledObjectRef
-	0, // 6: exscaler.ExternalScaler.GetMetricSpec:input_type -> exscaler.ScaledObjectRef
-	4, // 7: exscaler.ExternalScaler.GetMetrics:input_type -> exscaler.GetMetricsRequest
-	1, // 8: exscaler.ExternalScaler.IsActive:output_type -> exscaler.IsActiveResponse
-	1, // 9: exscaler.ExternalScaler.StreamIsActive:output_type -> exscaler.IsActiveResponse
-	2, // 10: exscaler.ExternalScaler.GetMetricSpec:output_type -> exscaler.GetMetricSpecResponse
-	5, // 11: exscaler.ExternalScaler.GetMetrics:output_type -> exscaler.GetMetricsResponse
+	7, // 0: externalscaler.ScaledObjectRef.scalerMetadata:type_name -> externalscaler.ScaledObjectRef.ScalerMetadataEntry
+	3, // 1: externalscaler.GetMetricSpecResponse.metricSpecs:type_name -> externalscaler.MetricSpec
+	0, // 2: externalscaler.GetMetricsRequest.scaledObjectRef:type_name -> externalscaler.ScaledObjectRef
+	6, // 3: externalscaler.GetMetricsResponse.metricValues:type_name -> externalscaler.MetricValue
+	0, // 4: externalscaler.ExternalScaler.IsActive:input_type -> externalscaler.ScaledObjectRef
+	0, // 5: externalscaler.ExternalScaler.StreamIsActive:input_type -> externalscaler.ScaledObjectRef
+	0, // 6: externalscaler.ExternalScaler.GetMetricSpec:input_type -> externalscaler.ScaledObjectRef
+	4, // 7: externalscaler.ExternalScaler.GetMetrics:input_type -> externalscaler.GetMetricsRequest
+	1, // 8: externalscaler.ExternalScaler.IsActive:output_type -> externalscaler.IsActiveResponse
+	1, // 9: externalscaler.ExternalScaler.StreamIsActive:output_type -> externalscaler.IsActiveResponse
+	2, // 10: externalscaler.ExternalScaler.GetMetricSpec:output_type -> externalscaler.GetMetricSpecResponse
+	5, // 11: externalscaler.ExternalScaler.GetMetrics:output_type -> externalscaler.GetMetricsResponse
 	8, // [8:12] is the sub-list for method output_type
 	4, // [4:8] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

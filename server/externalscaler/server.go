@@ -7,7 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
-	exscaler "nwdaf-otel/generated/externalscaler"
+	externalScaler "nwdaf-otel/generated/externalscaler"
 	"sync"
 )
 
@@ -23,13 +23,14 @@ type ScalingServer struct {
 }
 
 func NewExternalScalerServer() *ScalingServer {
+	grpcServer := grpc.NewServer()
+	externalScaler.RegisterExternalScalerServer(grpcServer, &Scaler{})
 	scalingServer := &ScalingServer{
-		kedaServer: grpc.NewServer(),
+		kedaServer: grpcServer,
 		nwdafServer: &http.Server{
 			Addr: fmt.Sprintf(":%v", HttpPort),
 		},
 	}
-	exscaler.RegisterExternalScalerServer(scalingServer.kedaServer, &scaler{})
 	return scalingServer
 }
 
@@ -48,6 +49,7 @@ func (s *ScalingServer) serveGrpc() {
 	s.wg.Add(1)
 	defer s.wg.Done()
 
+	log.Printf("Starting gRPC server on port %v", GrpcPort)
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", GrpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -75,5 +77,6 @@ func (s *ScalingServer) serveHTTP() {
 		}
 	})
 	s.nwdafServer.Handler = mux
+	log.Printf("Starting HTTP server on port %v", HttpPort)
 	_ = s.nwdafServer.ListenAndServe()
 }

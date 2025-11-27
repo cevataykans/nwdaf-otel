@@ -4,7 +4,7 @@
 // - protoc             v6.33.1
 // source: server/externalscaler/external_scaler.proto
 
-package exscaler
+package externalscaler
 
 import (
 	context "context"
@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExternalScaler_IsActive_FullMethodName       = "/exscaler.ExternalScaler/IsActive"
-	ExternalScaler_StreamIsActive_FullMethodName = "/exscaler.ExternalScaler/StreamIsActive"
-	ExternalScaler_GetMetricSpec_FullMethodName  = "/exscaler.ExternalScaler/GetMetricSpec"
-	ExternalScaler_GetMetrics_FullMethodName     = "/exscaler.ExternalScaler/GetMetrics"
+	ExternalScaler_IsActive_FullMethodName       = "/externalscaler.ExternalScaler/IsActive"
+	ExternalScaler_StreamIsActive_FullMethodName = "/externalscaler.ExternalScaler/StreamIsActive"
+	ExternalScaler_GetMetricSpec_FullMethodName  = "/externalscaler.ExternalScaler/GetMetricSpec"
+	ExternalScaler_GetMetrics_FullMethodName     = "/externalscaler.ExternalScaler/GetMetrics"
 )
 
 // ExternalScalerClient is the client API for ExternalScaler service.
@@ -212,7 +212,7 @@ func _ExternalScaler_GetMetrics_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ExternalScaler_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "exscaler.ExternalScaler",
+	ServiceName: "externalscaler.ExternalScaler",
 	HandlerType: (*ExternalScalerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

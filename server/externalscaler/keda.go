@@ -27,11 +27,11 @@ const (
 )
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/
-type scaler struct {
+type Scaler struct {
 	pb.UnimplementedExternalScalerServer
 }
 
-func (s *scaler) getLatency(ctx context.Context) (float64, error) {
+func (s *Scaler) getLatency(ctx context.Context) (float64, error) {
 	r, err := http.NewRequestWithContext(ctx, "GET", LatencyEndpoint, nil)
 	if err != nil {
 		return 0, fmt.Errorf("error creating get latency request: %w", err)
@@ -59,7 +59,7 @@ func (s *scaler) getLatency(ctx context.Context) (float64, error) {
 	return payload, nil
 }
 
-func (s *scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
+func (s *Scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
 	// The value can be a latency model that can contain values, thresholds ...
 	value, err := s.getLatency(ctx)
 	if err != nil {
@@ -74,7 +74,7 @@ func (s *scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsA
 	return &pb.IsActiveResponse{Result: value > LatencyThreshold}, nil
 }
 
-func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalScaler_StreamIsActiveServer) error {
+func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalScaler_StreamIsActiveServer) error {
 	//longitude := req.ScalerMetadata["longitude"]
 	//latitude := req.ScalerMetadata["latitude"]
 	//
@@ -103,7 +103,7 @@ func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 	}
 }
 
-func (s *scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
+func (s *Scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
 	// Provide target value
 	return &pb.GetMetricSpecResponse{
 		MetricSpecs: []*pb.MetricSpec{
@@ -115,7 +115,7 @@ func (s *scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*p
 	}, nil
 }
 
-func (s *scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
+func (s *Scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
 	value, err := s.getLatency(ctx)
 	if err != nil {
 		log.Printf("error getting latency value when serving GetMetrics: %v", err)
