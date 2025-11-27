@@ -168,7 +168,7 @@ func (c *NRFClient) startHeartbeat(stop chan struct{}) {
 			_, _ = io.Copy(io.Discard, res.Body)
 			_ = res.Body.Close()
 
-			if res.StatusCode != http.StatusOK {
+			if res.StatusCode >= 300 {
 				log.Printf("Keep-alive failed. NRF server returned status %d, starting registration", res.StatusCode)
 				go c.registerNWDAF(stop)
 				return
