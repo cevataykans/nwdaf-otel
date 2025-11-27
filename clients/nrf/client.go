@@ -48,7 +48,7 @@ func (c *NRFClient) testConnection() error {
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
 		return fmt.Errorf("NRF server returned status %d", res.StatusCode)
 	}
-	log.Println("Successfully connected NRF client and ready to register.")
+	//log.Println("Successfully connected NRF client and ready to register.")
 	return nil
 }
 
@@ -122,18 +122,12 @@ func (c *NRFClient) registerNWDAF(stop chan struct{}) {
 			_ = res.Body.Close()
 		}()
 
-		switch res.StatusCode {
-		case http.StatusOK:
-			log.Println("NWDAF profile successfully updated")
-		case http.StatusCreated:
-			log.Println("NWDAF profile successfully created")
-		default:
+		if res.StatusCode != http.StatusCreated && res.StatusCode != http.StatusOK {
 			log.Printf("registration request returned status %d, retring after 5 sec", res.StatusCode)
 			time.Sleep(5 * time.Second)
 			go c.registerNWDAF(stop)
 			return
 		}
-
 		go c.startHeartbeat(stop)
 	}
 }
@@ -169,7 +163,7 @@ func (c *NRFClient) startHeartbeat(stop chan struct{}) {
 			_ = res.Body.Close()
 
 			if res.StatusCode >= 300 {
-				log.Printf("Keep-alive failed. NRF server returned status %d, starting registration", res.StatusCode)
+				//log.Printf("Keep-alive failed. NRF server returned status %d, starting registration", res.StatusCode)
 				go c.registerNWDAF(stop)
 				return
 			}

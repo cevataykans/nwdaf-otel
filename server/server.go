@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"log"
+	"math"
 	"net/http"
 	"nwdaf-otel/clients/prometheus"
 	analyticsinfoAPI "nwdaf-otel/generated/analyticsinfo"
@@ -59,6 +60,9 @@ func createLatencyHandler(pClient *prometheus.Client) latencyHandler {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+		if val == math.NaN() {
+			val = 0.0
 		}
 
 		bytes, err := json.Marshal(val)

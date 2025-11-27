@@ -2,7 +2,11 @@ package externalscaler
 
 import (
 	"context"
-	"math/rand"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
 	pb "nwdaf-otel/generated/externalscaler"
 	"time"
 )
@@ -16,35 +20,58 @@ NWDAF -> External Scaler [returns NWDAF controlled metric values, dynamically ch
 External Scaler -> KEDA [Based on the returned values, NWDAF implicitly controls scaling with KEDA acting as the operator]
 */
 
-const MetricName = "udm_latency"
+const (
+	MetricName       = "udm_latency"
+	LatencyEndpoint  = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
+	LatencyThreshold = float64(4.0)
+)
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/
 type scaler struct {
 	pb.UnimplementedExternalScalerServer
 }
 
+func (s *scaler) getLatency(ctx context.Context) (float64, error) {
+	r, err := http.NewRequestWithContext(ctx, "GET", LatencyEndpoint, nil)
+	if err != nil {
+		return 0, fmt.Errorf("error creating get latency request: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(r)
+	if err != nil {
+		return 0, fmt.Errorf("error doing get latency request: %w", err)
+	}
+	if res.StatusCode != http.StatusOK {
+		return 0, fmt.Errorf("error getting latency status: %d", res.StatusCode)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return 0, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	var payload float64
+	err = json.Unmarshal(body, &payload)
+	if err != nil {
+		return 0, fmt.Errorf("error unmarshalling response body: %w", err)
+	}
+	return payload, nil
+}
+
 func (s *scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
-	// Call your microservice
-	//resp, err := http.Get("http://my-microservice.default.svc.cluster.local/my-latency")
-	//if err != nil {
-	//	return &pb.IsActiveResponse{Result: false}, nil
-	//}
-	//defer resp.Body.Close()
-	//
-	//body, err := io.ReadAll(resp.Body)
-	//if err != nil {
-	//	return nil, status.Error(codes.Internal, err.Error())
-	//}
+	// The value can be a latency model that can contain values, thresholds ...
+	value, err := s.getLatency(ctx)
+	if err != nil {
+		log.Printf("error getting latency value when serving IsActive: %v", err)
+		return &pb.IsActiveResponse{Result: false}, nil
+	}
 
-	//payload := USGSResponse{}
-	//err = json.Unmarshal(body, &payload)
-	//if err != nil {
-	//	return nil, status.Error(codes.Internal, err.Error())
-	//}
-
-	// Example: Active when latency > 200ms
-	// NWDAF can directly control when scaling should be active!
-	return &pb.IsActiveResponse{Result: rand.Float64()*100 > 0.9}, nil
+	/* 	Example: Active when latency > 4.0 seconds
+	NWDAF can directly control when scaling should be active!
+	e.g. NWDAF can also return a threshold value, or just boolean true or false -> can do the evaluation inside!
+	*/
+	return &pb.IsActiveResponse{Result: value > LatencyThreshold}, nil
 }
 
 func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalScaler_StreamIsActiveServer) error {
@@ -61,13 +88,13 @@ func (s *scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 			// call cancelled
 			return nil
 		case <-time.Tick(time.Second):
-			//earthquakeCount, err := getEarthQuakeCount(longitude, latitude)
-			//if err != nil {
-			//	// log error
-			//	continue
-			//}
+			value, err := s.getLatency(kedaServer.Context())
+			if err != nil {
+				log.Printf("error getting latency value when serving StreamIsActive: %v", err)
+				continue
+			}
 
-			if rand.Float64()*100 > 0.9 {
+			if value > LatencyThreshold {
 				_ = kedaServer.Send(&pb.IsActiveResponse{
 					Result: true,
 				})
@@ -82,18 +109,23 @@ func (s *scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*p
 		MetricSpecs: []*pb.MetricSpec{
 			{
 				MetricName:      MetricName,
-				TargetSizeFloat: 2000, //200, // target: 200ms
+				TargetSizeFloat: 4000, //200, // target: 200ms
 			},
 		},
 	}, nil
 }
 
 func (s *scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
+	value, err := s.getLatency(ctx)
+	if err != nil {
+		log.Printf("error getting latency value when serving GetMetrics: %v", err)
+		value = 0.0
+	}
 	return &pb.GetMetricsResponse{
 		MetricValues: []*pb.MetricValue{
 			{
 				MetricName:       MetricName,
-				MetricValueFloat: rand.Float64() * 100,
+				MetricValueFloat: value,
 			},
 		},
 	}, nil
