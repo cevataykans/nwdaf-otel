@@ -76,7 +76,7 @@ func (c *Client) QueryUDMLatency() (float64, error) {
       histogram_quantile(0.95,
         sum by(le) (
           rate(
-            traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc", span_name="POST /nudm-ueau/v1/{var}/auth-events"}[1m]
+            traces_spanmetrics_latency_bucket{service_name=~"udm.aether-5gc", span_name="GET /nudm-sdm/v1/{var}/am-data"}[1m]
           )
         )
       )
