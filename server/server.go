@@ -33,8 +33,9 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 
 // TODO: accept a config, that will point to port, certificate e.g. options
 type analyticsInfoServer struct {
-	mux *mux.Router
-	srv *http.Server
+	mux        *mux.Router
+	srv        *http.Server
+	promClient *prometheus.Client
 }
 
 func registerExternalScalerHandlers(mux *mux.Router, pClient *prometheus.Client) {
@@ -75,11 +76,10 @@ func registerExternalScalerHandlers(mux *mux.Router, pClient *prometheus.Client)
 	})
 }
 
-func NewAnalyticsInfoServer(pClient *prometheus.Client) Server {
-	router := mux.NewRouter()
-	registerExternalScalerHandlers(router, pClient)
+func NewAnalyticsInfoServer(promClient *prometheus.Client) Server {
 	return &analyticsInfoServer{
-		mux: router,
+		mux:        nil,
+		promClient: promClient,
 	}
 }
 
@@ -92,6 +92,7 @@ func (s *analyticsInfoServer) Setup() {
 
 	// Handle health check probes
 	s.mux.HandleFunc("/health", handleHealthCheck)
+	registerExternalScalerHandlers(s.mux, s.promClient)
 }
 
 func (s *analyticsInfoServer) Start(shutdownChn chan struct{}) chan error {
