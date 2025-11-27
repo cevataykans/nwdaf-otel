@@ -39,10 +39,13 @@ helm repo update
 helm install keda kedacore/keda --version 2.10.2 --namespace keda --create-namespace
 sleep 1m
 
-cd "$AETHER_DIR"
 echo "****** AETHER 5GC INSTALLATION ******"
+cd "$AETHER_DIR"
 make aether-5gc-install
+cd "$current_dir"
+make start-nwdaf
 echo "****** AETHER AMP INSTALLATION ******"
+cd "$AETHER_DIR"
 make monitor-install
 cd "$current_dir"
 kubectl apply -f scripts/otel-service-monitor.yaml

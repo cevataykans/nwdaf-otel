@@ -30,11 +30,20 @@ install-nuc1:
 uninstall-nuc1:
 	bash scripts/infra/nuc1/uninstall.sh
 
-start-analytics:
-	helm install -f helm/analyticsinfo_values.yaml nwdaf-analytics-info ./helm -n aether-5gc
+start-nwdaf: start-analytics-info start-external-scaler
+stop-nwdaf: stop-external-scaler stop-analytics-info
 
-stop-analytics:
+start-analytics-info:
+	helm install nwdaf-analytics-info ./helm/charts/analytics_info -n aether-5gc
+
+stop-analytics-info:
 	helm uninstall nwdaf-analytics-info -n aether-5gc
+
+start-external-scaler:
+	helm install external-scaler ./helm/charts/external_scaler -n aether-5gc
+
+stop-external-scaler:
+	helm uninstall external-scaler -n aether-5gc
 
 get-plots:
 	scp -r sevinc@131.159.25.36:/home/sevinc/graphs ./graphs

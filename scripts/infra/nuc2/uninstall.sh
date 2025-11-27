@@ -9,11 +9,11 @@ echo "****** AETHER UNINSTALLATION ******"
 cd "$AETHER_DIR"
 make aether-gnbsim-uninstall
 make monitor-uninstall
+cd "$current_dir"
+make stop-nwdaf
+cd "$AETHER_DIR"
 make aether-5gc-uninstall
 cd "$current_dir"
-
-echo "****** REMOVE KEDA ******"
-helm uninstall keda -n keda
 
 echo "****** REMOVE ISTIO ******"
 sh scripts/infra/istio_uninstall.sh

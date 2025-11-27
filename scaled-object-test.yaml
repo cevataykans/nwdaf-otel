@@ -7,8 +7,8 @@ spec:
   scaleTargetRef:
     kind: Deployment
     name: udm
-  pollingInterval: 5       # how often KEDA checks Prometheus
-  cooldownPeriod: 300        # wait time after scale-down conditions are met
+  pollingInterval: 5  # how often KEDA checks Prometheus
+  cooldownPeriod: 300 # wait time after scale-down conditions are met
   minReplicaCount: 1
   maxReplicaCount: 20
 
@@ -16,7 +16,6 @@ spec:
     - type: prometheus
       metadata:
         serverAddress: http://prometheus-operated.cattle-monitoring-system.svc.cluster.local:9090
-        # 👇 Replace this PromQL with your real latency metric
         query: |
           histogram_quantile(0.95, 
             sum by(le) (
