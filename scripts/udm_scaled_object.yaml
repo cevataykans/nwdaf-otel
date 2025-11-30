@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: udm
   pollingInterval: 1       # how often KEDA polls info, maybe overridden by IsActiveSeries gRPC call in external scaler.
-  cooldownPeriod: 300      # wait time after scale-down conditions are met
+  cooldownPeriod: 120      # wait time after scale-down conditions are met
   minReplicaCount: 1
   maxReplicaCount: 10
 
