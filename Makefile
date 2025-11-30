@@ -25,10 +25,10 @@ uninstall-nuc2:
 	bash scripts/infra/nuc2/uninstall.sh
 
 install-no-istio:
-	bash scripts/infra/nuc2/install.sh
+	bash scripts/infra/no-istio/install.sh
 
 uninstall-no-istio:
-	bash scripts/infra/nuc2/uninstall.sh
+	bash scripts/infra/no-istio/uninstall.sh
 
 install-nuc1:
 	bash scripts/infra/nuc1/install.sh
