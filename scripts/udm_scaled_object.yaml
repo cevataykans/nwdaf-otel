@@ -12,7 +12,7 @@ spec:
   minReplicaCount: 1
   maxReplicaCount: 10
   advanced:                                          # Optional. Section to specify advanced options
-    restoreToOriginalReplicaCount: true/false        # Optional. Default: false
+    restoreToOriginalReplicaCount: false        # Optional. Default: false
     horizontalPodAutoscalerConfig:                   # Optional. Section to specify HPA related options
 #      name: { name-of-hpa-resource }                 # Optional. Default: keda-hpa-{scaled-object-name}
       behavior:                                      # Optional. Use to modify HPA's scaling behavior
