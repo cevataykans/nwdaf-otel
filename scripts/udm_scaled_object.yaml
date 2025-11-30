@@ -29,6 +29,8 @@ spec:
     - type: external
       metadata:
         scalerAddress: external-scaler.aether-5gc.svc.cluster.local:8081
+        metricType: Value # Do not make it AverageValue (at least for aether Onramp 5G Core) -> Will divide it by replica count
+
 #        longitude: "-122.335167"
 #        latitude: "47.608013"
 
