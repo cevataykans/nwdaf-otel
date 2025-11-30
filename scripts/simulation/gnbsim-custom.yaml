@@ -59,7 +59,7 @@ configuration:
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "{{START_IMSI}}" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: {{UE_COUNT}} # Number of UEs for for which the profile will be executed
-      perUserTimeout: 10
+      perUserTimeout: 30
       defaultAs: "8.8.8.8" #default icmp pkt destination
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
@@ -88,7 +88,7 @@ configuration:
       gnbName: gnb1 # gNB to be used for this profile
       startImsi: "{{START_IMSI}}" # First IMSI. Subsequent values will be used if ueCount is more than 1
       ueCount: {{UE_COUNT}} # Number of UEs for for which the profile will be executed
-      perUserTimeout: 10
+      perUserTimeout: 30
       defaultAs: "8.8.8.8" #default icmp pkt destination
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
