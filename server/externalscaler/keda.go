@@ -23,8 +23,8 @@ External Scaler -> KEDA [Based on the returned values, NWDAF implicitly controls
 const (
 	MetricName             = "udm_max_latency"
 	LatencyEndpoint        = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
-	ActiveLatencyThreshold = float64(2.00)
-	MaxLatencyThreshold    = float64(4.00)
+	ActiveLatencyThreshold = float64(1.00)
+	MaxLatencyThreshold    = float64(2.00)
 )
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/
