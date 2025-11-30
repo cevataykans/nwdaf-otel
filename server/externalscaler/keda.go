@@ -24,6 +24,7 @@ const (
 	MetricName             = "udm_max_latency"
 	LatencyEndpoint        = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
 	ActiveLatencyThreshold = float64(1.0)
+	MaxLatencyThreshold    = float64(3.0)
 )
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/
@@ -108,8 +109,8 @@ func (s *Scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*p
 		MetricSpecs: []*pb.MetricSpec{
 			{
 				MetricName: MetricName,
-				// 4 seconds
-				TargetSize: 4000, //200, // target: 200ms
+				// 3 seconds
+				TargetSize: int64(MaxLatencyThreshold * 1000), //200, // target: 200ms
 			},
 		},
 	}, nil
