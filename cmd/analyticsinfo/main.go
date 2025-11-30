@@ -73,7 +73,7 @@ func queryUDM(promClient *prometheus.Client, shutdownChn chan struct{}) {
 		case <-shutdownChn:
 			return
 		case <-timer.C:
-			val, err := promClient.QueryUDMLatency()
+			_, err := promClient.QueryUDMLatency()
 			if err != nil {
 				log.Printf("query udm err: %v\n", err)
 				continue
