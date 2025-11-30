@@ -24,7 +24,7 @@ const (
 	MetricName             = "udm_max_latency"
 	LatencyEndpoint        = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
 	ActiveLatencyThreshold = float64(1.0)
-	MaxLatencyThreshold    = float64(3.0)
+	MaxLatencyThreshold    = float64(2.0)
 )
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/

@@ -20,7 +20,7 @@ data:
     defaultConfig:
       discoveryAddress: istiod.istio-system.svc:15012
       tracing: 
-        sampling: 10.0
+        sampling: 100.0
     defaultProviders:
       tracing:
         - opentelemetry
@@ -63,4 +63,4 @@ spec:
   tracing:
     - providers:
         - name: opentelemetry
-      randomSamplingPercentage: 10
+      randomSamplingPercentage: 100
