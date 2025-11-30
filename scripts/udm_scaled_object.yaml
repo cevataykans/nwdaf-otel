@@ -8,21 +8,21 @@ spec:
     kind: Deployment
     name: udm
   pollingInterval: 1       # how often KEDA polls info, maybe overridden by IsActiveSeries gRPC call in external scaler.
-  cooldownPeriod: 120      # wait time after scale-down conditions are met
+  cooldownPeriod: 30      # wait time after scale-down conditions are met
   minReplicaCount: 1
   maxReplicaCount: 10
   advanced:                                          # Optional. Section to specify advanced options
-    restoreToOriginalReplicaCount: false        # Optional. Default: false
+    restoreToOriginalReplicaCount: true        # Optional. Default: false
     horizontalPodAutoscalerConfig:                   # Optional. Section to specify HPA related options
 #      name: { name-of-hpa-resource }                 # Optional. Default: keda-hpa-{scaled-object-name}
       behavior:                                      # Optional. Use to modify HPA's scaling behavior
         scaleUp:
-          stabilizationWindowSeconds: 5   # confirm latency really stays high
+          stabilizationWindowSeconds: 0   # confirm latency really stays high
           policies:
             - type: Pods
               value: 1
-              periodSeconds: 5
-          selectPolicy: Max
+              periodSeconds: 30
+#          selectPolicy: Max
 
   # https://keda.sh/docs/2.18/concepts/external-scalers/
   triggers:
