@@ -53,7 +53,7 @@ func main() {
 	//	log.Fatal(err)
 	//}
 	//log.Printf("Successfully initialized DB with %d rows", count)
-	go queryUDM(promClient, shutdownChn)
+	//go queryUDM(promClient, shutdownChn)
 
 	//go queryResources(promClient, repo, shutdownChn)
 
@@ -73,14 +73,12 @@ func queryUDM(promClient *prometheus.Client, shutdownChn chan struct{}) {
 		case <-shutdownChn:
 			return
 		case <-timer.C:
-			curSeconds := time.Now().UTC()
 			val, err := promClient.QueryUDMLatency()
 			if err != nil {
 				log.Printf("query udm err: %v\n", err)
 				continue
 			}
-			finishSeconds := time.Now().Sub(curSeconds).Seconds()
-			log.Printf("query udm latency value: %v, query time: %v\n", val, finishSeconds)
+			//log.Printf("query udm latency value: %v, query time: %v\n", val, finishSeconds)
 		}
 	}
 }

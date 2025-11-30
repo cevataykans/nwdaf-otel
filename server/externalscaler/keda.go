@@ -21,9 +21,9 @@ External Scaler -> KEDA [Based on the returned values, NWDAF implicitly controls
 */
 
 const (
-	MetricName       = "udm_max_latency"
-	LatencyEndpoint  = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
-	LatencyThreshold = float64(4.0)
+	MetricName             = "udm_max_latency"
+	LatencyEndpoint        = "http://nwdaf-analytics-info.aether-5gc.svc.cluster.local:8080/latency/udm"
+	ActiveLatencyThreshold = float64(1.0)
 )
 
 // Documentation: https://keda.sh/docs/2.18/concepts/external-scalers/
@@ -60,7 +60,7 @@ func (s *Scaler) getLatency(ctx context.Context) (float64, error) {
 }
 
 func (s *Scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsActiveResponse, error) {
-	log.Println("IsActive")
+	//log.Println("IsActive")
 	// The value can be a latency model that can contain values, thresholds ...
 	value, err := s.getLatency(ctx)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *Scaler) IsActive(ctx context.Context, req *pb.ScaledObjectRef) (*pb.IsA
 	NWDAF can directly control when scaling should be active!
 	e.g. NWDAF can also return a threshold value, or just boolean true or false -> can do the evaluation inside!
 	*/
-	return &pb.IsActiveResponse{Result: value > LatencyThreshold}, nil
+	return &pb.IsActiveResponse{Result: value > ActiveLatencyThreshold}, nil
 }
 
 func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalScaler_StreamIsActiveServer) error {
@@ -82,7 +82,7 @@ func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 	//if len(longitude) == 0 || len(latitude) == 0 {
 	//	return status.Error(codes.InvalidArgument, "longitude and latitude must be specified")
 	//}
-	log.Println("StreamIsActive")
+	//log.Println("StreamIsActive")
 	for {
 		select {
 		case <-kedaServer.Context().Done():
@@ -95,7 +95,7 @@ func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 				continue
 			}
 			_ = kedaServer.Send(&pb.IsActiveResponse{
-				Result: value > LatencyThreshold,
+				Result: value > ActiveLatencyThreshold,
 			})
 		}
 	}
@@ -103,7 +103,7 @@ func (s *Scaler) StreamIsActive(req *pb.ScaledObjectRef, kedaServer pb.ExternalS
 
 func (s *Scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
 	// Provide target value
-	log.Println("GetMetricSpec")
+	//log.Println("GetMetricSpec")
 	return &pb.GetMetricSpecResponse{
 		MetricSpecs: []*pb.MetricSpec{
 			{
@@ -116,7 +116,7 @@ func (s *Scaler) GetMetricSpec(ctx context.Context, req *pb.ScaledObjectRef) (*p
 }
 
 func (s *Scaler) GetMetrics(ctx context.Context, metricReq *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
-	log.Println("GetMetrics")
+	//log.Println("GetMetrics")
 	value, err := s.getLatency(ctx)
 	if err != nil {
 		log.Printf("error getting latency value when serving GetMetrics: %v", err)
