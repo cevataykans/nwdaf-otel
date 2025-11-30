@@ -17,11 +17,11 @@ spec:
 #      name: { name-of-hpa-resource }                 # Optional. Default: keda-hpa-{scaled-object-name}
       behavior:                                      # Optional. Use to modify HPA's scaling behavior
         scaleUp:
-          stabilizationWindowSeconds: 0   # confirm latency really stays high
+          stabilizationWindowSeconds: 10   # confirm latency really stays high
           policies:
             - type: Pods
               value: 1
-              periodSeconds: 30
+              periodSeconds: 45
 #          selectPolicy: Max
 
   # https://keda.sh/docs/2.18/concepts/external-scalers/
