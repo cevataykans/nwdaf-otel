@@ -10,7 +10,7 @@ spec:
   pollingInterval: 1       # how often KEDA polls info, maybe overridden by IsActiveSeries gRPC call in external scaler.
   cooldownPeriod: 30      # wait time after scale-down conditions are met
   minReplicaCount: 1
-  maxReplicaCount: 10
+  maxReplicaCount: 20
   advanced:                                          # Optional. Section to specify advanced options
     restoreToOriginalReplicaCount: true        # Optional. Default: false
     horizontalPodAutoscalerConfig:                   # Optional. Section to specify HPA related options
