@@ -30,7 +30,12 @@ echo "****** TEMPOOOOOOO ******"
 kubectl apply -f scripts/tempo.yaml
 
 echo "****** ISTIO INSTALLATION ******"
-sh scripts/infra/istio_install.sh
+#sh scripts/infra/istio_install.sh
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo update
+helm install istio-base istio/base -n istio-system --set defaultRevision=default --create-namespace --version "1.17.8"
+helm install istiod istio/istiod -n istio-system --version "1.17.8" --wait
+kubectl apply -f scripts/istio.yaml
 sleep 1m
 
 echo "****** KEDA INSTALLATION ******"
@@ -42,6 +47,15 @@ sleep 1m
 echo "****** AETHER 5GC INSTALLATION ******"
 cd "$AETHER_DIR"
 make aether-5gc-install
+kubectl label namespace aether-5gc istio-injection=enabled
+kubectl rollout restart deployment nrf -n aether-5gc
+kubectl rollout restart deployment amf -n aether-5gc
+kubectl rollout restart deployment smf -n aether-5gc
+kubectl rollout restart deployment nssf -n aether-5gc
+kubectl rollout restart deployment pcf -n aether-5gc
+kubectl rollout restart deployment udm -n aether-5gc
+kubectl rollout restart deployment udr -n aether-5gc
+
 cd "$current_dir"
 make start-nwdaf
 echo "****** AETHER AMP INSTALLATION ******"
