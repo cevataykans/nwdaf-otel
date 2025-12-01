@@ -18,6 +18,12 @@ generate_openapi:
 	openapi-generator generate -i templates/5G_APIs/TS29520_Nnwdaf_MLModelProvision.yaml -g go-server -o ./generated/temp --additional-properties=packageName=mlmodelprovision
 	mv ./generated/temp/go/* ./generated/mlmodelprovision
 
+install-latest:
+	bash scripts/infra/latest/install.sh
+
+uninstall-latest:
+	bash scripts/infra/latest/uninstall.sh
+
 install-nuc2:
 	bash scripts/infra/nuc2/install.sh
 
