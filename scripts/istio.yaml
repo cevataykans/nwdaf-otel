@@ -20,7 +20,15 @@ data:
     defaultConfig:
       discoveryAddress: istiod.istio-system.svc:15012
       tracing: 
-        sampling: 0.0
+        sampling: 100.0
+    defaultProviders:
+      tracing:
+        - opentelemetry
+    extensionProviders:
+      - name: "opentelemetry"
+        opentelemetry:
+          service: "simplest-collector.default.svc.cluster.local"
+          port: 4317
     enablePrometheusMerge: true
     rootNamespace: null
     trustDomain: cluster.local
@@ -34,7 +42,7 @@ spec:
   accessLogging:
     - providers:
         - name: opentelemetry
-#  tracing:
-#    - providers:
-#        - name: opentelemetry
-#      randomSamplingPercentage: 100
+  tracing:
+    - providers:
+        - name: opentelemetry
+      randomSamplingPercentage: 100
