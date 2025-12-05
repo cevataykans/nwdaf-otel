@@ -55,6 +55,7 @@ kubectl rollout restart deployment nssf -n aether-5gc
 kubectl rollout restart deployment pcf -n aether-5gc
 kubectl rollout restart deployment udm -n aether-5gc
 kubectl rollout restart deployment udr -n aether-5gc
+kubectl rollout restart deployment ausf -n aether-5gc
 
 cd "$current_dir"
 make start-nwdaf

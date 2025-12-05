@@ -34,12 +34,12 @@ def parse_latency(x):
             return float(x.replace("s", "").strip())
     return 0.0
 
-def load_latency_csv(path, columns_to_use=None):
+def load_latency_csv(path, columns_to_filter=None):
     df = pd.read_csv(path)
 
     # Filter only user-selected endpoints
-    if columns_to_use is not None:
-        columns = ["Time"] + [c for c in columns_to_use if c in df.columns]
+    if columns_to_filter is not None:
+        columns = [c for c in df.columns if c not in columns_to_filter]
         df = df[columns]
 
     # Convert timestamps
@@ -61,12 +61,12 @@ def plot_dual_latency(
         nf_name,
         server_csv,
         client_csv,
-        columns_to_use=None,
+        columns_to_filter=None,
         vertical_lines=None,
         output="latency_dual.png"
 ):
-    df_server = load_latency_csv(server_csv, columns_to_use)
-    df_client = load_latency_csv(client_csv, columns_to_use)
+    df_server = load_latency_csv(server_csv, columns_to_filter)
+    df_client = load_latency_csv(client_csv, columns_to_filter)
 
     # --------------------------------------------------------
     # Create 1×2 subplot figure
@@ -117,19 +117,21 @@ def plot_dual_latency(
 # ============================================================
 
 def main():
-    NF='UDM'
-    SERVER_CSV = f'grafana_data/nov18/{NF}_SERVER.csv'
-    CLIENT_CSV = f"grafana_data/nov18/{NF}_CLIENT.csv"
+    NF='PCF'
+    folder='dec4'
+    SERVER_CSV = f'grafana_data/{folder}/{NF}_SERVER.csv'
+    CLIENT_CSV = f"grafana_data/{folder}/{NF}_CLIENT.csv"
     plot_dual_latency(
         nf_name=NF,
         server_csv=SERVER_CSV,
         client_csv=CLIENT_CSV,
 
         # Filter a subset of endpoints; None = use all
-        # columns_to_use=[
-        #     "POST /nudm-sdm/v1/{var}/sdm-subscriptions",
-        #     "POST /nudm-ueau/v1/{var}/security-information/generate-auth-data"
-        # ],
+        columns_to_filter=[
+            #PCF
+            'POST /nnrf-nfm/v1/subscriptions',
+            'PUT /nnrf-nfm/v1/nf-instances/{var}',
+        ],
 
         # Vertical dotted lines marking simulation boundaries
         vertical_lines=[

@@ -121,8 +121,6 @@ def main():
     plt.savefig(f"{NF.lower()}_endpoint_latencies.png", dpi=300)
     # plt.savefig("udm_endpoint_latencies.pgf")
 
-    print("Generated: udm_endpoint_latencies.png")
-
 
 if __name__ == "__main__":
     main()
