@@ -10,6 +10,7 @@ for ((cur_ue_count=10; cur_ue_count<=510; cur_ue_count+=10)); do
     echo "running gnbsim with $cur_ue_count UEs"
     cd $aether_dir
     make aether-gnbsim-run
+    sleep 45
 done
 end_ts=$(date +%s)
 exit
