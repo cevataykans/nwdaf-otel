@@ -14,6 +14,7 @@ cd "$current_dir"
 make stop-nwdaf
 cd "$AETHER_DIR"
 make aether-5gc-uninstall
+sudo rm /tmp/sdcore-5g-values.yaml
 cd "$current_dir"
 
 helm uninstall keda -n keda
