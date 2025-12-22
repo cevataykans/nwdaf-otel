@@ -44,6 +44,11 @@ def load_latency_csv(path, columns_to_filter=None):
 
     # Convert timestamps
     df["Time"] = pd.to_datetime(df["Time"])
+    t_start = df["Time"].iloc[0]
+    df["Time"] = (
+            (df["Time"] - t_start)
+            .dt.total_seconds() / 60
+    )
 
     # Parse latency units (ms/s -> seconds)
     for col in df.columns:
@@ -100,7 +105,7 @@ def plot_dual_latency(
 
         # Grid (same as previous thesis style)
         ax.grid(True, linestyle='--', linewidth=0.4, alpha=0.7)
-        ax.set_xlabel("Time")
+        ax.set_xlabel("Elapsed Time (min)")
         ax.legend(loc='upper left', fontsize=10)
 
     axes[0].set_ylabel("Endpoint p95 Latency (s)")
@@ -117,8 +122,8 @@ def plot_dual_latency(
 # ============================================================
 
 def main():
-    NF='PCF'
-    folder='dec4'
+    NF='UDM'
+    folder='nov18'
     SERVER_CSV = f'grafana_data/{folder}/{NF}_SERVER.csv'
     CLIENT_CSV = f"grafana_data/{folder}/{NF}_CLIENT.csv"
     plot_dual_latency(
@@ -129,8 +134,8 @@ def main():
         # Filter a subset of endpoints; None = use all
         columns_to_filter=[
             #PCF
-            'POST /nnrf-nfm/v1/subscriptions',
-            'PUT /nnrf-nfm/v1/nf-instances/{var}',
+            # 'POST /nnrf-nfm/v1/subscriptions',
+            # 'PUT /nnrf-nfm/v1/nf-instances/{var}',
         ],
 
         # Vertical dotted lines marking simulation boundaries
@@ -139,7 +144,7 @@ def main():
             # "2025-11-18 22:40:00"
         ],
 
-        output=f"{NF.lower()}_p95_latencies.png"
+        output=f"{NF.lower()}_p95_latencies_2.png"
     )
 
 

@@ -101,6 +101,11 @@ def main():
     # Load CSV
     df = pd.read_csv(CLIENT_CSV)
     df["Time"] = pd.to_datetime(df["Time"])
+    t_start = df["Time"].iloc[0]
+    df["Time"] = (
+            (df["Time"] - t_start)
+            .dt.total_seconds() / 60
+    )
 
     # Identify endpoint columns
     endpoint_cols = [c for c in df.columns if c != "Time"]
@@ -126,10 +131,11 @@ def main():
 
     for ts in VERTICAL_LINES:
         t_parsed = pd.to_datetime(ts)
+        t_parsed = (t_parsed - t_start).total_seconds() / 60
         plt.axvline(t_parsed, color="red", linestyle="--", linewidth=0.8)
 
 
-    plt.xlabel("Time")
+    plt.xlabel("Elapsed Time (min)")
     plt.ylabel("Endpoint p95 Latency (s)")
     plt.title(f'{NF} Client Span Latencies')
 
@@ -144,7 +150,7 @@ def main():
     plt.tight_layout()
 
     # plt.savefig(f"{NF.lower()}_endpoint_latencies.png", dpi=300)
-    plt.savefig(f"latency_scaling_endpoint_latencies.png", dpi=300)
+    plt.savefig(f"latency_scaling_endpoint_latencies_2.png", dpi=300)
     # plt.savefig("udm_endpoint_latencies.pgf")
 
 

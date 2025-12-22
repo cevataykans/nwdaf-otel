@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 # === Configuration ===
-DB_FOLDER = "../data"
+DB_FOLDER = "data"
 DB_FILE = "series.db"
 TABLE = "series"
 TIME_COLUMN = "ts"
@@ -15,6 +15,7 @@ VALUE_COLUMN = "cpu_usage"
 OUTPUT_FOLDER = 'graphs'
 OUTPUT_FILE = "cpu_vs_time.png"
 
+# 1757419200, 1757422800
 def parse_args():
     # usage gnb_count, ue_count per gnb
     if len(sys.argv) != 3:
@@ -41,19 +42,20 @@ def main():
 
     start_ts, end_ts = parse_args()
     db_path = Path(DB_FOLDER) / DB_FILE
+    print(db_path)
 
     # Connect to SQLite
     conn = sqlite3.connect(db_path)
     services = [
-        'bessd',
+        # 'bessd',
         'amf',
-        'ausf',
-        'nrf',
-        'nssf',
-        'pcf',
-        'smf',
-        'udm',
-        'udr',
+        # 'ausf',
+        # 'nrf',
+        # 'nssf',
+        # 'pcf',
+        # 'smf',
+        # 'udm',
+        # 'udr',
     ]
 
     # column name -> title of plot
@@ -65,6 +67,12 @@ def main():
         'total_packets_sent': 'Network Packets Sent',
         'total_packets_received': 'Network Packets Received',
         'avg_trace_duration': 'Average Trace Duration'
+    }
+
+    column_names = {
+        'avg_trace_duration': 'Duration (μs)',
+        'cpu_usage': 'Cpu Utilization (%)',
+        'memory_usage': 'Memory Usage (bytes)',
     }
 
     cur_time = int(time.time())
@@ -79,13 +87,23 @@ def main():
 
         # Convert timestamp if needed
         df[TIME_COLUMN] = pd.to_datetime(df[TIME_COLUMN], unit="s", errors="coerce")
+        t_start = df[TIME_COLUMN].iloc[0]
+        df[TIME_COLUMN] = (
+                (df[TIME_COLUMN] - t_start)
+                .dt.total_seconds() / 60
+        )
+
         # draw each graph at the folder
         for column, title in columns.items():
+            custom_title = f'{title} ({service.upper()})'
             fig = plt.figure(figsize=(12,6))
             plt.plot(df[TIME_COLUMN], df[column], marker="o", linestyle="-")
-            plt.xlabel("Time")
-            plt.ylabel(column)
-            plt.title(title)
+            plt.xlabel("Elapsed Time (min)")
+            column_name = column
+            if column in column_names:
+                column_name = column_names[column]
+            plt.ylabel(column_name)
+            plt.title(custom_title)
             plt.grid(True)
             plt.tight_layout()
 
